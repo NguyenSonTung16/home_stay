@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: homestay_db
+    restart: always
+    environment:
+      POSTGRES_USER: homestay_user
+      POSTGRES_PASSWORD: homestay_password
+      POSTGRES_DB: homestay_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Ánh xạ thư mục chứa script để PostgreSQL tự động chạy khi khởi tạo database lần đầu
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  pgdata:
