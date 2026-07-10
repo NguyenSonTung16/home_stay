@@ -24,6 +24,9 @@ async function seedData() {
     // Tạo tài khoản và nhân viên
     await db.query(`INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('admin', '123', 'QuanLy', 1)`);
     await db.query(`INSERT INTO NhanVien(TenNV, ChucVu, MaTK) VALUES ('Quan ly 1', 'Quan Ly', 1)`);
+    
+    await db.query(`INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('ketoan', '123', 'KeToan', 1)`);
+    await db.query(`INSERT INTO NhanVien(TenNV, ChucVu, MaTK) VALUES ('Ke toan 1', 'Ke Toan', 2)`);
 
     // Tạo loại phòng
     await db.query(`INSERT INTO LoaiPhong(TenLoai, GiaTien, SucChua) VALUES ('Standard', 500000, 2), ('VIP', 1000000, 4)`);
@@ -34,7 +37,7 @@ async function seedData() {
       await db.query(`INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach${i}', '123', 'Khach', 1)`);
       
       // Khách hàng
-      const maTK = i + 1; 
+      const maTK = i + 2; 
       await db.query(`INSERT INTO KhachHang(HoTen, CCCD, SDT, MaTK) VALUES ('Khách Hàng ${i}', '0000000000${i}', '09000000${i}', ${maTK})`);
       
       // Phòng (chia ra Standard và VIP)
