@@ -110,29 +110,41 @@ export class HoanCocService {
         maNV: 1 // Hardcode nhân viên hiện tại
       };
 
-      // GỌI PAYPAL PAYOUT NẾU THỰC NHẬN CHI > 0
+      // GỌI PAYPAL PAYOUT NẾU THỰC NHẬN CHI >= 0
       let paypalResponse = null;
-      if (chiPhi.thucNhanChi > 0 && chiPhi.stk) {
-        const amountUSD = chiPhi.thucNhanChi / 25000; // Tỷ giá 25000 VND = 1 USD
-        const email = chiPhi.stk; // Lấy email từ trường stk
-        const batchId = `HD${maHD}_${Date.now()}`;
-        
-        paypalResponse = await this.paypalService.sendPayout(
-          email, 
-          amountUSD, 
-          `Hoan tien coc phong tro cho hop dong ${maHD}`, 
-          batchId
-        );
+      let newHopDongState = 4; // Mặc định là 4 (Đã thanh lý)
+      let newYeuCauState = 3;  // Mặc định là 3 (Đã hoàn tiền / Hoàn tất)
+
+      if (chiPhi.thucNhanChi >= 0) {
+        if (chiPhi.thucNhanChi > 0 && chiPhi.stk) {
+          const amountUSD = chiPhi.thucNhanChi / 25000; // Tỷ giá 25000 VND = 1 USD
+          const email = chiPhi.stk; // Lấy email từ trường stk
+          const batchId = `HD${maHD}_${Date.now()}`;
+          
+          paypalResponse = await this.paypalService.sendPayout(
+            email, 
+            amountUSD, 
+            `Hoan tien coc phong tro cho hop dong ${maHD}`, 
+            batchId
+          );
+        }
+      } else {
+        // thucNhanChi < 0 -> Khách nợ tiền
+        newHopDongState = 5; // Chờ thanh lý / Khách nợ
+        newYeuCauState = 4;  // Khách nợ tiền -> Chờ khách thanh toán
       }
 
-      // Cập nhật trạng thái hợp đồng (4 là đã thanh lý)
-      await this.hopDongService.capNhatTrangThai(maHD, 4);
+      // Cập nhật trạng thái hợp đồng
+      await this.hopDongService.capNhatTrangThai(maHD, newHopDongState);
+
+      // Cập nhật trạng thái yêu cầu trả phòng
+      const maYC = await this.yeuCauRepo.layMaYCByMaHD(maHD);
+      if (maYC) {
+        await this.yeuCauRepo.capNhatTrangThai(maYC, newYeuCauState);
+      }
 
       // Lưu bảng đối soát
       const result = await this.bangDoiSoatRepo.themPhanGhiMoi(bdsData);
-      
-      // Ở đây lý tưởng là cập nhật YeuCauTraPhong thành trạng thái Đã Hoàn Tiền (trạng thái 3 chẳng hạn)
-      // Nhưng hiện tại logic cũ đã coi như xong.
       
       return {
         ...result,

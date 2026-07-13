@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const RoomCheck: React.FC = () => {
-  const [records, setRecords] = useState([
+  const [records, setRecords] = useState<any[]>([
     { id: 'HD-9999', room: 'P.102', name: 'Nguyễn Văn A' },
     { id: 'HD-8821', room: 'P.205', name: 'Trần Thị B' },
     { id: 'HD-7742', room: 'P.401', name: 'Lê Văn C' },
@@ -360,11 +360,11 @@ const RoomCheck: React.FC = () => {
                   axios.post('/api/finance/tra-phong/khieu-nai', {
                     maHD: maHDNumber,
                     lyDo: complainReason
-                  }).then(res => {
+                  }).then(() => {
                     alert('Đã chuyển hồ sơ sang trạng thái Tranh chấp!');
                     setIsComplainMode(false);
                     // Cập nhật state nội bộ
-                    setRecords(records.map(r => r.id === activeRecord ? { ...r, trangthai: 3 } : r));
+                    setRecords(records.map((r: any) => r.id === activeRecord ? { ...r, trangthai: 3 } : r));
                   }).catch(err => {
                     alert('Lỗi: ' + (err.response?.data?.message || err.message));
                   });
@@ -648,9 +648,9 @@ const RoomCheck: React.FC = () => {
                   onClick={() => {
                     const maHDNumber = parseInt(activeRecord.replace('HD-', ''));
                     axios.post('/api/finance/tra-phong/giai-quyet-khieu-nai', { maHD: maHDNumber })
-                      .then(res => {
+                      .then(() => {
                         alert('Đã giải quyết khiếu nại, hồ sơ được mở khóa!');
-                        setRecords(records.map(r => r.id === activeRecord ? { ...r, trangthai: 1 } : r));
+                        setRecords(records.map((r: any) => r.id === activeRecord ? { ...r, trangthai: 1 } : r));
                       })
                       .catch(err => alert('Lỗi: ' + (err.response?.data?.message || err.message)));
                   }}
@@ -684,9 +684,9 @@ const RoomCheck: React.FC = () => {
                     kyBienBan: signed,
                     chiTiet: items,
                     maPhong: parseInt((records.find((r: any) => r.id === activeRecord)?.room || '0').replace('P.', ''))
-                  }).then(res => {
+                  }).then(() => {
                     alert('Ghi nhận và bàn giao thành công!');
-                    setRecords(records.map(r => r.id === activeRecord ? { ...r, trangthai: 2 } : r));
+                    setRecords(records.map((r: any) => r.id === activeRecord ? { ...r, trangthai: 2 } : r));
                   }).catch(err => {
                     alert('Lỗi từ Server: ' + (err.response?.data?.message || err.message));
                   });

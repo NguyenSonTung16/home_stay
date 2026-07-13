@@ -7,7 +7,7 @@ const RefundCheck: React.FC = () => {
     { id: 'HD-9999', name: 'Nguyễn Văn A', date: '20/10/2023', status: 'Chờ duyệt' },
     { id: 'HD-8821', name: 'Trần Thị B', date: '18/10/2023', status: 'Đã hoàn tất' }
   ]);
-  const [activeRecord, setActiveRecord] = useState<string | null>(null);
+
   const [chiPhiDoiSoat, setChiPhiDoiSoat] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<number | null>(null);
@@ -21,16 +21,11 @@ const RefundCheck: React.FC = () => {
             id: `HD-${row.mahd || row.MaHD}`,
             name: row.hoten || row.HoTen,
             date: '20/10/2023', // Demo date
-            status: row.trangthai === 1 ? 'Chờ duyệt' : 'Đã hoàn tất',
+            status: row.trangthai === 1 ? 'Chờ duyệt' : (row.trangthai === 5 ? 'Chờ thu thêm' : 'Đã hoàn tất'),
             statusCode: row.trangthai
           }));
           setRecords(newRecords);
-          setActiveRecord((prev) => {
-            if (!prev || !newRecords.find((r: any) => r.id === prev)) {
-              return newRecords[0].id;
-            }
-            return prev;
-          });
+
         } else {
           setRecords([]);
         }
@@ -51,8 +46,8 @@ const RefundCheck: React.FC = () => {
           setChiPhiDoiSoat(res.data.data);
         }
       }).catch(err => {
-         console.error('Lỗi lấy chi phí:', err);
-         setChiPhiDoiSoat(null);
+        console.error('Lỗi lấy chi phí:', err);
+        setChiPhiDoiSoat(null);
       });
     }
   }, [expandedId]);
@@ -96,13 +91,14 @@ const RefundCheck: React.FC = () => {
             <span className="text-caption font-bold text-secondary uppercase tracking-wider">
               Trạng thái:
             </span>
-            <select 
+            <select
               className="bg-white border border-outline-variant rounded-lg px-3 py-2 text-body focus:ring-2 focus:ring-primary-container focus:border-primary outline-none"
               value={filterStatus === null ? 'all' : filterStatus}
               onChange={(e) => setFilterStatus(e.target.value === 'all' ? null : Number(e.target.value))}
             >
               <option value="all">Tất cả</option>
               <option value="1">Chờ duyệt</option>
+              <option value="5">Chờ thu thêm</option>
               <option value="2">Đã hoàn tất</option>
             </select>
           </div>
@@ -156,11 +152,10 @@ const RefundCheck: React.FC = () => {
                   <td className="p-4">{record.name}</td>
                   <td className="p-4">{record.date}</td>
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-caption font-bold ${
-                      record.statusCode === 2 
-                        ? 'bg-success/20 text-success' 
-                        : 'bg-secondary-container text-on-secondary-container'
-                    }`}>
+                    <span className={`px-3 py-1 rounded-full text-caption font-bold ${record.statusCode === 2
+                        ? 'bg-success/20 text-success'
+                        : (record.statusCode === 5 ? 'bg-error/20 text-error' : 'bg-secondary-container text-on-secondary-container')
+                      }`}>
                       {record.status}
                     </span>
                   </td>
@@ -289,13 +284,17 @@ const RefundCheck: React.FC = () => {
                               onClick={() => {
                                 setIsProcessing(true);
                                 const maHDNumber = parseInt(record.id.replace('HD-', ''));
-                                axios.post('/api/finance/hoan-coc/phe-duyet', { 
+                                axios.post('/api/finance/hoan-coc/phe-duyet', {
                                   maHD: maHDNumber
-                                }).then((res) => {
-                                  alert('Phê duyệt thành công! Tiền cọc đang được xử lý qua PayPal.');
-                                  // Cập nhật trạng thái thành Đã hoàn tất thay vì xóa
-                                  const newRecords = records.map((r: any) => 
-                                    r.id === record.id ? { ...r, statusCode: 2, status: 'Đã hoàn tất' } : r
+                                }).then(() => {
+                                  alert(chiPhiDoiSoat.thucNhanChi < 0 ? 'Chốt công nợ thành công! Chờ khách thanh toán.' : 'Phê duyệt thành công! Tiền cọc đang được xử lý qua PayPal.');
+                                  // Cập nhật trạng thái
+                                  const newRecords = records.map((r: any) =>
+                                    r.id === record.id ? {
+                                      ...r,
+                                      statusCode: chiPhiDoiSoat.thucNhanChi < 0 ? 5 : 2,
+                                      status: chiPhiDoiSoat.thucNhanChi < 0 ? 'Chờ thu thêm' : 'Đã hoàn tất'
+                                    } : r
                                   );
                                   setRecords(newRecords);
                                 }).catch((err) => {
@@ -306,9 +305,11 @@ const RefundCheck: React.FC = () => {
                               }}
                             >
                               <span className="material-symbols-outlined text-[20px]">
-                                verified_user
+                                {chiPhiDoiSoat && chiPhiDoiSoat.thucNhanChi < 0 ? 'gavel' : 'verified_user'}
                               </span>{' '}
-                              {isProcessing ? 'Đang xử lý PayPal...' : 'Phê duyệt'}
+                              {isProcessing
+                                ? 'Đang xử lý...'
+                                : (chiPhiDoiSoat && chiPhiDoiSoat.thucNhanChi < 0 ? 'Chốt công nợ & Chờ thu' : 'Phê duyệt')}
                             </button>
                           )}
                         </div>

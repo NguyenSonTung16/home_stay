@@ -16,6 +16,9 @@ router.post('/hoan-coc/phe-duyet', hoanCocController.pheDuyetHoanCoc);
 
 // Các routes cho Xử lý trả phòng
 router.post('/tra-phong/request', checkoutController.requestCheckout);
+router.get('/tra-phong/status', checkoutController.getStatus);
+router.post('/tra-phong/pay-debt', checkoutController.payDebt);
+router.post('/tra-phong/capture-debt', checkoutController.captureDebt);
 router.get('/tra-phong/cho-tra-phong', traPhongController.getDanhSachChoTraPhong);
 router.get('/tra-phong/thong-tin-thue/:maHD', traPhongController.getThongTinThue);
 router.post('/tra-phong/xac-nhan-ban-giao', traPhongController.xacNhanBanGiao);
