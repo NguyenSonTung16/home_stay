@@ -20,7 +20,44 @@ const Sidebar: React.FC = () => {
           <p className="font-caption text-secondary">Property Management</p>
         </div>
       </div>
-      <nav className="flex-1 space-y-1">
+
+      {/* Booking / Customer links (Liem) */}
+      <div className="mt-8 mb-2 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+        Booking & Lưu trú (Liêm)
+      </div>
+      <nav className="flex-1 px-4 space-y-1">
+        <NavLink 
+          to="/dat-coc" 
+          className={({isActive}) => `flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${isActive ? 'bg-[#1E3A8A] text-white shadow-md' : 'text-[#64748B] hover:bg-blue-50 hover:text-[#1E3A8A]'}`}
+        >
+          <span className="material-symbols-outlined mr-3 text-[20px]">add_circle</span>
+          Đặt cọc (KH)
+        </NavLink>
+        <NavLink 
+          to="/thanh-toan-coc" 
+          className={({isActive}) => `flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${isActive ? 'bg-[#1E3A8A] text-white shadow-md' : 'text-[#64748B] hover:bg-blue-50 hover:text-[#1E3A8A]'}`}
+        >
+          <span className="material-symbols-outlined mr-3 text-[20px]">payments</span>
+          Thanh toán cọc (KH)
+        </NavLink>
+        <NavLink 
+          to="/ho-so-dat-coc" 
+          className={({isActive}) => `flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${isActive ? 'bg-[#1E3A8A] text-white shadow-md' : 'text-[#64748B] hover:bg-blue-50 hover:text-[#1E3A8A]'}`}
+        >
+          <span className="material-symbols-outlined mr-3 text-[20px]">folder_supervised</span>
+          Hồ sơ đặt cọc (Admin)
+        </NavLink>
+        <NavLink 
+          to="/yeu-cau-tra-phong" 
+          className={({isActive}) => `flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all ${isActive ? 'bg-[#1E3A8A] text-white shadow-md' : 'text-[#64748B] hover:bg-blue-50 hover:text-[#1E3A8A]'}`}
+        >
+          <span className="material-symbols-outlined mr-3 text-[20px]">output</span>
+          Yêu cầu trả phòng (KH)
+        </NavLink>
+      </nav>
+
+      {/* Settings section */}
+      <div className="p-4 border-t border-gray-100">
         <NavLink
           to="/room_check"
           className={({ isActive }) =>
@@ -48,7 +85,7 @@ const Sidebar: React.FC = () => {
           <span className="material-symbols-outlined">payments</span>
           <span className="font-body">Xử lý hoàn cọc</span>
         </NavLink>
-      </nav>
+      </div>
       <div className="px-gutter pt-4 mt-auto border-t border-outline-variant">
         <button className="flex items-center w-full px-4 py-2 gap-3 text-secondary hover:text-primary hover:bg-surface-container transition-colors rounded-lg mb-2">
           <span className="material-symbols-outlined">settings</span>

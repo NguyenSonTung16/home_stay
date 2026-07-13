@@ -6,6 +6,12 @@ import Dashboard from './pages/Dashboard';
 import RoomCheck from './pages/RoomCheck';
 import RefundCheck from './pages/RefundCheck';
 
+// Imported Liem's pages
+import DatCoc from './pages/DatCoc';
+import ThanhToanCoc from './pages/ThanhToanCoc';
+import XuLyHoSoDatCoc from './pages/XuLyHoSoDatCoc';
+import YeuCauTraPhong from './pages/YeuCauTraPhong';
+
 function App() {
   return (
     <BrowserRouter>
@@ -17,6 +23,12 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/room_check" element={<RoomCheck />} />
             <Route path="/refund_check" element={<RefundCheck />} />
+            
+            {/* Liêm's Routes */}
+            <Route path="/dat-coc" element={<DatCoc />} />
+            <Route path="/thanh-toan-coc" element={<ThanhToanCoc />} />
+            <Route path="/ho-so-dat-coc" element={<XuLyHoSoDatCoc />} />
+            <Route path="/yeu-cau-tra-phong" element={<YeuCauTraPhong />} />
           </Routes>
         </main>
       </div>

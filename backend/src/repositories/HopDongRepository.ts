@@ -35,4 +35,19 @@ export class HopDongRepository {
     // đã hoàn thành hoặc update bảng liên quan trong tương lai.
     return true; 
   }
+
+  async getActiveByKH(maKH: number): Promise<any[]> {
+    const res = await db.query(`
+      SELECT DISTINCT h.MaHD, h.NgayKy, h.NgayHetHan, p.TenPhong,
+             CASE WHEN y.MaYC IS NOT NULL THEN true ELSE false END AS hasyeucau
+      FROM HopDong h
+      JOIN ChiTietGiuong cg ON cg.MaHD = h.MaHD
+      JOIN Giuong g ON g.MaGiuong = cg.MaGiuong
+      JOIN Phong p ON p.MaPhong = g.MaPhong
+      LEFT JOIN YeuCauTraPhong y ON y.MaHD = h.MaHD
+      WHERE h.MaKHDaiDien = $1
+      ORDER BY h.MaHD DESC
+    `, [maKH]);
+    return res.rows;
+  }
 }

@@ -23,3 +23,10 @@ Tung-todo-work.md
 logs
 *.log
 npm-debug.log*
+
+# Assignment & Analysis documents
+analysis.pdf
+app.drawio.png
+assignment.pdf
+flaw.md
+problem.pdf
