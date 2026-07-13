@@ -32,9 +32,12 @@ export class HoanCocController {
   public pheDuyetHoanCoc = async (req: Request, res: Response) => {
     try {
       const { maHD } = req.body;
+      console.log(`[HoanCocController] pheDuyetHoanCoc called for maHD: ${maHD}`);
       const result = await this.hoanCocService.luuBangDoiSoat(maHD);
+      console.log(`[HoanCocController] pheDuyetHoanCoc success for maHD: ${maHD}`);
       res.status(200).json({ success: true, data: result });
     } catch (error) {
+      console.error(`[HoanCocController] pheDuyetHoanCoc error:`, error);
       res.status(500).json({ success: false, message: (error as Error).message });
     }
   };

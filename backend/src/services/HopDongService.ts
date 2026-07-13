@@ -25,4 +25,12 @@ export class HopDongService {
   async capNhatTrangThai(maHD: number, trangThai: number) {
     return await this.hopDongRepo.capNhatTrangThai(maHD, trangThai);
   }
+
+  async layHopDongActiveTheoMaTK(maTK: number) {
+    return await this.hopDongRepo.layHopDongActiveTheoMaTK(maTK);
+  }
+
+  async layHopDongGanNhatTheoMaTK(maTK: number) {
+    return await this.hopDongRepo.layHopDongGanNhatTheoMaTK(maTK);
+  }
 }

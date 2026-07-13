@@ -3,6 +3,7 @@ import { DatCocController } from '../controllers/DatCocController';
 import { ThanhToanCocController } from '../controllers/ThanhToanCocController';
 import { HoSoDatCocController } from '../controllers/HoSoDatCocController';
 import { YeuCauTraPhongController } from '../controllers/YeuCauTraPhongController';
+import { searchRooms, getRoomDetails, createAppointment } from '../controllers/BookingController';
 
 const router = Router();
 const datCocController = new DatCocController();
@@ -26,6 +27,10 @@ router.post('/ho-so/phe-duyet', hoSoDatCocController.pheDuyet);
 // UC4: Yêu cầu trả phòng (Customer)
 router.get('/hop-dong/dang-hoat-dong', yeuCauTraPhongController.getHopDongCuaKH);
 router.post('/yeu-cau-tra-phong', yeuCauTraPhongController.taoYeuCau);
+
+router.get('/rooms', searchRooms);
+router.get('/rooms/:id', getRoomDetails);
+router.post('/appointments', createAppointment);
 
 export default router;
 

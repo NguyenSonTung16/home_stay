@@ -9,7 +9,7 @@ export class YeuCauTraPhongRepository {
       JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH 
       JOIN PhieuDatCoc c ON c.MaKH = k.MaKH
       JOIN Phong p ON p.MaPhong = c.MaPhong
-      ORDER BY y.MaYC DESC
+      ORDER BY y.NgayDuKien ASC
     `);
     return res.rows;
   }
@@ -47,6 +47,15 @@ export class YeuCauTraPhongRepository {
       `INSERT INTO YeuCauTraPhong (NgayDuKien, STKNhanCoc, TrangThai, LyDo, MaHD)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [data.NgayDuKien, data.STKNhanCoc, data.TrangThai, data.LyDo, data.MaHD]
+    );
+    return res.rows[0];
+  }
+
+  async taoYeuCauTraPhong(ngayDuKien: string, stk: string, trangThai: number, lyDo: string, maHD: number): Promise<any> {
+    const res = await db.query(
+      `INSERT INTO YeuCauTraPhong (NgayDuKien, STKNhanCoc, TrangThai, LyDo, MaHD) 
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [ngayDuKien, stk, trangThai, lyDo, maHD]
     );
     return res.rows[0];
   }

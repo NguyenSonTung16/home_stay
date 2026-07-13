@@ -7,24 +7,35 @@ const RefundCheck: React.FC = () => {
     { id: 'HD-9999', name: 'Nguyễn Văn A', date: '20/10/2023', status: 'Chờ duyệt' },
     { id: 'HD-8821', name: 'Trần Thị B', date: '18/10/2023', status: 'Đã hoàn tất' }
   ]);
-  const [activeRecord, setActiveRecord] = useState<string | null>(null);
+
   const [chiPhiDoiSoat, setChiPhiDoiSoat] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<number | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/finance/hoan-coc/cho-doi-soat').then(res => {
-      if (res.data.success && res.data.data.length > 0) {
-        setRecords(res.data.data.map((row: any) => ({
-          id: `HD-${row.mahd || row.MaHD}`,
-          name: row.hoten || row.HoTen,
-          date: '20/10/2023', // Demo date
-          status: row.trangthai === 1 ? 'Chờ duyệt' : 'Đã hoàn tất',
-          statusCode: row.trangthai
-        })));
-        setActiveRecord(`HD-${res.data.data[0].mahd || res.data.data[0].MaHD}`);
-      }
-    }).catch(err => console.error('Lỗi tải danh sách chờ hoàn cọc:', err));
+    const fetchData = () => {
+      axios.get('/api/finance/hoan-coc/cho-doi-soat').then(res => {
+        if (res.data.success && res.data.data.length > 0) {
+          const newRecords = res.data.data.map((row: any) => ({
+            id: `HD-${row.mahd || row.MaHD}`,
+            name: row.hoten || row.HoTen,
+            date: '20/10/2023', // Demo date
+            status: row.trangthai === 1 ? 'Chờ duyệt' : (row.trangthai === 5 ? 'Chờ thu thêm' : 'Đã hoàn tất'),
+            statusCode: row.trangthai
+          }));
+          setRecords(newRecords);
+
+        } else {
+          setRecords([]);
+        }
+      }).catch(err => console.error('Lỗi tải danh sách chờ hoàn cọc:', err));
+    };
+
+    fetchData(); // Fetch initial data
+    const interval = setInterval(fetchData, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -35,8 +46,8 @@ const RefundCheck: React.FC = () => {
           setChiPhiDoiSoat(res.data.data);
         }
       }).catch(err => {
-         console.error('Lỗi lấy chi phí:', err);
-         setChiPhiDoiSoat(null);
+        console.error('Lỗi lấy chi phí:', err);
+        setChiPhiDoiSoat(null);
       });
     }
   }, [expandedId]);
@@ -80,13 +91,14 @@ const RefundCheck: React.FC = () => {
             <span className="text-caption font-bold text-secondary uppercase tracking-wider">
               Trạng thái:
             </span>
-            <select 
+            <select
               className="bg-white border border-outline-variant rounded-lg px-3 py-2 text-body focus:ring-2 focus:ring-primary-container focus:border-primary outline-none"
               value={filterStatus === null ? 'all' : filterStatus}
               onChange={(e) => setFilterStatus(e.target.value === 'all' ? null : Number(e.target.value))}
             >
               <option value="all">Tất cả</option>
               <option value="1">Chờ duyệt</option>
+              <option value="5">Chờ thu thêm</option>
               <option value="2">Đã hoàn tất</option>
             </select>
           </div>
@@ -140,11 +152,10 @@ const RefundCheck: React.FC = () => {
                   <td className="p-4">{record.name}</td>
                   <td className="p-4">{record.date}</td>
                   <td className="p-4">
-                    <span className={`px-3 py-1 rounded-full text-caption font-bold ${
-                      record.statusCode === 2 
-                        ? 'bg-success/20 text-success' 
-                        : 'bg-secondary-container text-on-secondary-container'
-                    }`}>
+                    <span className={`px-3 py-1 rounded-full text-caption font-bold ${record.statusCode === 2
+                        ? 'bg-success/20 text-success'
+                        : (record.statusCode === 5 ? 'bg-error/20 text-error' : 'bg-secondary-container text-on-secondary-container')
+                      }`}>
                       {record.status}
                     </span>
                   </td>
@@ -196,9 +207,20 @@ const RefundCheck: React.FC = () => {
                                 Chi phí đền bù hư hỏng & vệ sinh
                               </span>
                               <span className="text-right font-bold text-error">
-                                -{chiPhiDoiSoat ? (chiPhiDoiSoat.tongKhauTru || 0).toLocaleString() : 0}đ
+                                -{chiPhiDoiSoat ? ((chiPhiDoiSoat.tongKhauTru || 0) - (chiPhiDoiSoat.phiPhatBaoTre || 0)).toLocaleString() : 0}đ
                               </span>
                             </div>
+                            {chiPhiDoiSoat && chiPhiDoiSoat.phiPhatBaoTre > 0 && (
+                              <div className="grid grid-cols-2 p-4 bg-error/10">
+                                <span className="font-bold text-error flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-sm">warning</span>
+                                  Phí phạt báo trả phòng trễ (25%)
+                                </span>
+                                <span className="text-right font-bold text-error">
+                                  -{chiPhiDoiSoat.phiPhatBaoTre.toLocaleString()}đ
+                                </span>
+                              </div>
+                            )}
                             <div className="grid grid-cols-2 p-4 bg-primary-fixed/30">
                               <span className="font-bold">Số dư thực tế</span>
                               <span className="text-right font-h2 text-primary">
@@ -257,27 +279,37 @@ const RefundCheck: React.FC = () => {
                         <div className="flex justify-end gap-3">
                           {record.statusCode === 1 && (
                             <button
-                              className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center gap-2"
+                              className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                              disabled={isProcessing}
                               onClick={() => {
+                                setIsProcessing(true);
                                 const maHDNumber = parseInt(record.id.replace('HD-', ''));
-                                axios.post('/api/finance/hoan-coc/phe-duyet', { 
+                                axios.post('/api/finance/hoan-coc/phe-duyet', {
                                   maHD: maHDNumber
                                 }).then(() => {
-                                  alert('Phê duyệt thành công!');
-                                  // Cập nhật trạng thái thành Đã hoàn tất thay vì xóa
-                                  const newRecords = records.map((r: any) => 
-                                    r.id === record.id ? { ...r, statusCode: 2, status: 'Đã hoàn tất' } : r
+                                  alert(chiPhiDoiSoat.thucNhanChi < 0 ? 'Chốt công nợ thành công! Chờ khách thanh toán.' : 'Phê duyệt thành công! Tiền cọc đang được xử lý qua PayPal.');
+                                  // Cập nhật trạng thái
+                                  const newRecords = records.map((r: any) =>
+                                    r.id === record.id ? {
+                                      ...r,
+                                      statusCode: chiPhiDoiSoat.thucNhanChi < 0 ? 5 : 2,
+                                      status: chiPhiDoiSoat.thucNhanChi < 0 ? 'Chờ thu thêm' : 'Đã hoàn tất'
+                                    } : r
                                   );
                                   setRecords(newRecords);
                                 }).catch((err) => {
                                   alert('Lỗi từ Server: ' + (err.response?.data?.message || err.message));
+                                }).finally(() => {
+                                  setIsProcessing(false);
                                 });
                               }}
                             >
                               <span className="material-symbols-outlined text-[20px]">
-                                verified_user
+                                {chiPhiDoiSoat && chiPhiDoiSoat.thucNhanChi < 0 ? 'gavel' : 'verified_user'}
                               </span>{' '}
-                              Phê duyệt
+                              {isProcessing
+                                ? 'Đang xử lý...'
+                                : (chiPhiDoiSoat && chiPhiDoiSoat.thucNhanChi < 0 ? 'Chốt công nợ & Chờ thu' : 'Phê duyệt')}
                             </button>
                           )}
                         </div>

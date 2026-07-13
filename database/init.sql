@@ -49,6 +49,7 @@ CREATE TABLE KhachHang (
     HoTen VARCHAR(100) NOT NULL,
     CCCD VARCHAR(20) NOT NULL,
     SDT VARCHAR(15),
+    Email VARCHAR(100),
     DiaChi VARCHAR(200),
     Avatar VARCHAR(255),
     STKNhanCoc VARCHAR(50),
@@ -94,10 +95,18 @@ CREATE TABLE PhieuDangKyHen (
     GioHen TIME,
     GhiChu VARCHAR(255),
     TrangThai INT NOT NULL,
-    DSPhongXem VARCHAR(255),
     MaKH INT NOT NULL,
     FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH)
 );
+
+CREATE TABLE CT_LichHen (
+    MaPhieu INT NOT NULL,
+    MaPhong INT NOT NULL,
+    PRIMARY KEY (MaPhieu, MaPhong),
+    FOREIGN KEY (MaPhieu) REFERENCES PhieuDangKyHen(MaPhieu) ON DELETE CASCADE,
+    FOREIGN KEY (MaPhong) REFERENCES Phong(MaPhong) ON DELETE CASCADE
+);
+
 
 CREATE TABLE PhieuDatCoc (
     MaCoc SERIAL PRIMARY KEY,
