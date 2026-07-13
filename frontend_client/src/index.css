@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer utilities {
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  min-height: max(884px, 100dvh);
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Custom range slider styling */
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+  background: #dce1ff;
+  height: 4px;
+  border-radius: 2px;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  margin-top: -6px;
+  background-color: #00236f;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.method-card {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.method-card:hover {
+  border-color: #00236f;
+  background-color: #f2f4f6;
+}
+
+.method-card.active {
+  border-color: #1e3a8a;
+  background-color: #d0e1fb;
+  box-shadow: 0 0 8px rgba(30, 58, 138, 0.2);
+  border-width: 2px;
+}
+
+.qr-scanner-line {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00236f, transparent);
+  position: absolute;
+  width: 100%;
+  top: 0;
+  animation: scan 3s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0%,
+  100% {
+    top: 0;
+  }
+  50% {
+    top: 100%;
+  }
+}
+
+.success-checkmark-animation {
+  animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tonal-shadow {
+  box-shadow: 0px 2px 4px rgba(30, 58, 138, 0.05);
+}

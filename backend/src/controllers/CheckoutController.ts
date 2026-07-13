@@ -109,6 +109,8 @@ export class CheckoutController {
       }
       
       const { maHD, amount } = req.body;
+      console.log(`[CheckoutController] payDebt called - maHD: ${maHD}, amount: ${amount}`);
+      
       const { PaypalService } = await import('../services/PaypalService');
       const paypalService = new PaypalService();
 
@@ -117,6 +119,7 @@ export class CheckoutController {
       const referenceId = `DEBT_${maHD}_${Date.now()}`;
       
       const order = await paypalService.createOrder(amountUSD, referenceId);
+      console.log(`[CheckoutController] createOrder success - orderId: ${order.id}`);
       res.status(200).json({ success: true, data: order });
     } catch (error) {
       console.error('Error creating paypal order for debt:', error);
@@ -127,11 +130,13 @@ export class CheckoutController {
   public captureDebt = async (req: Request, res: Response): Promise<void> => {
     try {
       const { orderId, maHD } = req.body;
+      console.log(`[CheckoutController] captureDebt called - orderId: ${orderId}, maHD: ${maHD}`);
       
       const { PaypalService } = await import('../services/PaypalService');
       const paypalService = new PaypalService();
 
       const captureData = await paypalService.captureOrder(orderId);
+      console.log(`[CheckoutController] captureOrder success - status: ${captureData.status}`);
       
       if (captureData.status === 'COMPLETED') {
         // Cập nhật hợp đồng về 4 (Đã thanh lý)
@@ -143,8 +148,10 @@ export class CheckoutController {
           await this.yeuCauRepo.capNhatTrangThai(maYC, 5);
         }
 
+        console.log(`[CheckoutController] Debt paid for maHD: ${maHD}`);
         res.status(200).json({ success: true, message: 'Thanh toán nợ thành công, hoàn tất thanh lý hợp đồng.' });
       } else {
+        console.warn(`[CheckoutController] Debt capture not completed - status: ${captureData.status}`);
         res.status(400).json({ success: false, message: 'Thanh toán chưa hoàn tất' });
       }
     } catch (error) {

@@ -1,0 +1,29 @@
+import { db } from '../config/db';
+import { PhongDTO } from '../models';
+
+export class PhongDB {
+    static async layDS(): Promise<PhongDTO[]> {
+        console.log("PhongDB: layDS called (không tham số)");
+        const query = `
+            SELECT p.MaPhong, p.TenPhong, p.ChiNhanh, p.TrangThai, 
+                   lp.TenLoai, lp.GiaTien, lp.SucChua
+            FROM Phong p
+            JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
+            WHERE p.TrangThai = 1
+        `;
+        const result = await db.query(query);
+        const rows = result.rows || [];
+        return rows.map((r: any) => ({
+            MaPhong: r.maphong || r.MaPhong,
+            TenPhong: r.tenphong || r.TenPhong,
+            ChiNhanh: r.chinhanh || r.ChiNhanh,
+            TrangThai: r.trangthai || r.TrangThai,
+            TenLoai: r.tenloai || r.TenLoai,
+            GiaTien: Number(r.giatien || r.GiaTien || 0),
+            SucChua: Number(r.succhua || r.SucChua || 0),
+            DienTich: Number(r.dientich || r.DienTich || 25),
+            TienIch: r.tienich || r.TienIch || ["wifi", "mayLanh", "tuCaNhan"],
+            HinhAnh: r.hinhanh || r.HinhAnh
+        }));
+    }
+}

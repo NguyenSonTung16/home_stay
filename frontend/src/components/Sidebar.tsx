@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/AuthContext';
 
 const Sidebar: React.FC = () => {
   const { user } = useAuth();
-  
   return (
     <aside
       className="w-sidebar-width h-screen hidden md:flex fixed left-0 top-0 bg-white dark:bg-inverse-surface border-r border-outline-variant dark:border-outline shadow-sm flex-col py-stack-md z-30 transition-all duration-300"
@@ -24,7 +23,7 @@ const Sidebar: React.FC = () => {
         </div>
       </div>
       <nav className="flex-1 space-y-1">
-        {user?.role === 'QuanLy' && (
+        {(user?.role === 'QuanLy' || user?.role === 'Admin') && (
           <NavLink
             to="/room_check"
             className={({ isActive }) =>
@@ -40,7 +39,7 @@ const Sidebar: React.FC = () => {
           </NavLink>
         )}
 
-        {user?.role === 'KeToan' && (
+        {(user?.role === 'KeToan' || user?.role === 'Admin') && (
           <NavLink
             to="/refund_check"
             className={({ isActive }) =>
@@ -56,9 +55,9 @@ const Sidebar: React.FC = () => {
           </NavLink>
         )}
         
-        {user?.role === 'Khach' && (
+        {(user?.role === 'Sale' || user?.role === 'Admin') && (
           <NavLink
-            to="/request_checkout"
+            to="/appointment_check"
             className={({ isActive }) =>
               `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
                 isActive
@@ -67,18 +66,17 @@ const Sidebar: React.FC = () => {
               }`
             }
           >
-            <span className="material-symbols-outlined">outbox</span>
-            <span className="font-body">Yêu cầu trả phòng</span>
+            <span className="material-symbols-outlined">calendar_month</span>
+            <span className="font-body">Xử lý lịch hẹn</span>
           </NavLink>
         )}
       </nav>
-      
-      <div className="mt-auto px-gutter space-y-2">
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary rounded-lg transition-colors">
+      <div className="px-gutter pt-4 mt-auto border-t border-outline-variant">
+        <button className="flex items-center w-full px-4 py-2 gap-3 text-secondary hover:text-primary hover:bg-surface-container transition-colors rounded-lg mb-2">
           <span className="material-symbols-outlined">settings</span>
           <span className="font-body">Settings</span>
         </button>
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-secondary hover:bg-surface-container hover:text-primary rounded-lg transition-colors">
+        <button className="flex items-center w-full px-4 py-2 gap-3 text-secondary hover:text-primary hover:bg-surface-container transition-colors rounded-lg">
           <span className="material-symbols-outlined">help</span>
           <span className="font-body">Support</span>
         </button>

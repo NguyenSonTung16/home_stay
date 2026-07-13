@@ -15,24 +15,24 @@ Tài liệu này sẽ hướng dẫn bạn các bước chi tiết để cài đ
 ---
 
 ### Bước 1: Khởi tạo Cơ sở dữ liệu (Database)
-Dự án sử dụng PostgreSQL. Cách nhanh nhất để có Database với đầy đủ dữ liệu mẫu (Seed Data) là sử dụng Docker.
+Dữ liệu của dự án sử dụng PostgreSQL. Cách nhanh nhất là sử dụng Docker.
 
-1. Mở Terminal tại thư mục gốc của dự án (thư mục chứa file `docker-compose.yml`).
+1. Mở Terminal tại thư mục gốc của dự án.
 2. Chạy lệnh sau để khởi động Database:
    ```bash
    docker-compose up -d
    ```
    *Lưu ý: Docker sẽ tự động nạp cấu trúc bảng từ file `database/init.sql`.*
-3. Chạy lệnh nạp dữ liệu test (Seed Data) vào CSDL:
+3. Chạy lệnh nạp dữ liệu mẫu (Seed Data) vào CSDL:
    ```bash
    cd backend
-   npx ts-node -T seed_10_rooms.ts
+   npx ts-node seed.ts
    ```
+   *File `seed.ts` này sẽ thực thi trực tiếp các câu lệnh SQL từ `database/seed.sql`.*
 
 ---
 
 ### Bước 2: Cài đặt và cấu hình Backend
-Backend của dự án được xây dựng bằng Node.js (Express + TypeScript).
 
 1. Mở Terminal và di chuyển vào thư mục `backend`:
    ```bash
@@ -43,8 +43,8 @@ Backend của dự án được xây dựng bằng Node.js (Express + TypeScript
    npm install
    ```
 3. Tạo file cấu hình môi trường `.env`:
-   - Copy nội dung từ file `.env.example` và tạo ra một file mới tên là `.env` nằm trong thư mục `backend`.
-   - Nếu bạn sử dụng Docker ở Bước 1, thông số kết nối mặc định như sau:
+   - Copy nội dung từ file `.env.example` và tạo file `.env`.
+   - Nếu bạn sử dụng Docker ở Bước 1, thông số kết nối mặc định thường là:
      ```env
      DB_HOST=localhost
      DB_PORT=5432
@@ -53,74 +53,76 @@ Backend của dự án được xây dựng bằng Node.js (Express + TypeScript
      DB_NAME=homestay_db
      PORT=3000
      ```
-4. Khởi động Backend server (Chạy chế độ development):
+4. Khởi động Backend server:
    ```bash
    npm run dev
    ```
-   *Server sẽ bắt đầu chạy ở địa chỉ `http://localhost:3000`.*
+   *Server sẽ chạy ở `http://localhost:3000`.*
 
 ---
 
-### Bước 3: Cài đặt và chạy Frontend
-Frontend của dự án được xây dựng bằng React.js (Vite + TailwindCSS + TypeScript).
+### Bước 3: Cài đặt và chạy Frontend (Admin) và Frontend Client
 
+Dự án hiện bao gồm 2 phần Frontend (Admin cho nhân viên và Client cho khách).
+
+**Chạy Frontend Admin:**
 1. Mở một cửa sổ Terminal **mới** và di chuyển vào thư mục `frontend`:
    ```bash
    cd frontend
-   ```
-2. Cài đặt các thư viện Frontend:
-   ```bash
    npm install
-   ```
-3. Khởi động Frontend server:
-   ```bash
    npm run dev
    ```
-4. Mở trình duyệt web truy cập địa chỉ `http://localhost:5173`.
+   *(Truy cập `http://localhost:5173`)*
+
+**Chạy Frontend Client:**
+2. Mở một cửa sổ Terminal **mới** và di chuyển vào thư mục `frontend_client`:
+   ```bash
+   cd frontend_client
+   npm install
+   npm run dev
+   ```
+   *(Truy cập `http://localhost:5174`)*
 
 ---
 
-## B. Thông tin Tài khoản Đăng nhập (Test Data)
+## B. Thông tin Tài khoản Đăng nhập Hệ Thống (Frontend Admin)
 
-Sau khi chạy xong lệnh `seed_10_rooms.ts` ở Bước 1, hệ thống đã nạp sẵn 2 tài khoản để bạn kiểm thử phân quyền Role Guard.
+Sau khi chạy xong lệnh nạp dữ liệu (seed) ở Bước 1, hệ thống đã cung cấp sẵn các tài khoản với từng quyền (Role) như sau (Tất cả đều dùng mật khẩu `123`):
 
-| Chức vụ (VaiTro) | Tên đăng nhập (Username) | Mật khẩu (Password) | Phân quyền hiển thị (Menu) |
+| Quyền (Role) | Tài khoản (Username) | Mật khẩu | Quyền hạn và Hiển thị Menu |
 | :--- | :--- | :--- | :--- |
-| Quản lý | `admin` | `123` | Có quyền xem menu **Xử lý trả phòng**. Không thấy phần Hoàn cọc. |
-| Kế toán | `ketoan` | `123` | Có quyền xem menu **Xử lý hoàn cọc**. Không thấy phần Trả phòng. |
+| **Quản trị viên hệ thống (Admin)** | `admin` | `123` | Có toàn quyền. Nhìn thấy và truy cập được **TẤT CẢ** các tab của mọi chức năng. |
+| **Quản lý (QuanLy)** | `quanly` | `123` | Chỉ có quyền xem và thao tác ở tab **Xử lý trả phòng**. |
+| **Nhân viên Sale (Sale)** | `nvsale` | `123` | Chỉ có quyền xem và thao tác ở tab **Xử lý lịch hẹn**. |
+| **Kế toán (KeToan)** | `ketoan` | `123` | Có quyền xem và thao tác ở tab **Xử lý hoàn cọc**. |
 
 ---
 
-## C. Hướng dẫn thêm Tài khoản hoặc Role khác để Test
+## C. Hướng dẫn thêm Tài khoản hoặc Role khác
 
-Nếu bạn muốn tạo thêm một nhân viên mới với Vai trò (Role) khác, hãy mở file `backend/seed_10_rooms.ts` bằng VS Code và làm theo 2 bước sau:
+Nếu bạn muốn tạo thêm một vai trò (Role) mới:
 
-**Bước 1:** Tìm đến dòng mã tạo tài khoản (khoảng dòng 24), bạn sẽ thấy đoạn code tương tự:
-```javascript
-// Tạo tài khoản và nhân viên
-await db.query(`INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('admin', '123', 'QuanLy', 1)`);
-await db.query(`INSERT INTO NhanVien(TenNV, ChucVu, MaTK) VALUES ('Quan ly 1', 'Quan Ly', 1)`);
+**Bước 1: Cập nhật cơ sở dữ liệu (`database/seed.sql`)**
+1. Mở file `database/seed.sql`.
+2. Thêm một câu lệnh `INSERT INTO TaiKhoan` với `VaiTro` mới.
+   ```sql
+   INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('letan', '123', 'LeTan', 1);
+   ```
+3. Khai báo nhân viên tương ứng trong `INSERT INTO NhanVien` với `MaTK` tương ứng mã vừa tạo.
+4. Chạy lại lệnh `npx ts-node seed.ts` trong thư mục `backend`.
 
-await db.query(`INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('ketoan', '123', 'KeToan', 1)`);
-await db.query(`INSERT INTO NhanVien(TenNV, ChucVu, MaTK) VALUES ('Ke toan 1', 'Ke Toan', 2)`);
-```
-
-**Bước 2:** Copy và paste thêm một đoạn mã tương tự để tạo tài khoản mới. Chú ý:
-- Sửa giá trị `Username` và `VaiTro` ở lệnh `INSERT INTO TaiKhoan`. (Ví dụ `VaiTro` là `'LeTan'`).
-- Ở lệnh `INSERT INTO NhanVien`, chú ý trường `MaTK` (Mã tài khoản) phải là số tự tăng theo thứ tự của tài khoản vừa tạo (nếu tạo thêm người thứ 3 thì `MaTK` là `3`). Đồng thời, phải cập nhật lại biến `maTK` của nhóm Khách Hàng (ví dụ `const maTK = i + 3;`) nếu bạn chèn thêm tài khoản nhân viên thứ 3.
-
-**Ví dụ thêm 1 tài khoản Lễ tân:**
-```javascript
-await db.query(`INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('letan', '123', 'LeTan', 1)`);
-await db.query(`INSERT INTO NhanVien(TenNV, ChucVu, MaTK) VALUES ('Le Tan 1', 'Le Tan', 3)`);
-```
-*(Nếu thêm 1 nhân viên nữa thành 3 người, nhớ sửa ở dòng 43 phần Khách hàng: `const maTK = i + 3;`)*
-
-**Bước 3:** Sau khi sửa xong file `seed_10_rooms.ts`, mở terminal ở thư mục `backend` và chạy lệnh:
-```bash
-npx ts-node -T seed_10_rooms.ts
-```
-Dữ liệu sẽ được tự động xóa và nạp lại từ đầu với tài khoản mới của bạn!
-
-**Cấu hình Phân quyền Frontend:** 
-Để Role mới có thể nhìn thấy menu, hãy mở `frontend/src/components/Sidebar.tsx` và `frontend/src/App.tsx`, copy khối code Navbar/Route đã có sẵn và đổi tên `allowedRoles={['TenRole']}` thành role của bạn.
+**Bước 2: Cấu hình Phân quyền ở Frontend (React)**
+Để Role mới có thể nhìn thấy menu, bạn cần khai báo quyền ở 2 nơi trong thư mục `frontend`:
+1. `src/App.tsx`: Bao bọc Route của bạn bằng component `ProtectedRoute`:
+   ```tsx
+   <Route element={<ProtectedRoute allowedRoles={['LeTan', 'Admin']} />}>
+     <Route path="/le-tan" element={<LeTanComponent />} />
+   </Route>
+   ```
+2. `src/components/Sidebar.tsx`: Chèn điều kiện kiểm tra vai trò để hiển thị NavLink trên menu:
+   ```tsx
+   {(user?.role === 'LeTan' || user?.role === 'Admin') && (
+     <NavLink to="/le-tan">...</NavLink>
+   )}
+   ```
+   *(Chú ý: Đừng quên thêm `user?.role === 'Admin'` nếu bạn muốn tài khoản Admin có thể thấy tab này)*

@@ -60,6 +60,7 @@ export class PaypalService {
         },
       });
 
+      console.log(`[PaypalService] Payout sent successfully for batch: ${senderBatchId}`);
       return response.data;
     } catch (error: any) {
       console.error('PayPal Payout Error:', error.response?.data || error.message);
@@ -94,6 +95,7 @@ export class PaypalService {
         },
       });
 
+      console.log(`[PaypalService] Order created successfully: ${response.data.id}`);
       return response.data; // Trả về order object (bao gồm id và links)
     } catch (error: any) {
       console.error('PayPal Create Order Error:', error.response?.data || error.message);
@@ -119,6 +121,7 @@ export class PaypalService {
         }
       );
 
+      console.log(`[PaypalService] Order captured successfully: ${orderId}`);
       return response.data;
     } catch (error: any) {
       console.error('PayPal Capture Order Error:', error.response?.data || error.message);

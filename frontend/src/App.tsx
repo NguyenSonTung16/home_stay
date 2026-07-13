@@ -5,12 +5,12 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import RoomCheck from './pages/RoomCheck';
 import RefundCheck from './pages/RefundCheck';
-import { RequestCheckout } from './pages/RequestCheckout';
-import Invoices from './pages/Invoices';
+
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import MobileBottomNav from './components/MobileBottomNav';
+import AppointmentCheck from './pages/AppointmentCheck';
 
 const MainLayout = () => (
   <div className="bg-surface font-body text-on-surface flex min-h-screen">
@@ -36,22 +36,21 @@ function App() {
               <Route path="/" element={<Dashboard />} />
               
               {/* Only QuanLy can access RoomCheck */}
-              <Route element={<ProtectedRoute allowedRoles={['QuanLy']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['QuanLy', 'Admin']} />}>
                 <Route path="/room_check" element={<RoomCheck />} />
               </Route>
               
               {/* Only KeToan can access RefundCheck */}
-              <Route element={<ProtectedRoute allowedRoles={['KeToan']} />}>
+              <Route element={<ProtectedRoute allowedRoles={['KeToan', 'Admin']} />}>
                 <Route path="/refund_check" element={<RefundCheck />} />
               </Route>
               
-              {/* Only Khach can access RequestCheckout */}
-              <Route element={<ProtectedRoute allowedRoles={['Khach']} />}>
-                <Route path="/request_checkout" element={<RequestCheckout />} />
+
+
+              {/* Appointment Check for Sales */}
+              <Route element={<ProtectedRoute allowedRoles={['Sale', 'Admin']} />}>
+                <Route path="/appointment_check" element={<AppointmentCheck />} />
               </Route>
-              
-              {/* Invoices Placeholder */}
-              <Route path="/invoices" element={<Invoices />} />
             </Route>
           </Route>
         </Routes>
