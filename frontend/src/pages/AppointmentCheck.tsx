@@ -6,6 +6,7 @@ export const AppointmentCheck: React.FC = () => {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedAppointment, setSelectedAppointment] = useState<any | null>(null);
+  const [modalNote, setModalNote] = useState<string>('');
 
   const fetchAppointments = async () => {
 
@@ -13,7 +14,15 @@ export const AppointmentCheck: React.FC = () => {
     setIsLoading(true);
     try {
       const res = await fetch('/api/lichhen');
-      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const text = await res.text();
+      if (!text) {
+        setAppointments([]);
+        return;
+      }
+      const result = JSON.parse(text);
       if (result.success && Array.isArray(result.data)) {
         setAppointments(result.data);
       } else {
@@ -248,36 +257,15 @@ export const AppointmentCheck: React.FC = () => {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
+                              setModalNote(item.phanhoi ?? item.PhanHoi ?? '');
                               setSelectedAppointment(item);
                             }}
                             className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium text-xs transition-colors flex items-center gap-1"
-                            title="Xem chi tiết mô tả"
+                            title="Xem chi tiết và xử lý"
                           >
                             <span className="material-symbols-outlined text-sm">visibility</span>
                             Chi tiết
                           </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUpdateStatus(id, 1);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-medium text-xs transition-colors"
-                          >
-                            Duyệt
-                          </button>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleUpdateStatus(id, -1);
-                            }}
-                            className="px-3 py-1.5 rounded-lg bg-rose-50 text-rose-700 hover:bg-rose-100 font-medium text-xs transition-colors"
-                          >
-                            Từ chối
-                          </button>
-
-
                         </div>
                       </td>
                     </tr>
@@ -408,6 +396,18 @@ export const AppointmentCheck: React.FC = () => {
                     : 'Khách hàng không để lại ghi chú chi tiết nào.'}
                 </div>
               </div>
+
+              {/* Lời nhắn / Phản hồi cho khách hàng */}
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2">Lời nhắn / Phản hồi gửi cho khách hàng</h4>
+                <textarea
+                  value={modalNote}
+                  onChange={(e) => setModalNote(e.target.value)}
+                  placeholder="Nhập lời nhắn cho khách (ví dụ: Vui lòng đến đúng giờ / Rất tiếc hiện tại phòng đã kín lịch...)"
+                  rows={3}
+                  className="w-full p-3.5 rounded-xl border border-gray-300 focus:outline-none focus:border-blue-600 text-sm font-medium text-gray-800 shadow-sm"
+                />
+              </div>
             </div>
 
             {/* Modal Footer */}
@@ -425,7 +425,7 @@ export const AppointmentCheck: React.FC = () => {
                   type="button"
                   onClick={() => {
                     const id = selectedAppointment.maphieu ?? selectedAppointment.MaPhieu ?? selectedAppointment.malichhen ?? selectedAppointment.MaLichHen;
-                    handleUpdateStatus(id, -1);
+                    handleUpdateStatus(id, -1, modalNote);
                     setSelectedAppointment(null);
                   }}
                   className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm transition-colors shadow-sm"
@@ -436,7 +436,7 @@ export const AppointmentCheck: React.FC = () => {
                   type="button"
                   onClick={() => {
                     const id = selectedAppointment.maphieu ?? selectedAppointment.MaPhieu ?? selectedAppointment.malichhen ?? selectedAppointment.MaLichHen;
-                    handleUpdateStatus(id, 1);
+                    handleUpdateStatus(id, 1, modalNote);
                     setSelectedAppointment(null);
                   }}
                   className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-colors shadow-sm"

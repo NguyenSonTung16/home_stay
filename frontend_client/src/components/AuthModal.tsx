@@ -8,10 +8,13 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess }) => {
   const [isRegistering, setIsRegistering] = useState(false);
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [hoten, setHoten] = useState('');
   const [sdt, setSdt] = useState('');
+  const [cccd, setCccd] = useState('');
+  const [diachi, setDiachi] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -25,12 +28,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       setErrorMsg('Vui lòng nhập Email và Mật khẩu.');
       return;
     }
+    if (isRegistering && (!hoten.trim() || !sdt.trim() || !cccd.trim())) {
+      setErrorMsg('Vui lòng điền đủ Họ tên, Số điện thoại và Số CCCD/CMND.');
+      return;
+    }
 
     setLoading(true);
     try {
       const endpoint = isRegistering ? `${import.meta.env.VITE_API_URL}/api/auth/register` : `${import.meta.env.VITE_API_URL}/api/auth/login`;
       const bodyPayload = isRegistering
-        ? { email: email.trim(), password, hoten: hoten.trim(), sdt: sdt.trim() }
+        ? { username: username.trim() || email.trim(), email: email.trim(), password, hoten: hoten.trim(), sdt: sdt.trim(), cccd: cccd.trim(), diachi: diachi.trim() }
         : { email: email.trim(), password };
 
       const response = await fetch(endpoint, {
@@ -115,7 +122,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
             <>
               <div>
                 <label className="block text-[#444651] font-semibold text-xs mb-1">
-                  Họ và tên
+                  Tên đăng nhập <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Ví dụ: nguyenvana123"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#D1D5DB] focus:outline-none focus:border-[#00236F] text-sm font-medium text-[#191C1E]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#444651] font-semibold text-xs mb-1">
+                  Họ và tên <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -128,7 +148,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
 
               <div>
                 <label className="block text-[#444651] font-semibold text-xs mb-1">
-                  Số điện thoại
+                  Số điện thoại <span className="text-rose-500">*</span>
                 </label>
                 <input
                   type="tel"
@@ -138,19 +158,45 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
                   className="w-full px-4 py-2.5 rounded-xl border border-[#D1D5DB] focus:outline-none focus:border-[#00236F] text-sm font-medium text-[#191C1E]"
                 />
               </div>
+
+              <div>
+                <label className="block text-[#444651] font-semibold text-xs mb-1">
+                  Số CCCD / CMND <span className="text-rose-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={cccd}
+                  onChange={(e) => setCccd(e.target.value)}
+                  placeholder="Ví dụ: 079099001234"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#D1D5DB] focus:outline-none focus:border-[#00236F] text-sm font-medium text-[#191C1E]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#444651] font-semibold text-xs mb-1">
+                  Địa chỉ
+                </label>
+                <input
+                  type="text"
+                  value={diachi}
+                  onChange={(e) => setDiachi(e.target.value)}
+                  placeholder="Ví dụ: Quận 1, TP. HCM"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[#D1D5DB] focus:outline-none focus:border-[#00236F] text-sm font-medium text-[#191C1E]"
+                />
+              </div>
             </>
           )}
 
           <div>
             <label className="block text-[#444651] font-semibold text-xs mb-1">
-              Email đăng nhập <span className="text-rose-500">*</span>
+              {isRegistering ? 'Email (Lưu vào KhachHang)' : 'Tên đăng nhập'} <span className="text-rose-500">*</span>
             </label>
             <input
-              type="email"
+              type={isRegistering ? "email" : "text"}
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="nguyenvana@gmail.com"
+              placeholder={isRegistering ? "nguyenvana@gmail.com" : "Nhập tên đăng nhập"}
               className="w-full px-4 py-2.5 rounded-xl border border-[#D1D5DB] focus:outline-none focus:border-[#00236F] text-sm font-medium text-[#191C1E]"
             />
           </div>

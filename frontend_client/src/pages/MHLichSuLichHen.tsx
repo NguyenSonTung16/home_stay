@@ -2,14 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from '../components/AuthModal';
 
-export const MHXuLyLichHen: React.FC = () => {
+export const MHLichSuLichHen: React.FC = () => {
     const navigate = useNavigate();
     const [danhSachPhieuHen, setDanhSachPhieuHen] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentUser, setCurrentUser] = useState<any>({
-        id: 1, makh: 1, hoten: "Demo Khách hàng", email: "khach@example.com", vaitro: "Khach"
-    });
+    const [currentUser, setCurrentUser] = useState<any>(null);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                setCurrentUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Error parsing user from localStorage", e);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         hienThi();
@@ -26,8 +35,9 @@ export const MHXuLyLichHen: React.FC = () => {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lichhen`);
             const result = await res.json();
             if (result.success) {
+                const userData = currentUser.user || currentUser;
                 const myAppointments = result.data.filter((p: any) =>
-                    String(p.makh) === String(currentUser.id) || String(p.makh) === String(currentUser.makh)
+                    String(p.makh) === String(userData.id) || String(p.makh) === String(userData.makh)
                 );
                 setDanhSachPhieuHen(myAppointments);
             }
@@ -98,19 +108,38 @@ export const MHXuLyLichHen: React.FC = () => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs">
-                        <span className="material-symbols-outlined text-[18px]">person</span>
-                        <span>{currentUser?.hoten || currentUser?.email || "Guest"}</span>
-                    </div>
+                    {currentUser ? (
+                        <div 
+                            className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs cursor-pointer"
+                            onClick={() => {
+                                if (window.confirm("Bạn có muốn đăng xuất?")) {
+                                    localStorage.removeItem('currentUser');
+                                    setCurrentUser(null);
+                                }
+                            }}
+                            title="Nhấn để đăng xuất"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">person</span>
+                            <span>{currentUser?.user?.hoten || currentUser?.user?.username || currentUser?.username || currentUser?.hoten || currentUser?.email || "Guest"}</span>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsAuthModalOpen(true)}
+                            className="flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-[#00236F] text-white font-bold text-[13px] hover:bg-[#00184D] transition-all active:scale-95"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">login</span>
+                            <span>Đăng nhập</span>
+                        </button>
+                    )}
                 </div>
             </header>
 
             {/* Main Container */}
             <main className="pt-24 px-4 sm:px-8 lg:px-12 w-full max-w-[1600px] mx-auto">
                 <div className="mb-6">
-                    <h2 className="text-[22px] font-extrabold text-[#00236F]">Lịch Hẹn Xem Phòng Của Tôi</h2>
+                    <h2 className="text-[22px] font-extrabold text-[#00236F]">Lịch Sử Lịch Hẹn</h2>
                     <p className="text-[#54647A] text-[14px] mt-1">
-                        Theo dõi trạng thái và chi tiết các lịch hẹn xem phòng mà bạn đã đăng ký.
+                        Theo dõi lịch sử, trạng thái và chi tiết các lịch hẹn xem phòng mà bạn đã đăng ký.
                     </p>
                 </div>
 
@@ -258,11 +287,11 @@ export const MHXuLyLichHen: React.FC = () => {
 
 
                 <div
-                    onClick={() => navigate('/quan-ly-lich-hen')}
+                    onClick={() => navigate('/lich-su-lich-hen')}
                     className="flex flex-col items-center justify-center bg-[#1E3A8A] text-white rounded-xl px-4 py-1.5 cursor-pointer active:scale-95 transition-transform font-bold"
                 >
-                    <span className="material-symbols-outlined text-[20px]">person</span>
-                    <span className="text-[11px] mt-0.5">Cá nhân</span>
+                    <span className="material-symbols-outlined text-[20px]">history</span>
+                    <span className="text-[11px] mt-0.5">Lịch sử hẹn</span>
                 </div>
             </nav>
 

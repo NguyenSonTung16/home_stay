@@ -39,8 +39,8 @@ router.put('/:id/status', async (req: Request, res: Response) => {
     try {
         const id = parseInt(String(req.params.id));
 
-        const { status } = req.body;
-        const result = await LichHenBUS.ThayDoiTrangThai(id, status);
+        const { status, phanHoi } = req.body;
+        const result = await LichHenBUS.ThayDoiTrangThai(id, status, phanHoi);
 
         res.json({ success: true, data: result });
     } catch (error) {

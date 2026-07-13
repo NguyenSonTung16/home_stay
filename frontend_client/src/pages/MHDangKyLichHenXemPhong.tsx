@@ -4,9 +4,18 @@ import { useNavigate } from 'react-router-dom';
 export const MHDangKyLichHenXemPhong = () => {
     const navigate = useNavigate();
 
-    const [currentUser, setCurrentUser] = useState<any>({
-        id: 1, makh: 1, hoten: "Demo Khách hàng", email: "khach@example.com", vaitro: "Khach"
-    });
+    const [currentUser, setCurrentUser] = useState<any>(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                setCurrentUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Error parsing user from localStorage", e);
+            }
+        }
+    }, []);
 
     const [danhSachPhong, setDanhSachPhong] = useState<any[]>([]);
 
@@ -33,6 +42,14 @@ export const MHDangKyLichHenXemPhong = () => {
     }, []);
 
     const btn_datLich = async () => {
+        if (!currentUser || (!currentUser.user && !currentUser.id)) {
+            alert("Vui lòng đăng nhập để đặt lịch hẹn!");
+            return;
+        }
+
+        const userData = currentUser.user || currentUser;
+        const maKH = userData.makh || userData.id;
+
         setIsSubmitting(true);
         try {
             const danhSachMaPhong = danhSachPhong.map(p => p.MaPhong || p.maphong).filter(Boolean);
@@ -45,7 +62,7 @@ export const MHDangKyLichHenXemPhong = () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    MaKH: currentUser ? (currentUser.id || currentUser.makh || 1) : 1,
+                    MaKH: maKH,
                     DanhSachMaPhong: danhSachMaPhong,
                     DSPhongXem: chuoiDSPhong || (danhSachMaPhong.length > 0 ? `Phòng ${danhSachMaPhong.join(', ')}` : 'Chưa chọn phòng'),
                     NgayHen: `2023-10-${selectedDate < 10 ? '0' + selectedDate : selectedDate}`,
@@ -58,14 +75,13 @@ export const MHDangKyLichHenXemPhong = () => {
             if (result.success) {
                 alert(`Đăng ký lịch hẹn xem ${danhSachPhong.length} phòng vào ngày ${selectedDate} lúc ${selectedTime} thành công!`);
                 localStorage.removeItem("danhSachPhongQuanTam");
-                navigate('/quan-ly-lich-hen');
+                navigate('/lich-su-lich-hen');
             } else {
-                alert(`Đăng ký lịch hẹn xem ${danhSachPhong.length} phòng thành công!`);
-                navigate('/quan-ly-lich-hen');
+                alert(`Đăng ký lịch hẹn thất bại: ${result.message || 'Có lỗi xảy ra'}`);
             }
-        } catch (error) {
-            alert(`Đã xác nhận đặt lịch hẹn ngày ${selectedDate} lúc ${selectedTime}!`);
-            navigate('/quan-ly-lich-hen');
+        } catch (error: any) {
+            console.error("Lỗi đặt lịch:", error);
+            alert(`Lỗi kết nối khi đặt lịch hẹn: ${error.message || error}`);
         } finally {
             setIsSubmitting(false);
         }
@@ -111,7 +127,7 @@ export const MHDangKyLichHenXemPhong = () => {
                 <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs">
                         <span className="material-symbols-outlined text-[18px]">person</span>
-                        <span>{currentUser?.hoten || currentUser?.email || "Guest"}</span>
+                        <span>{currentUser?.user?.hoten || currentUser?.user?.username || currentUser?.username || currentUser?.hoten || currentUser?.email || "Guest"}</span>
                     </div>
                 </div>
             </header>
@@ -307,11 +323,11 @@ export const MHDangKyLichHenXemPhong = () => {
 
 
                 <div
-                    onClick={() => navigate('/quan-ly-lich-hen')}
+                    onClick={() => navigate('/lich-su-lich-hen')}
                     className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
                 >
-                    <span className="material-symbols-outlined text-[20px]">person</span>
-                    <span className="text-[11px] font-normal mt-0.5">Cá nhân</span>
+                    <span className="material-symbols-outlined text-[20px]">history</span>
+                    <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
                 </div>
             </nav>
 

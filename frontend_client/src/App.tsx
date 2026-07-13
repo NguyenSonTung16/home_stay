@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { MHTimKiemPhong } from './pages/MHTimKiemPhong';
 import { MHDangKyLichHenXemPhong } from './pages/MHDangKyLichHenXemPhong';
-import { MHXuLyLichHen } from './pages/MHXuLyLichHen';
+import { MHLichSuLichHen } from './pages/MHLichSuLichHen';
 import Search from './pages/Search';
 
 function App() {
@@ -11,7 +11,7 @@ function App() {
         <Route path="/" element={<MHTimKiemPhong />} />
         <Route path="/search-demo" element={<Search />} />
         <Route path="/dat-lich-hen" element={<MHDangKyLichHenXemPhong />} />
-        <Route path="/quan-ly-lich-hen" element={<MHXuLyLichHen />} />
+        <Route path="/lich-su-lich-hen" element={<MHLichSuLichHen />} />
       </Routes>
     </Router>
   );

@@ -17,14 +17,29 @@ export const MHTimKiemPhong = () => {
         tuCaNhan: false
     });
 
-    // Quản lý Đăng nhập / Người dùng
-    const [currentUser, setCurrentUser] = useState<any>({
-        id: 1, makh: 1, hoten: "Demo Khách hàng", email: "khach@example.com", vaitro: "Khach"
-    });
-
     // Quản lý Danh sách phòng quan tâm (localStorage)
     const [danhSachQuanTam, setDanhSachQuanTam] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+    // Quản lý Đăng nhập / Người dùng
+    const [currentUser, setCurrentUser] = useState<any>(null);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                setCurrentUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Error parsing user from localStorage", e);
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
+    };
 
 
     const loadDanhSachQuanTam = () => {
@@ -153,10 +168,20 @@ export const MHTimKiemPhong = () => {
                     </button>
 
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs">
-                            <span className="material-symbols-outlined text-[18px]">person</span>
-                            <span>{currentUser?.hoten || currentUser?.email || "Guest"}</span>
-                        </div>
+                        {currentUser ? (
+                            <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs cursor-pointer" onClick={handleLogout} title="Nhấn để đăng xuất">
+                                <span className="material-symbols-outlined text-[18px]">person</span>
+                                <span>{currentUser.user?.username || currentUser.username || currentUser.hoten || currentUser.email || "Guest"}</span>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-[#00236F] text-white font-bold text-[13px] hover:bg-[#00184D] transition-all active:scale-95"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">login</span>
+                                <span>Đăng nhập</span>
+                            </button>
+                        )}
                     </div>
                 </div>
             </header>
@@ -517,7 +542,13 @@ export const MHTimKiemPhong = () => {
                 </div>
             )}
 
+            <AuthModal 
+                isOpen={isAuthModalOpen} 
+                onClose={() => setIsAuthModalOpen(false)} 
+                onSuccess={(user) => {
+                    setCurrentUser(user);
+                }} 
+            />
         </div>
     );
 };
-
