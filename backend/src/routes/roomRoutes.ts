@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { PhongBUS } from '../services/PhongBUS';
+import { getRoomDetails } from '../controllers/BookingController';
 
 const router = Router();
 
@@ -17,5 +18,8 @@ router.get('/search', async (req: Request, res: Response) => {
         res.status(500).json({ success: false, message: 'Lỗi server' });
     }
 });
+
+// GET /api/phong/:id
+router.get('/:id', getRoomDetails);
 
 export default router;

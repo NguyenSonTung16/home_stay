@@ -320,7 +320,10 @@ export const MHTimKiemPhong = () => {
                                     >
                                         <div>
                                             {/* Room Image */}
-                                            <div className="relative h-48 w-full bg-[#ECEEF0]">
+                                            <div
+                                                className="relative h-48 w-full bg-[#ECEEF0] cursor-pointer"
+                                                onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
+                                            >
                                                 <img
                                                     alt={phong.tenphong}
                                                     className="w-full h-full object-cover"
@@ -343,7 +346,10 @@ export const MHTimKiemPhong = () => {
                                             <div className="p-4 flex flex-col gap-2.5">
                                                 <div className="flex justify-between items-start">
                                                     <div>
-                                                        <h4 className="text-[#00236F] font-bold text-[16px] leading-tight">
+                                                        <h4
+                                                            className="text-[#00236F] font-bold text-[16px] leading-tight cursor-pointer hover:underline"
+                                                            onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
+                                                        >
                                                             {phong.tenphong}
                                                         </h4>
                                                         <p className="text-[#54647A] text-[12px] mt-0.5">
