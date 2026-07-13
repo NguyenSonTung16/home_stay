@@ -5,7 +5,7 @@ const Header: React.FC = () => {
   const { user, logout } = useAuth();
   
   return (
-    <header className="h-16 sticky top-0 right-0 bg-white dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm z-20 flex items-center justify-between px-gutter">
+    <header className="hidden md:flex h-16 sticky top-0 right-0 bg-white dark:bg-inverse-surface border-b border-outline-variant dark:border-outline shadow-sm z-20 items-center justify-between px-gutter">
       <div className="flex items-center bg-surface-container-low px-4 py-2 rounded-full border border-outline-variant w-96">
         <span className="material-symbols-outlined text-secondary mr-2">
           search

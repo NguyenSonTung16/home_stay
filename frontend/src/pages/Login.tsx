@@ -167,32 +167,7 @@ const Login: React.FC = () => {
                         
                     </form>
 
-                    {/* Footer Mobile Alternatives */}
-                    <div className="mt-10 lg:hidden text-center">
-                        <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                                <div className="w-full border-t border-gray-200"></div>
-                            </div>
-                            <div className="relative flex justify-center text-xs">
-                                <span className="px-3 bg-white text-gray-500">Hoặc tiếp tục với</span>
-                            </div>
-                        </div>
-                        <div className="mt-6 grid grid-cols-2 gap-4">
-                            <button className="flex justify-center items-center py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-[#253e85]">
-                                <span className="material-symbols-outlined text-[20px]">fingerprint</span>
-                            </button>
-                            <button className="flex justify-center items-center py-2.5 border border-gray-200 rounded-lg hover:bg-gray-50 text-[#253e85]">
-                                <span className="material-symbols-outlined text-[20px]">key</span>
-                            </button>
-                        </div>
-                        <div className="mt-8">
-                            <a href="#" className="text-xs text-gray-500 flex items-center justify-center gap-1">
-                                <span className="material-symbols-outlined text-[14px]">arrow_back</span>
-                                Quay lại Trang chủ
-                            </a>
-                            <h3 className="text-6xl font-black text-gray-100 mt-4 tracking-tighter">FIT</h3>
-                        </div>
-                    </div>
+
 
                     {/* Footer Desktop */}
                     <div className="hidden lg:flex flex-col items-center mt-12 text-xs text-gray-400 gap-4">

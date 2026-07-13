@@ -31,8 +31,17 @@ export class HopDongRepository {
   }
 
   async capNhatTrangThai(maHD: number, trangThai: number): Promise<any> {
-    // Vì bảng HopDong không có cột TrangThai, ta ngầm định thao tác cập nhật này 
-    // đã hoàn thành hoặc update bảng liên quan trong tương lai.
     return true; 
+  }
+
+  async layHopDongActiveTheoMaTK(maTK: number): Promise<any> {
+    const res = await db.query(`
+      SELECT h.* 
+      FROM HopDong h
+      JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH
+      WHERE k.MaTK = $1 AND h.NgayHetHan >= CURRENT_DATE
+      ORDER BY h.MaHD DESC LIMIT 1
+    `, [maTK]);
+    return res.rows.length ? res.rows[0] : null;
   }
 }

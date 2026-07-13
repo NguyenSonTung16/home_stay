@@ -11,20 +11,36 @@ const RefundCheck: React.FC = () => {
   const [chiPhiDoiSoat, setChiPhiDoiSoat] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<number | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/finance/hoan-coc/cho-doi-soat').then(res => {
-      if (res.data.success && res.data.data.length > 0) {
-        setRecords(res.data.data.map((row: any) => ({
-          id: `HD-${row.mahd || row.MaHD}`,
-          name: row.hoten || row.HoTen,
-          date: '20/10/2023', // Demo date
-          status: row.trangthai === 1 ? 'Chờ duyệt' : 'Đã hoàn tất',
-          statusCode: row.trangthai
-        })));
-        setActiveRecord(`HD-${res.data.data[0].mahd || res.data.data[0].MaHD}`);
-      }
-    }).catch(err => console.error('Lỗi tải danh sách chờ hoàn cọc:', err));
+    const fetchData = () => {
+      axios.get('/api/finance/hoan-coc/cho-doi-soat').then(res => {
+        if (res.data.success && res.data.data.length > 0) {
+          const newRecords = res.data.data.map((row: any) => ({
+            id: `HD-${row.mahd || row.MaHD}`,
+            name: row.hoten || row.HoTen,
+            date: '20/10/2023', // Demo date
+            status: row.trangthai === 1 ? 'Chờ duyệt' : 'Đã hoàn tất',
+            statusCode: row.trangthai
+          }));
+          setRecords(newRecords);
+          setActiveRecord((prev) => {
+            if (!prev || !newRecords.find((r: any) => r.id === prev)) {
+              return newRecords[0].id;
+            }
+            return prev;
+          });
+        } else {
+          setRecords([]);
+        }
+      }).catch(err => console.error('Lỗi tải danh sách chờ hoàn cọc:', err));
+    };
+
+    fetchData(); // Fetch initial data
+    const interval = setInterval(fetchData, 10000); // Poll every 10 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -196,9 +212,20 @@ const RefundCheck: React.FC = () => {
                                 Chi phí đền bù hư hỏng & vệ sinh
                               </span>
                               <span className="text-right font-bold text-error">
-                                -{chiPhiDoiSoat ? (chiPhiDoiSoat.tongKhauTru || 0).toLocaleString() : 0}đ
+                                -{chiPhiDoiSoat ? ((chiPhiDoiSoat.tongKhauTru || 0) - (chiPhiDoiSoat.phiPhatBaoTre || 0)).toLocaleString() : 0}đ
                               </span>
                             </div>
+                            {chiPhiDoiSoat && chiPhiDoiSoat.phiPhatBaoTre > 0 && (
+                              <div className="grid grid-cols-2 p-4 bg-error/10">
+                                <span className="font-bold text-error flex items-center gap-2">
+                                  <span className="material-symbols-outlined text-sm">warning</span>
+                                  Phí phạt báo trả phòng trễ (25%)
+                                </span>
+                                <span className="text-right font-bold text-error">
+                                  -{chiPhiDoiSoat.phiPhatBaoTre.toLocaleString()}đ
+                                </span>
+                              </div>
+                            )}
                             <div className="grid grid-cols-2 p-4 bg-primary-fixed/30">
                               <span className="font-bold">Số dư thực tế</span>
                               <span className="text-right font-h2 text-primary">
@@ -257,13 +284,15 @@ const RefundCheck: React.FC = () => {
                         <div className="flex justify-end gap-3">
                           {record.statusCode === 1 && (
                             <button
-                              className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center gap-2"
+                              className="bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition-all flex items-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                              disabled={isProcessing}
                               onClick={() => {
+                                setIsProcessing(true);
                                 const maHDNumber = parseInt(record.id.replace('HD-', ''));
                                 axios.post('/api/finance/hoan-coc/phe-duyet', { 
                                   maHD: maHDNumber
-                                }).then(() => {
-                                  alert('Phê duyệt thành công!');
+                                }).then((res) => {
+                                  alert('Phê duyệt thành công! Tiền cọc đang được xử lý qua PayPal.');
                                   // Cập nhật trạng thái thành Đã hoàn tất thay vì xóa
                                   const newRecords = records.map((r: any) => 
                                     r.id === record.id ? { ...r, statusCode: 2, status: 'Đã hoàn tất' } : r
@@ -271,13 +300,15 @@ const RefundCheck: React.FC = () => {
                                   setRecords(newRecords);
                                 }).catch((err) => {
                                   alert('Lỗi từ Server: ' + (err.response?.data?.message || err.message));
+                                }).finally(() => {
+                                  setIsProcessing(false);
                                 });
                               }}
                             >
                               <span className="material-symbols-outlined text-[20px]">
                                 verified_user
                               </span>{' '}
-                              Phê duyệt
+                              {isProcessing ? 'Đang xử lý PayPal...' : 'Phê duyệt'}
                             </button>
                           )}
                         </div>

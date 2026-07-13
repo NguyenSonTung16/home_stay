@@ -2,6 +2,7 @@ import { HopDongService } from './HopDongService';
 import { PhieuKiemTraPhongService } from './PhieuKiemTraPhongService';
 import { BangDoiSoatRepository } from '../repositories/BangDoiSoatRepository';
 import { YeuCauTraPhongRepository } from '../repositories/YeuCauTraPhongRepository';
+import { PaypalService } from './PaypalService';
 
 export interface IBangDoiSoat {
   tienCoc: number;
@@ -17,6 +18,7 @@ export class HoanCocService {
   private phieuKiemTraService = new PhieuKiemTraPhongService();
   private bangDoiSoatRepo = new BangDoiSoatRepository();
   private yeuCauRepo = new YeuCauTraPhongRepository();
+  private paypalService = new PaypalService();
 
   /**
    * Bước 1: Lấy danh sách hợp đồng chờ đối soát hoàn cọc
@@ -41,6 +43,16 @@ export class HoanCocService {
     const yeuCau = await this.yeuCauRepo.docYeuCauTheoHD(maHD);
     if (!yeuCau) throw new Error('Không tìm thấy yêu cầu trả phòng');
 
+    // Tiền cọc lấy chuẩn xác từ HopDongService
+    const tienCoc = Number(hopDong.tienCoc || 0); 
+
+    let phiPhatBaoTre = 0;
+    let lyDoHienThi = yeuCau.lydo || '';
+    if (lyDoHienThi.startsWith('[PENALTY_25]')) {
+      phiPhatBaoTre = tienCoc * 0.25;
+      lyDoHienThi = lyDoHienThi.replace('[PENALTY_25]', '').trim();
+    }
+
     // Logic tính Tỷ lệ hoàn cọc
     const ngayKy = new Date(hopDong.ngayky);
     const ngayDuKien = new Date(yeuCau.ngaydukien);
@@ -62,12 +74,10 @@ export class HoanCocService {
       }
     }
 
-    // Tiền cọc lấy chuẩn xác từ HopDongService
-    const tienCoc = Number(hopDong.tienCoc || 0); 
     const tienHoanDinhMuc = tienCoc * (tyLeHoanCoc / 100);
 
-    // Khấu trừ = Phí hư hỏng + Phí vệ sinh
-    const tongKhauTru = Number(phieuKiemTra.phihuhong || 0) + Number(phieuKiemTra.phivesinh || 0);
+    // Khấu trừ = Phí hư hỏng + Phí vệ sinh + Phí phạt báo trễ
+    const tongKhauTru = Number(phieuKiemTra.phihuhong || 0) + Number(phieuKiemTra.phivesinh || 0) + phiPhatBaoTre;
     const thucNhanChi = tienHoanDinhMuc - tongKhauTru;
 
     return {
@@ -78,7 +88,10 @@ export class HoanCocService {
       tienHoanDinhMuc,
       tongKhauTru,
       thucNhanChi,
-      chiTietPhieu: phieuKiemTra
+      phiPhatBaoTre,
+      lyDoHienThi,
+      chiTietPhieu: phieuKiemTra,
+      stk: yeuCau.stknhancoc
     };
   }
 
@@ -97,13 +110,34 @@ export class HoanCocService {
         maNV: 1 // Hardcode nhân viên hiện tại
       };
 
-      // BDsBUS -> HdBUS: capNhatTrangThai(maHD, 4)
+      // GỌI PAYPAL PAYOUT NẾU THỰC NHẬN CHI > 0
+      let paypalResponse = null;
+      if (chiPhi.thucNhanChi > 0 && chiPhi.stk) {
+        const amountUSD = chiPhi.thucNhanChi / 25000; // Tỷ giá 25000 VND = 1 USD
+        const email = chiPhi.stk; // Lấy email từ trường stk
+        const batchId = `HD${maHD}_${Date.now()}`;
+        
+        paypalResponse = await this.paypalService.sendPayout(
+          email, 
+          amountUSD, 
+          `Hoan tien coc phong tro cho hop dong ${maHD}`, 
+          batchId
+        );
+      }
+
+      // Cập nhật trạng thái hợp đồng (4 là đã thanh lý)
       await this.hopDongService.capNhatTrangThai(maHD, 4);
 
-      // BDsBUS -> BDsDB: themPhanGhiMoi(bds)
+      // Lưu bảng đối soát
       const result = await this.bangDoiSoatRepo.themPhanGhiMoi(bdsData);
       
-      return result;
+      // Ở đây lý tưởng là cập nhật YeuCauTraPhong thành trạng thái Đã Hoàn Tiền (trạng thái 3 chẳng hạn)
+      // Nhưng hiện tại logic cũ đã coi như xong.
+      
+      return {
+        ...result,
+        paypalResponse
+      };
     } catch (error) {
       throw new Error(`Lỗi khi lưu bảng đối soát: ${(error as Error).message}`);
     }

@@ -34,17 +34,35 @@ const RoomCheck: React.FC = () => {
   const currentStatus = Number(activeRecordData?.trangthai || 1);
 
   useEffect(() => {
-    axios.get('/api/finance/tra-phong/cho-tra-phong').then(res => {
-      if (res.data.success && res.data.data.length > 0) {
-        setRecords(res.data.data.map((row: any) => ({
-          id: `HD-${row.mahd || row.MaHD}`,
-          room: row.tenphong || row.TenPhong || 'P.102',
-          name: row.hoten || row.HoTen,
-          trangthai: Number(row.trangthai || row.TrangThai || 1)
-        })));
-        setActiveRecord(`HD-${res.data.data[0].mahd || res.data.data[0].MaHD}`);
-      }
-    }).catch(err => console.error('Lỗi tải danh sách chờ trả phòng:', err));
+    const fetchData = () => {
+      axios.get('/api/finance/tra-phong/cho-tra-phong').then(res => {
+        if (res.data.success && res.data.data.length > 0) {
+          const newRecords = res.data.data.map((row: any) => ({
+            id: `HD-${row.mahd || row.MaHD}`,
+            room: row.tenphong || row.TenPhong || 'P.102',
+            name: row.hoten || row.HoTen,
+            date: row.ngaydukien || row.NgayDuKien,
+            trangthai: Number(row.trangthai || row.TrangThai || 1)
+          }));
+          setRecords(newRecords);
+          
+          setActiveRecord((prev) => {
+            // Nếu chưa có activeRecord hoặc record hiện tại không còn trong list, chọn cái đầu tiên
+            if (!prev || !newRecords.find((r: any) => r.id === prev)) {
+              return newRecords[0].id;
+            }
+            return prev;
+          });
+        } else {
+          setRecords([]);
+        }
+      }).catch(err => console.error('Lỗi tải danh sách chờ trả phòng:', err));
+    };
+
+    fetchData(); // Gọi ngay lần đầu
+    const interval = setInterval(fetchData, 10000); // Polling 10s
+
+    return () => clearInterval(interval);
   }, []);
 
   const [items, setItems] = useState([
@@ -225,9 +243,17 @@ const RoomCheck: React.FC = () => {
                 {record.trangthai === 2 && <span className="px-2 py-0.5 bg-success/20 text-success text-[10px] rounded font-bold uppercase">Đã hoàn tất</span>}
                 {record.trangthai === 3 && <span className="px-2 py-0.5 bg-error/20 text-error text-[10px] rounded font-bold uppercase">Đang tranh chấp</span>}
               </div>
-              <div className="flex items-center gap-2 text-secondary">
-                <span className="material-symbols-outlined text-sm">person</span>
-                <span className="font-body text-sm">{record.name}</span>
+              <div className="flex items-center justify-between text-secondary mt-1">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">person</span>
+                  <span className="font-body text-sm">{record.name}</span>
+                </div>
+                {record.date && (
+                  <div className="flex items-center gap-1 text-[11px] bg-surface-container px-2 py-0.5 rounded-full">
+                    <span className="material-symbols-outlined text-[12px]">calendar_clock</span>
+                    <span>{new Date(record.date).toLocaleDateString('vi-VN')}</span>
+                  </div>
+                )}
               </div>
             </button>
           ))}
