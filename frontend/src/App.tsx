@@ -5,6 +5,7 @@ import Header from './components/Header';
 import Dashboard from './pages/Dashboard';
 import RoomCheck from './pages/RoomCheck';
 import RefundCheck from './pages/RefundCheck';
+import AppointmentCheck from './pages/AppointmentCheck';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/room_check" element={<RoomCheck />} />
             <Route path="/refund_check" element={<RefundCheck />} />
+            <Route path="/appointment_check" element={<AppointmentCheck />} />
           </Routes>
         </main>
       </div>

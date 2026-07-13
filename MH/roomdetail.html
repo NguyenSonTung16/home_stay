@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport" />
+    <title>Chi tiết phòng - Tòa A</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed-dim": "#b6c4ff",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#00236f",
+                        "on-surface": "#191c1e",
+                        "on-secondary-container": "#54647a",
+                        "warning": "#F59E0B",
+                        "surface-dim": "#d8dadc",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#384055",
+                        "on-primary": "#ffffff",
+                        "success": "#10B981",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface-variant": "#444651",
+                        "surface-muted": "#F1F5F9",
+                        "error-container": "#ffdad6",
+                        "surface-container": "#eceef0",
+                        "surface-tint": "#4059aa",
+                        "danger": "#EF4444",
+                        "surface-bright": "#f7f9fb",
+                        "info": "#3B82F6",
+                        "secondary": "#505f76",
+                        "tertiary": "#222a3e",
+                        "on-tertiary-container": "#a4acc5",
+                        "primary-fixed": "#dce1ff",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-primary-fixed-variant": "#264191",
+                        "primary-container": "#1e3a8a",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "tertiary-fixed": "#dae2fd",
+                        "on-secondary-fixed": "#0b1c30",
+                        "border-subtle": "#E2E8F0",
+                        "on-primary-container": "#90a8ff",
+                        "outline-variant": "#c5c5d3",
+                        "background": "#f7f9fb",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-primary-fixed": "#00164e",
+                        "outline": "#757682"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xl": "32px",
+                        "margin-desktop": "32px",
+                        "lg": "24px",
+                        "unit": "4px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "gutter": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface">
+    <!-- Top App Bar -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface shadow-sm border-b border-outline-variant h-14 flex items-center px-margin-mobile justify-between">
+        <div class="flex items-center gap-4">
+            <button aria-label="Quay lại"
+                class="p-2 -ml-2 rounded-full hover:bg-surface-container active:opacity-80 transition-all">
+                <span class="material-symbols-outlined text-primary">arrow_back</span>
+            </button>
+            <h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Phòng 4 người - Cao cấp</h1>
+        </div>
+        <button class="p-2 rounded-full hover:bg-surface-container active:opacity-80 transition-all">
+            <span class="material-symbols-outlined text-primary">share</span>
+        </button>
+    </header>
+    <main class="pt-14 pb-32">
+        <!-- Image Gallery Hero -->
+        <section class="relative">
+            <div class="w-full aspect-[4/3] bg-surface-container overflow-hidden">
+                <img alt="Phòng ngủ cao cấp" class="w-full h-full object-cover"
+                    data-alt="A professionally photographed interior of a modern dormitory room with white walls and sleek furniture. The room features a bunk bed with clean grey linens and a large window letting in bright, soft natural light. The overall aesthetic is clean and corporate with a palette of deep blues and neutral grays, reflecting a high-efficiency living environment for students."
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuA56wTxeaDwoV4hphGCAobuBPBGMz15TV8sqrs23Iootl2c2REQK3gh2Gyxqbt7NcNQ_qle03YUR-Gn5BhuzjJRM2hupvo8LL6G1RghfLVB2Y_wHJ8818rSHBnELZOC-B0Ero4BL41IXqElpnFUya7HSUap1fl4H8voJyx2eDycgBow7ZOSq3HlE9leUHMOEUGY2MRa0zB-DfBz5LoSzFMPDjEiJGJosgTUnhlKevB8xIMBp0jpuTyV9l8Ae6-XN21x88-3acBFkZmf" />
+            </div>
+            <!-- Thumbnails -->
+            <div class="flex gap-2 px-margin-mobile -mt-12 relative z-10 overflow-x-auto hide-scrollbar pb-4">
+                <div class="flex-shrink-0 w-24 h-24 rounded-xl border-2 border-primary overflow-hidden shadow-lg">
+                    <img alt="Góc phòng" class="w-full h-full object-cover"
+                        data-alt="A close-up shot of a modern bunk bed ladder and smooth wooden frame in a bright dormitory room. The lighting is warm and inviting, highlighting the high-quality materials and professional finish of the furniture. The background shows soft-focused modern wall art."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDutl6lG0DeQW2ISj489MgZQK1zS86ap3q-Mi76flZVl3du-GYQALI0ZvDQHUxAvh4cjdNOeLc23woHqeWwQG_3dqNh4rFLS2VyqFQ1h6Y12OZHCZXtuearsi3zesBIzZ-vuvvr669-EhEeTRezr1k7VTPzI-wrmEs-teevB_xB5pQ-me7vFCxLosuA2AkgDbNrDZcmyDdzcNfObEMFYZY_7iCgZzewQEB2SLpA86yGEEcX5trz0f3fn6Q5IiiuFbGTJC17c2F1oX90" />
+                </div>
+                <div
+                    class="flex-shrink-0 w-24 h-24 rounded-xl border-2 border-white overflow-hidden shadow-lg bg-surface">
+                    <img alt="Bàn làm việc" class="w-full h-full object-cover"
+                        data-alt="A clean, minimalist study desk with a sleek ergonomic chair and a small desk lamp. The setup is organized for high efficiency, with a soft ambient glow from the lamp casting gentle shadows on the white desktop. The wall behind is a neutral light gray."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnHORDpKe_WgXUNBGKbf-sYPwC36uLu3k4--a9aBwoVouwNpsnpzFBJR6MXDWr8CXLdznvB25WRpqn1iYnbj-M8QwYA9AHKRH581bcTKFh208KDHBXIqP-igko77_3y4gipe4FkDVl9sV0LW9b9v9Q2K-kPhwpTxZlMRw2o-WRik4disabv5KCzA9RdSKCvOEHzeb90_IK55a6yRzlBc5jUMONk0pOJ2Mlusg1ACd4mir7ROV7ul5I7VOblh5WkKyeadE28oyoyBnY" />
+                </div>
+                <div
+                    class="flex-shrink-0 w-24 h-24 rounded-xl border-2 border-white overflow-hidden shadow-lg bg-surface">
+                    <img alt="Tủ đồ" class="w-full h-full object-cover"
+                        data-alt="A modern storage solution featuring a floor-to-ceiling wooden cabinet with integrated smart locks. The design is systematic and professional, emphasizing security and space optimization in a shared living environment. The lighting is crisp and clear."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmBUrc6sijPwVDeDwXEJEUWnGC5EuPX1MeDXA7P7Upd3oXHv5qXmi-UqWf8jM4b_xBZlYgFqNPPWIAW9HECIbekjdNXslIyDW9YyvqrFchnEW_bxlZzqyVTF99wrorJfihUeJA7OD9ukgDU0qmQIheuAqQnZThOW4-htO5aQOp3Uid65BAHY1KZHnrigeTz3IHn589Vz5YwQfliHYOgwBCNVVjTtwarRnWQouNwzXvT7bAIS8nFglg3974RCzYCj2cTF5svH2pKJLN" />
+                </div>
+                <div
+                    class="flex-shrink-0 w-24 h-24 rounded-xl border-2 border-white overflow-hidden shadow-lg bg-surface flex items-center justify-center bg-surface-container">
+                    <span class="font-label-md text-primary">+5</span>
+                </div>
+            </div>
+        </section>
+        <!-- Main Info -->
+        <section class="px-margin-mobile mt-4">
+            <div class="flex flex-col gap-2">
+                <div class="flex justify-between items-baseline">
+                    <div class="flex flex-col">
+                        <span class="text-primary font-headline-lg-mobile text-headline-lg-mobile">2.2tr <span
+                                class="text-body-md font-normal text-on-surface-variant">/ tháng</span></span>
+                    </div>
+                    <div
+                        class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-label-sm text-label-sm flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-success"></span>
+                        Còn 3 chỗ trống
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 text-on-surface-variant font-body-md text-body-md">
+                    <span class="material-symbols-outlined text-sm">apartment</span>
+                    Vị trí: Tòa A
+                </div>
+            </div>
+        </section>
+        <!-- Description -->
+        <section class="px-margin-mobile mt-xl">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface mb-sm">Mô tả chi tiết</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                Phòng được thiết kế hiện đại, đầy đủ ánh sáng tự nhiên. Phù hợp cho sinh viên và người đi làm trẻ cần
+                không gian yên tĩnh và tiện nghi.
+            </p>
+        </section>
+        <!-- Amenities Grid -->
+        <section class="px-margin-mobile mt-xl">
+            <h2 class="font-headline-sm text-headline-sm text-on-surface mb-md">Tiện nghi &amp; Dịch vụ</h2>
+            <div class="grid grid-cols-1 gap-sm">
+                <!-- Amenity Item -->
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">wifi</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Wi-Fi</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Tốc độ cao</span>
+                    </div>
+                </div>
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">ac_unit</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Máy lạnh</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Inverter tiết kiệm điện</span>
+                    </div>
+                </div>
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">lock</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Tủ cá nhân</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Khóa từ</span>
+                    </div>
+                </div>
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">bed</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Giường tầng</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Nệm cao su êm ái</span>
+                    </div>
+                </div>
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">cleaning_services</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Dịch vụ dọn phòng</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">2 lần/tuần</span>
+                    </div>
+                </div>
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">soup_kitchen</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Khu vực bếp chung</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Đầy đủ dụng cụ</span>
+                    </div>
+                </div>
+                <div
+                    class="flex items-start p-md bg-white rounded-xl border border-border-subtle shadow-sm hover:border-primary-fixed-dim transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-primary-fixed flex items-center justify-center mr-md">
+                        <span class="material-symbols-outlined text-primary">local_parking</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="font-label-md text-label-md text-on-surface">Bãi đậu xe</span>
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">An ninh 24/7</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Shared Facilities -->
+        <section class="px-margin-mobile mt-xl pb-10">
+            <div class="bg-surface-container-low p-lg rounded-xl border-l-4 border-primary">
+                <h3 class="font-label-md text-label-md text-primary mb-sm">Tiện ích chung tòa nhà</h3>
+                <p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Khu vực sinh hoạt chung, Máy giặt sấy tự động, Hệ thống PCCC hiện đại.
+                </p>
+            </div>
+        </section>
+    </main>
+    <!-- Footer Action Buttons -->
+    <footer
+        class="fixed bottom-0 w-full z-50 bg-surface border-t border-outline-variant p-margin-mobile flex gap-md shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
+        <button
+            class="flex-1 py-3 px-4 border border-primary text-primary font-label-md text-label-md rounded-xl hover:bg-surface-container transition-colors active:scale-95">Hẹn
+            xem phòng</button>
+        <button
+            class="flex-[1.5] py-3 px-4 bg-primary text-on-primary font-label-md text-label-md rounded-xl shadow-md hover:bg-opacity-90 transition-all active:scale-95">
+            Đặt cọc ngay
+        </button>
+    </footer>
+    <!-- Interactive Layer: Simple Scroll Indicator -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const gallery = document.querySelector('.overflow-x-auto');
+            gallery.addEventListener('scroll', () => {
+                // Potential for adding micro-interactions here
+            });
+        });
+    </script>
+</body>
+
+</html>

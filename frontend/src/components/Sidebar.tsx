@@ -48,6 +48,20 @@ const Sidebar: React.FC = () => {
           <span className="material-symbols-outlined">payments</span>
           <span className="font-body">Xử lý hoàn cọc</span>
         </NavLink>
+
+        <NavLink
+          to="/appointment_check"
+          className={({ isActive }) =>
+            `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+              isActive
+                ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+            }`
+          }
+        >
+          <span className="material-symbols-outlined">calendar_month</span>
+          <span className="font-body">Xử lý lịch hẹn</span>
+        </NavLink>
       </nav>
       <div className="px-gutter pt-4 mt-auto border-t border-outline-variant">
         <button className="flex items-center w-full px-4 py-2 gap-3 text-secondary hover:text-primary hover:bg-surface-container transition-colors rounded-lg mb-2">

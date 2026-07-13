@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Đăng ký lịch hẹn - FIT 4.0</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2d3133",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container": "#eceef0",
+                        "background": "#f7f9fb",
+                        "tertiary-fixed": "#dae2fd",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary": "#222a3e",
+                        "primary": "#00236f",
+                        "surface": "#f7f9fb",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-tertiary-container": "#a4acc5",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#54647a",
+                        "inverse-primary": "#b6c4ff",
+                        "outline": "#757682",
+                        "info": "#3B82F6",
+                        "surface-variant": "#e0e3e5",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "warning": "#F59E0B",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "tertiary-container": "#384055",
+                        "on-surface-variant": "#444651",
+                        "on-primary-fixed-variant": "#264191",
+                        "surface-muted": "#F1F5F9",
+                        "primary-container": "#1e3a8a",
+                        "on-surface": "#191c1e",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#dce1ff",
+                        "danger": "#EF4444",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "secondary-container": "#d0e1fb",
+                        "on-primary": "#ffffff",
+                        "border-subtle": "#E2E8F0",
+                        "on-background": "#191c1e",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-error-container": "#93000a",
+                        "success": "#10B981",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-tint": "#4059aa",
+                        "on-primary-container": "#90a8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#00164e",
+                        "secondary-fixed": "#d3e4fe",
+                        "outline-variant": "#c5c5d3",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary": "#505f76",
+                        "surface-dim": "#d8dadc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "unit": "4px",
+                        "gutter": "20px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "md": "16px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-surface min-h-screen pb-24">
+    <!-- Header Section (Predicted TopAppBar Variant for Sub-page) -->
+    <header
+        class="bg-surface-container-lowest flex justify-between items-center px-margin-mobile h-16 w-full fixed top-0 z-50 shadow-sm">
+        <div class="flex items-center gap-4">
+            <button class="transition-all duration-200 active:scale-95 text-primary" onclick="history.back()">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <h1 class="font-headline-md text-headline-md font-bold text-primary">Đặt lịch xem nhiều phòng</h1>
+        </div>
+        <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+            <span class="material-symbols-outlined w-full h-full flex items-center justify-center text-outline-variant"
+                style="font-size: 40px;">account_circle</span>
+        </div>
+    </header>
+    <main class="mt-20 px-margin-mobile space-y-xl">
+        <section class="space-y-sm">
+            <div class="flex justify-between items-center">
+                <h2 class="font-label-md text-label-md text-on-surface-variant uppercase">Danh sách phòng đã chọn</h2>
+                <span class="font-label-sm text-label-sm text-primary">3 phòng</span>
+            </div>
+            <div class="flex gap-md overflow-x-auto pb-2 hide-scrollbar">
+                <!-- Room 1 -->
+                <div
+                    class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-xl p-sm border border-outline-variant shadow-sm">
+                    <div class="flex gap-sm">
+                        <img alt="Room" class="w-16 h-16 rounded-lg object-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD07A-5Xk05M7Gh2j3F_Zu92E9dWQ5ypBj7bfGS0vWFxYyTPRH7BoEVVlC8QPkUKd2zyjKe23zXR6ccQ0qVTn3lE_5bumU3xwjKs_L7canVTmIbb27ZJF2R7i9QKewIcHVEOyt8nGeiQ2BpMhOCrIVwpod7gkE1fJG5UDakpugVaZbUTQsMXUWf1c9F90PbB1vqXcC_zu2XKgFURYi2CDrcAkesvzHkmasa8WK_deZ7PeOPSt50Q_Wg5ADY7nMtP4uRm8IR8RMr8Fco">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-label-md text-label-md text-primary line-clamp-1">Studio Cao Cấp - T12</h3>
+                            <p class="text-[12px] text-on-surface-variant truncate">Quận 1, TP. HCM</p>
+                            <p class="font-bold text-primary text-label-md">8.5tr<span
+                                    class="text-[10px] font-normal">/tháng</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Room 2 -->
+                <div
+                    class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-xl p-sm border border-outline-variant shadow-sm">
+                    <div class="flex gap-sm">
+                        <img alt="Room" class="w-16 h-16 rounded-lg object-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD07A-5Xk05M7Gh2j3F_Zu92E9dWQ5ypBj7bfGS0vWFxYyTPRH7BoEVVlC8QPkUKd2zyjKe23zXR6ccQ0qVTn3lE_5bumU3xwjKs_L7canVTmIbb27ZJF2R7i9QKewIcHVEOyt8nGeiQ2BpMhOCrIVwpod7gkE1fJG5UDakpugVaZbUTQsMXUWf1c9F90PbB1vqXcC_zu2XKgFURYi2CDrcAkesvzHkmasa8WK_deZ7PeOPSt50Q_Wg5ADY7nMtP4uRm8IR8RMr8Fco">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-label-md text-label-md text-primary line-clamp-1">Căn hộ 1PN - Tầng 5</h3>
+                            <p class="text-[12px] text-on-surface-variant truncate">Quận 3, TP. HCM</p>
+                            <p class="font-bold text-primary text-label-md">12tr<span
+                                    class="text-[10px] font-normal">/tháng</span></p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Room 3 -->
+                <div
+                    class="flex-shrink-0 w-64 bg-surface-container-lowest rounded-xl p-sm border border-outline-variant shadow-sm">
+                    <div class="flex gap-sm">
+                        <img alt="Room" class="w-16 h-16 rounded-lg object-cover"
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuD07A-5Xk05M7Gh2j3F_Zu92E9dWQ5ypBj7bfGS0vWFxYyTPRH7BoEVVlC8QPkUKd2zyjKe23zXR6ccQ0qVTn3lE_5bumU3xwjKs_L7canVTmIbb27ZJF2R7i9QKewIcHVEOyt8nGeiQ2BpMhOCrIVwpod7gkE1fJG5UDakpugVaZbUTQsMXUWf1c9F90PbB1vqXcC_zu2XKgFURYi2CDrcAkesvzHkmasa8WK_deZ7PeOPSt50Q_Wg5ADY7nMtP4uRm8IR8RMr8Fco">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-label-md text-label-md text-primary line-clamp-1">Studio Ban Công - T8</h3>
+                            <p class="text-[12px] text-on-surface-variant truncate">Bình Thạnh, TP. HCM</p>
+                            <p class="font-bold text-primary text-label-md">9tr<span
+                                    class="text-[10px] font-normal">/tháng</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Selected Room Card -->
+        <!-- Date Selection (Calendar View) -->
+        <section class="space-y-sm">
+            <div class="flex justify-between items-center">
+                <h2 class="font-label-md text-label-md text-on-surface-variant uppercase">Chọn ngày xem phòng</h2>
+                <span class="font-label-sm text-label-sm text-primary">Tháng 10, 2023</span>
+            </div>
+            <div
+                class="bg-surface-container-lowest rounded-xl p-md shadow-[0px_2px_4px_rgba(30,58,138,0.05)] border border-outline-variant">
+                <div class="calendar-grid text-center font-label-sm text-label-sm text-outline mb-2">
+                    <div class="">CN</div>
+                    <div class="">T2</div>
+                    <div class="">T3</div>
+                    <div class="">T4</div>
+                    <div class="">T5</div>
+                    <div class="">T6</div>
+                    <div class="">T7</div>
+                </div>
+                <div class="calendar-grid gap-y-2">
+                    <!-- Placeholder days for Oct 2023 starting Sunday -->
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-outline font-body-sm text-body-sm opacity-50"
+                        disabled="">30</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">1</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">2</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">3</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">4</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">5</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">6</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">7</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full bg-primary text-on-primary font-bold text-body-sm shadow-md">8</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">9</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">10</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">11</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">12</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">13</button>
+                    <button
+                        class="h-10 w-10 mx-auto flex items-center justify-center rounded-full text-on-surface font-body-sm text-body-sm hover:bg-surface-container transition-colors">14</button>
+                </div>
+            </div>
+        </section>
+        <!-- Time Selection -->
+        <section class="space-y-sm">
+            <h2 class="font-label-md text-label-md text-on-surface-variant uppercase">Chọn giờ hẹn</h2>
+            <div class="flex flex-wrap gap-md">
+                <button
+                    class="time-chip flex-1 min-w-[80px] py-3 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md transition-all duration-200 active:scale-95 text-center"
+                    onclick="selectTime(this)">
+                    08:00
+                </button>
+                <button
+                    class="time-chip flex-1 min-w-[80px] py-3 rounded-xl border-2 border-primary bg-primary-container/10 text-primary font-bold text-label-md transition-all duration-200 active:scale-95 text-center"
+                    onclick="selectTime(this)">
+                    09:30
+                </button>
+                <button
+                    class="time-chip flex-1 min-w-[80px] py-3 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md transition-all duration-200 active:scale-95 text-center"
+                    onclick="selectTime(this)">
+                    14:00
+                </button>
+                <button
+                    class="time-chip flex-1 min-w-[80px] py-3 rounded-xl border border-outline-variant bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md transition-all duration-200 active:scale-95 text-center"
+                    onclick="selectTime(this)">
+                    16:30
+                </button>
+            </div>
+        </section>
+        <!-- Notes Section -->
+        <section class="space-y-sm">
+            <h2 class="font-label-md text-label-md text-on-surface-variant uppercase">Ghi chú cho Sale</h2>
+            <div class="relative">
+                <textarea
+                    class="w-full h-32 p-md bg-surface-container-lowest border border-outline-variant rounded-xl font-body-sm text-body-sm focus:border-2 focus:border-primary focus:ring-0 focus:shadow-[0_0_8px_rgba(30,58,138,0.2)] transition-all resize-none"
+                    placeholder="Mô tả nhu cầu cụ thể của bạn (ví dụ: cần xem thêm bãi đỗ xe)..."></textarea>
+                <span
+                    class="absolute bottom-3 right-3 text-outline text-[10px] uppercase font-bold tracking-widest">Optional</span>
+            </div>
+        </section>
+    </main>
+    <!-- Bottom Action Bar -->
+    <div
+        class="fixed bottom-0 w-full bg-surface-container-lowest p-margin-mobile shadow-[0px_-2px_4px_rgba(30,58,138,0.05)] z-50">
+        <button
+            class="w-full bg-primary text-on-primary py-4 rounded-xl font-headline-sm text-headline-sm font-bold shadow-lg transition-all duration-200 active:scale-[0.98] hover:opacity-90 flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_add_on</span>
+            Xác nhận đặt lịch
+        </button>
+    </div>
+    <script>
+        function selectTime(element) {
+            // Remove active classes from all chips
+            document.querySelectorAll('.time-chip').forEach(chip => {
+                chip.classList.remove('border-2', 'border-primary', 'bg-primary-container/10', 'text-primary', 'font-bold');
+                chip.classList.add('border', 'border-outline-variant', 'bg-surface-container-lowest', 'text-on-surface-variant');
+            });
+
+            // Add active classes to selected chip
+            element.classList.remove('border', 'border-outline-variant', 'bg-surface-container-lowest', 'text-on-surface-variant');
+            element.classList.add('border-2', 'border-primary', 'bg-primary-container/10', 'text-primary', 'font-bold');
+        }
+
+        // Simple day selection interaction
+        document.querySelectorAll('.calendar-grid button').forEach(day => {
+            day.addEventListener('click', function () {
+                if (this.disabled) return;
+                document.querySelectorAll('.calendar-grid button').forEach(d => {
+                    if (!d.disabled && d.classList.contains('bg-primary')) {
+                        d.classList.remove('bg-primary', 'text-on-primary', 'font-bold', 'shadow-md');
+                        d.classList.add('text-on-surface');
+                    }
+                });
+                this.classList.add('bg-primary', 'text-on-primary', 'font-bold', 'shadow-md');
+                this.classList.remove('text-on-surface');
+            });
+        });
+    </script>
+
+
+</body>
+
+</html>

@@ -4,6 +4,7 @@
     "start": "tsx app.ts"
   },
   "dependencies": {
+    "@paypal/checkout-server-sdk": "^1.0.3",
     "@types/express": "^5.0.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/jest": "^30.0.0",
+    "@types/paypal__checkout-server-sdk": "^1.0.8",
     "@types/supertest": "^7.2.0",
     "cors": "^2.8.6",
     "jest": "^30.4.2",

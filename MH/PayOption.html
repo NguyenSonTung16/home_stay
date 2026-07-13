@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#757682",
+                        "on-tertiary-container": "#a4acc5",
+                        "primary": "#00236f",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-dim": "#d8dadc",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed-variant": "#264191",
+                        "inverse-surface": "#2d3133",
+                        "success": "#10B981",
+                        "surface-muted": "#F1F5F9",
+                        "on-secondary-container": "#54647a",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-error": "#ffffff",
+                        "warning": "#F59E0B",
+                        "surface-container": "#eceef0",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#90a8ff",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "secondary": "#505f76",
+                        "on-background": "#191c1e",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#444651",
+                        "secondary-container": "#d0e1fb",
+                        "border-subtle": "#E2E8F0",
+                        "info": "#3B82F6",
+                        "error": "#ba1a1a",
+                        "tertiary": "#222a3e",
+                        "inverse-on-surface": "#eff1f3",
+                        "outline-variant": "#c5c5d3",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-container": "#1e3a8a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dce1ff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary-fixed": "#dae2fd",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-variant": "#e0e3e5",
+                        "on-primary-fixed": "#00164e",
+                        "on-tertiary": "#ffffff",
+                        "danger": "#EF4444",
+                        "tertiary-container": "#384055",
+                        "surface-tint": "#4059aa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .method-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .method-card:hover {
+            border-color: #00236f;
+            background-color: #f2f4f6;
+        }
+
+        .method-card.active {
+            border-color: #1e3a8a;
+            background-color: #d0e1fb;
+            box-shadow: 0 0 8px rgba(30, 58, 138, 0.2);
+            border-width: 2px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+    <style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body-md text-on-surface min-h-screen flex flex-col">
+    <!-- Top Navigation (Shared Component Style) -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface-container-highest flex items-center justify-between px-margin-mobile h-16 shadow-[0_2px_4px_rgba(30,58,138,0.05)] md:px-margin-desktop">
+        <div class="flex items-center gap-sm">
+            <button
+                class="material-symbols-outlined text-primary hover:bg-surface-container-low transition-colors p-2 rounded-full active:scale-95">arrow_back</button>
+            <h1 class="font-headline-md text-headline-md font-bold text-primary">Phương thức thanh toán</h1>
+        </div>
+        <div class="hidden md:flex items-center gap-lg">
+            <span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">FIT 4.0
+                Ecosystem</span>
+        </div>
+    </header>
+    <main class="mt-16 mb-24 flex-grow px-margin-mobile md:px-margin-desktop py-xl max-w-4xl mx-auto w-full">
+        <!-- Summary Section -->
+        <section
+            class="bg-surface-container-lowest rounded-xl p-lg shadow-[0_2px_4px_rgba(30,58,138,0.05)] border border-border-subtle mb-xl">
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-xs">Tổng số tiền thanh
+                        toán</p>
+                    <h2 class="font-headline-lg text-headline-lg text-primary">1.250.000đ</h2>
+                </div>
+                <div class="hidden sm:block">
+                    <span class="material-symbols-outlined text-primary text-5xl opacity-10">receipt_long</span>
+                </div>
+            </div>
+            <div class="mt-md pt-md border-t border-border-subtle flex items-center gap-sm">
+                <span class="material-symbols-outlined text-info text-sm">info</span>
+                <p class="font-body-sm text-body-sm text-on-secondary-container">Vui lòng chọn phương thức phù hợp để
+                    tiếp tục.</p>
+            </div>
+        </section>
+        <!-- Payment Methods Grid -->
+        <div class="space-y-xl">
+            <!-- Wallets -->
+            <section>
+                <h3 class="font-label-md text-label-md text-on-surface-variant uppercase mb-md px-sm">Ví điện tử</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="method-card flex items-center gap-md p-md bg-white border border-border-subtle rounded-xl cursor-pointer group active-nav-marker"
+                        onclick="selectMethod(this)">
+                        <div
+                            class="w-12 h-12 rounded-lg bg-surface-muted flex items-center justify-center overflow-hidden">
+                            <img alt="MoMo" class="w-full h-full object-cover"
+                                data-alt="A close-up shot of a smartphone screen displaying a bright pink digital wallet logo with clean white typography. The logo is set against a minimalist white background, capturing a modern corporate technology vibe. The lighting is crisp and uniform, highlighting the vibrant pink tones and sharp edges of the graphic design. The overall aesthetic is professional and secure, reflecting a high-end financial application interface."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC844RWMTSE73RCM3q3stsmCvsAVdRe0Z-VxNMTfgtaWWE_hct3Cb3dmu3PQlyVNn3AmGsYmWOdpzwnkIcczHdO4MtoMNvCm0PSXx54DyYUpKbDpE5J0cC0NefpAwiNg46mmIU3813CN53XHiHOSt_KB-v_JF6rNB4OIoyHBLImDx5zNDKoTt5BK0jFwcCLGbosJ09TndhEPmS4PYz2suQmDCcxJn5awESNlIJu4jSeekeGaa-r0mTztO9CGycrD0h0q-7faTqMaZbs" />
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-headline-sm text-headline-sm text-on-surface">MoMo</h4>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">Thanh toán nhanh qua ứng dụng
+                                MoMo</p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-primary hidden group-[.active]:block">check_circle</span>
+                    </div>
+                    <div class="method-card flex items-center gap-md p-md bg-white border border-border-subtle rounded-xl cursor-pointer group"
+                        onclick="selectMethod(this)">
+                        <div
+                            class="w-12 h-12 rounded-lg bg-surface-muted flex items-center justify-center overflow-hidden">
+                            <img alt="ZaloPay" class="w-full h-full object-cover"
+                                data-alt="A high-resolution digital rendering of a financial app icon featuring vibrant blue and green gradient colors. The design is sleek and contemporary, fitting a corporate fintech platform. It is presented on a soft gray surface with subtle shadows that enhance its depth. The lighting is bright and clear, emphasizing the professional and trustworthy nature of the brand identity. The composition is centered and balanced for a modern UI layout."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuANe_yZKwn4q9Gv9-HKViomfLuPfftkL31LYRL8DG5wC1w51Kf-hsZhfnddIlO3SGs1ed5ZesHYk3TgvcuD5BxaAW93mU6x-QHm66qo2d4u0dOWngxGbY6bxY_s9lJV1XiSO2ZGzAFzOhJAs8FFQ9Tt1H_LYOi7h5GfnXHH1vDIrkGlSiwMXsIM9gDP2tJUK-zKpTo4TByCzYM2fFzybdxz5js8-k4ggXmHROGHkmRjH4hP-c1ku43vxnzWNq2HI1lKCA_j02lGpfkE" />
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-headline-sm text-headline-sm text-on-surface">ZaloPay</h4>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">Thanh toán an toàn qua ZaloPay
+                            </p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-primary hidden group-[.active]:block">check_circle</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Banking -->
+            <section>
+                <h3 class="font-label-md text-label-md text-on-surface-variant uppercase mb-md px-sm">Ngân hàng
+                    (Internet Banking)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+                    <div class="method-card flex items-center gap-md p-md bg-white border border-border-subtle rounded-xl cursor-pointer group"
+                        onclick="selectMethod(this)">
+                        <div
+                            class="w-12 h-12 rounded-lg bg-surface-muted flex items-center justify-center overflow-hidden">
+                            <img alt="Vietcombank" class="w-full h-full object-cover"
+                                data-alt="A professional bank logo set against a pristine white background. The brand colors are a deep, prestigious green and crisp white, conveying a sense of stability and institutional trust. The lighting is even and high-key, suitable for a modern corporate environment. Every detail of the typography is sharp and clean, reflecting a high-quality financial service interface. The mood is authoritative and secure, typical of a premier banking application."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdkQ3a22bH0vs9VYdOPmjWjfszIILK8PaPlcgxDyERy0AgzyiiVWwICst56E87UoI1BenrsE5ef-zHisDeghS69xeHdWpIWb08Lg68cvC2e66ydV9rVo5j2GKoiD2AfoBRvGFsveHBGn9bfAdsnwaMTY1btXSvkoIh6VFY5VtJfJMgDdzTAdiOn8MasqrO-1QBCiV0XnIwNzaD7ImtTnePxryDaWzxZLpfD5_g5V2Bere1Ss0ZjM3qth7HlYVgC7iabybenuh1z3r_" />
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-headline-sm text-headline-sm text-on-surface">Vietcombank</h4>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">Thanh toán qua app VCB Digibank
+                            </p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-primary hidden group-[.active]:block">check_circle</span>
+                    </div>
+                    <div class="method-card flex items-center gap-md p-md bg-white border border-border-subtle rounded-xl cursor-pointer group"
+                        onclick="selectMethod(this)">
+                        <div
+                            class="w-12 h-12 rounded-lg bg-surface-muted flex items-center justify-center overflow-hidden">
+                            <img alt="MB Bank" class="w-full h-full object-cover"
+                                data-alt="A sleek corporate app icon featuring a distinctive blue star on a white background with subtle red accents. The graphic design is modern and minimalist, representing a reliable financial institution. The lighting is soft and diffused, creating a premium feel without harsh reflections. The color palette is patriotic yet sophisticated, perfectly aligned with a professional banking environment. The icon is framed within a soft-cornered square, typical of high-end mobile user interfaces."
+                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeGzCY7sm8A2LTNX-LAWuKIvkK2G1qevtHu1TzLqOf7wui0FpfwyMatQIch9yjNPOE90j-vcwKvgpVq9bXY3r6eD5Qw0rdr_PuddCVURqBkvd_3Zy3i_U5cbaXFCslzuwyKXaRXPe9IWvX8DVKxF_I8_TftAt6YzjlZBrHwOirqhYYWxI538ir_DTgIFp_kD1IsVsjaqCSwWLCJ3MDPUmFnNWrR7O3aEx8dpLi03KWyZKPzsR7qvaKGtEMvsOm9Mrqcd-uNB-ksPB6" />
+                        </div>
+                        <div class="flex-grow">
+                            <h4 class="font-headline-sm text-headline-sm text-on-surface">MB Bank</h4>
+                            <p class="font-body-sm text-body-sm text-on-surface-variant">Chuyển khoản nhanh MB Bank</p>
+                        </div>
+                        <span
+                            class="material-symbols-outlined text-primary hidden group-[.active]:block">check_circle</span>
+                    </div>
+                </div>
+            </section>
+            <!-- Cards -->
+            <section>
+                <h3 class="font-label-md text-label-md text-on-surface-variant uppercase mb-md px-sm">Thẻ quốc tế</h3>
+                <div class="method-card flex items-center gap-md p-md bg-white border border-border-subtle rounded-xl cursor-pointer group"
+                    onclick="selectMethod(this)">
+                    <div class="flex gap-sm h-12 items-center px-md bg-surface-muted rounded-lg">
+                        <span class="material-symbols-outlined text-primary text-3xl">credit_card</span>
+                    </div>
+                    <div class="flex-grow">
+                        <h4 class="font-headline-sm text-headline-sm text-on-surface">Visa / Mastercard</h4>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Hỗ trợ tất cả ngân hàng quốc tế</p>
+                    </div>
+                    <span
+                        class="material-symbols-outlined text-primary hidden group-[.active]:block">check_circle</span>
+                </div>
+            </section>
+        </div>
+    </main>
+    <!-- Bottom Action Area -->
+    <div
+        class="fixed bottom-0 w-full bg-surface-container-lowest p-md pb-lg border-t border-border-subtle shadow-[0_-2px_10px_rgba(30,58,138,0.05)] z-50 md:px-margin-desktop">
+        <div class="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-md">
+            <div class="hidden md:block">
+                <p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Sẵn sàng thanh toán</p>
+                <p class="font-headline-sm text-headline-sm text-primary">1.250.000đ</p>
+            </div>
+            <button
+                class="w-full md:w-auto bg-primary-container text-on-primary-container font-label-md text-label-md py-4 px-xl rounded-xl shadow-sm hover:brightness-110 active:scale-95 duration-150 flex items-center justify-center gap-sm transition-all"
+                onclick="createOrder()">
+                <span>Tạo đơn hàng</span>
+                <span class="material-symbols-outlined">arrow_forward</span>
+            </button>
+        </div>
+    </div>
+    <!-- Toast Notification (Hidden by default) -->
+    <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] opacity-0 transition-opacity duration-300 pointer-events-none"
+        id="toast">
+        <div
+            class="bg-inverse-surface text-inverse-on-surface px-lg py-sm rounded-lg flex items-center gap-md shadow-lg border-l-4 border-success">
+            <span class="material-symbols-outlined text-success">check_circle</span>
+            <span class="font-body-sm">Đang chuyển hướng thanh toán...</span>
+        </div>
+    </div>
+    <script>
+        function selectMethod(element) {
+            // Remove active class from all method cards
+            document.querySelectorAll('.method-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            // Add active class to clicked card
+            element.classList.add('active');
+
+            // Haptic feedback simulation
+            if (window.navigator && window.navigator.vibrate) {
+                window.navigator.vibrate(10);
+            }
+        }
+
+        function createOrder() {
+            const selected = document.querySelector('.method-card.active');
+            if (!selected) {
+                alert('Vui lòng chọn một phương thức thanh toán');
+                return;
+            }
+
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                toast.classList.remove('opacity-100');
+            }, 3000);
+        }
+
+        // Initialize first option as selected
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstOption = document.querySelector('.method-card');
+            if (firstOption) selectMethod(firstOption);
+        });
+    </script>
+</body>
+
+</html>

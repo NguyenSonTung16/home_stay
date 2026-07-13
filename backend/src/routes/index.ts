@@ -2,13 +2,15 @@ import { Router } from 'express';
 import authRoutes from './authRoutes'; // Tín
 import serviceRoutes from './serviceRoutes'; // Tuấn
 import bookingRoutes from './bookingRoutes'; // Liêm
-import financeRoutes from './financeRoutes'; // Tùng
+import roomRoutes from './roomRoutes';
+import lichHenRoutes from './lichHenRoutes';
 
 const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/services', serviceRoutes);
 router.use('/booking', bookingRoutes);
-router.use('/finance', financeRoutes);
+router.use('/phong', roomRoutes);
+router.use('/lichhen', lichHenRoutes);
 
 export default router;

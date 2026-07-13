@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Thanh toán hóa đơn - FIT 4.0</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#757682",
+                        "on-tertiary-container": "#a4acc5",
+                        "primary": "#00236f",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-dim": "#d8dadc",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "secondary-fixed": "#d3e4fe",
+                        "on-tertiary-fixed-variant": "#3f465c",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed-variant": "#264191",
+                        "inverse-surface": "#2d3133",
+                        "success": "#10B981",
+                        "surface-muted": "#F1F5F9",
+                        "on-secondary-container": "#54647a",
+                        "surface-container-low": "#f2f4f6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#131b2e",
+                        "on-error": "#ffffff",
+                        "warning": "#F59E0B",
+                        "surface-container": "#eceef0",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#90a8ff",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "secondary": "#505f76",
+                        "on-background": "#191c1e",
+                        "inverse-primary": "#b6c4ff",
+                        "surface-bright": "#f7f9fb",
+                        "on-surface-variant": "#444651",
+                        "secondary-container": "#d0e1fb",
+                        "border-subtle": "#E2E8F0",
+                        "info": "#3B82F6",
+                        "error": "#ba1a1a",
+                        "tertiary": "#222a3e",
+                        "inverse-on-surface": "#eff1f3",
+                        "outline-variant": "#c5c5d3",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-container": "#1e3a8a",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-error-container": "#93000a",
+                        "primary-fixed": "#dce1ff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "tertiary-fixed": "#dae2fd",
+                        "tertiary-fixed-dim": "#bec6e0",
+                        "surface-variant": "#e0e3e5",
+                        "on-primary-fixed": "#00164e",
+                        "on-tertiary": "#ffffff",
+                        "danger": "#EF4444",
+                        "tertiary-container": "#384055",
+                        "surface-tint": "#4059aa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "sm": "8px",
+                        "xl": "32px",
+                        "margin-desktop": "32px",
+                        "margin-mobile": "16px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .qr-scanner-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00236f, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 3s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+
+            0%,
+            100% {
+                top: 0;
+            }
+
+            50% {
+                top: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+    <!-- Top AppBar (from Shared Components Logic) -->
+    <header
+        class="fixed top-0 w-full z-50 bg-surface-container-highest dark:bg-tertiary-container shadow-[0_2px_4px_rgba(30,58,138,0.05)] shadow-sm flex items-center justify-between px-margin-mobile md:px-margin-desktop h-16">
+        <div class="flex items-center gap-sm">
+            <button
+                class="p-sm rounded-full hover:bg-surface-container-low transition-colors active:scale-95 duration-150">
+                <span class="material-symbols-outlined text-primary dark:text-primary-fixed">arrow_back</span>
+            </button>
+            <h1 class="font-headline-sm text-headline-sm text-primary dark:text-primary-fixed">Thanh toán hóa đơn</h1>
+        </div>
+        <div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">FIT 4.0</div>
+    </header>
+    <main
+        class="flex-1 mt-16 pb-24 md:pb-8 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto w-full flex flex-col items-center justify-center">
+        <!-- Transaction Canvas -->
+        <div
+            class="w-full max-w-md bg-surface-container-lowest rounded-xl shadow-[0px_2px_4px_rgba(30,58,138,0.05)] border border-border-subtle p-xl flex flex-col items-center">
+            <!-- Order Summary Section -->
+            <div class="w-full text-center mb-xl">
+                <span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Thông tin đơn
+                    hàng</span>
+                <h2 class="font-headline-md text-headline-md text-on-surface mt-xs">Thanh toán tiền điện nước tháng
+                    10/2023</h2>
+                <div class="mt-md px-lg py-sm bg-surface-container rounded-lg inline-block">
+                    <span class="font-headline-lg text-headline-lg text-primary">1.250.000đ</span>
+                </div>
+            </div>
+            <!-- QR Code Module -->
+            <div class="relative p-lg bg-white rounded-xl border-2 border-primary/10 mb-xl shadow-inner group"
+                style="transform: perspective(1000px) rotateX(0deg) rotateY(0deg); transition: transform 0.5s;">
+                <div class="relative w-64 h-64 flex items-center justify-center overflow-hidden">
+                    <div class="qr-scanner-line opacity-50"></div>
+                    <img alt="Mã QR Thanh Toán" class="w-full h-full object-contain"
+                        data-alt="A high-contrast, professional QR code displayed on a clean white background within a sleek mobile application interface. The surrounding UI features a sophisticated corporate palette of deep navy blues and soft grays, with subtle glowing accents. The lighting is bright and modern, suggesting a secure and trustworthy financial transaction environment. Professional digital flat design aesthetic with crisp edges and precise alignment."
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJBJsi7ACaMNvVFKk51L3KIqvaQUR3XKef5n6MMSyWUl1vNj1s9TDVJE6vUrG7NNdvewA9wJzUwEWDGBeoiUkyjAfEmAyiaYXHBbBV8soeXMapVyZdCo7E2XnttlHCxKCj62efgHtRhf32LbAUPCKw7Yz53ILBRlAKhkCMG_ujgRbObZ-5S8ikjuND-AKn60i0yM3f01laG7RmyCS-LfTwstpRUhyEpNFCp2nAA9eddcOJK0xwhucf58AslRimSm14cn04le3VjyeK">
+                    <!-- Corner Brackets for Scanner look -->
+                    <div class="absolute top-0 left-0 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-lg"></div>
+                    <div class="absolute top-0 right-0 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-lg">
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-lg">
+                    </div>
+                    <div class="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-lg">
+                    </div>
+                </div>
+            </div>
+            <!-- Instructions -->
+            <div class="flex items-start gap-md bg-info/5 p-md rounded-lg border-l-4 border-info mb-xl w-full">
+                <span class="material-symbols-outlined text-info mt-xs"
+                    style="font-variation-settings: 'FILL' 1;">info</span>
+                <p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Mở ứng dụng ngân hàng hoặc ví điện tử để quét mã. Sau khi thanh toán thành công, hệ thống sẽ tự động
+                    cập nhật trạng thái hóa đơn của bạn.
+                </p>
+            </div>
+            <!-- Action Buttons -->
+            <div class="w-full space-y-md">
+
+                <button
+                    class="w-full border-2 border-primary text-primary py-md px-lg rounded-xl font-label-md text-label-md hover:bg-surface-container transition-all active:scale-[0.98]">
+                    Quay lại trang chủ
+                </button>
+            </div>
+        </div>
+        <!-- Decorative Background Element -->
+        <div
+            class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl">
+        </div>
+    </main>
+    <!-- Bottom Nav Bar (Suppressed as per "Task-Focused" rule but technically part of shell if needed - Here we follow suppression for focus) -->
+    <script>
+        function handleComplete() {
+            // Minimalist feedback for button interaction
+            const btn = event.currentTarget;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Đang xử lý...';
+            btn.classList.add('opacity-80');
+
+            setTimeout(() => {
+                btn.innerHTML = '<span class="material-symbols-outlined">verified</span> Thanh toán thành công!';
+                btn.classList.remove('bg-primary');
+                btn.classList.add('bg-success');
+
+                // Trigger confetti or similar effect if desired
+                console.log("Transaction verified successfully.");
+            }, 1500);
+        }
+
+        // Add a micro-interaction to the QR code
+        document.querySelector('.group').addEventListener('mousemove', (e) => {
+            const el = e.currentTarget;
+            const rect = el.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+
+            el.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        document.querySelector('.group').addEventListener('mouseleave', (e) => {
+            e.currentTarget.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+            e.currentTarget.style.transition = 'transform 0.5s ease';
+        });
+    </script>
+
+
+</body>
+
+</html>
