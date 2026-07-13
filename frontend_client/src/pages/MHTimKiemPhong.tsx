@@ -308,115 +308,115 @@ export const MHTimKiemPhong = () => {
 
                         {/* Room List / Grid - 2 cột trên PC, 1 cột trên mobile */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {filteredRooms.map((phong: any) => {
-                            const isWishlisted = danhSachQuanTam.some((p: any) => p.maphong === phong.maphong);
-                            const badgeText = phong.trangthai || "Còn trống";
-                            const isWarningBadge = badgeText === "Sắp hết" || phong.badgeColor === "warning";
+                            {filteredRooms.map((phong: any) => {
+                                const isWishlisted = danhSachQuanTam.some((p: any) => p.maphong === phong.maphong);
+                                const badgeText = phong.trangthai || "Còn trống";
+                                const isWarningBadge = badgeText === "Sắp hết" || phong.badgeColor === "warning";
 
-                            return (
-                                <div
-                                    key={phong.maphong}
-                                    className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between"
-                                >
-                                    <div>
-                                        {/* Room Image */}
-                                        <div className="relative h-48 w-full bg-[#ECEEF0]">
-                                            <img
-                                                alt={phong.tenphong}
-                                                className="w-full h-full object-cover"
-                                                src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"}
-                                            />
-                                            <div className="absolute top-3 right-3">
-                                                <span
-                                                    className={
-                                                        isWarningBadge
-                                                            ? "bg-[#D97706]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
-                                                            : "bg-[#10B981]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
-                                                    }
-                                                >
-                                                    {badgeText}
-                                                </span>
+                                return (
+                                    <div
+                                        key={phong.maphong}
+                                        className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between"
+                                    >
+                                        <div>
+                                            {/* Room Image */}
+                                            <div className="relative h-48 w-full bg-[#ECEEF0]">
+                                                <img
+                                                    alt={phong.tenphong}
+                                                    className="w-full h-full object-cover"
+                                                    src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"}
+                                                />
+                                                <div className="absolute top-3 right-3">
+                                                    <span
+                                                        className={
+                                                            isWarningBadge
+                                                                ? "bg-[#D97706]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
+                                                                : "bg-[#10B981]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
+                                                        }
+                                                    >
+                                                        {badgeText}
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            {/* Info */}
+                                            <div className="p-4 flex flex-col gap-2.5">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h4 className="text-[#00236F] font-bold text-[16px] leading-tight">
+                                                            {phong.tenphong}
+                                                        </h4>
+                                                        <p className="text-[#54647A] text-[12px] mt-0.5">
+                                                            {phong.chinhanh || "Tòa A • Tầng 1"}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-[#00236F] font-bold text-[17px]">
+                                                            {(Number(phong.giatien) / 1000000).toFixed(1)}M
+                                                        </p>
+                                                        <p className="text-[#54647A] text-[9px] uppercase font-medium tracking-wider">
+                                                            VNĐ / THÁNG
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-4 text-[#54647A] text-[12px]">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-[17px]">group</span>
+                                                        <span>{phong.succhua || 4} người</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-[17px]">square_foot</span>
+                                                        <span>{phong.dientich || 25}m²</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Hiển thị tiện ích có sẵn của phòng */}
+                                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                                    {phong.tienich?.includes("wifi") && (
+                                                        <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
+                                                            <span className="material-symbols-outlined text-[13px]">wifi</span> Wi-Fi
+                                                        </span>
+                                                    )}
+                                                    {phong.tienich?.includes("mayLanh") && (
+                                                        <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
+                                                            <span className="material-symbols-outlined text-[13px]">ac_unit</span> Máy lạnh
+                                                        </span>
+                                                    )}
+                                                    {phong.tienich?.includes("tuCaNhan") && (
+                                                        <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
+                                                            <span className="material-symbols-outlined text-[13px]">lock</span> Tủ cá nhân
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 
-                                        {/* Info */}
-                                        <div className="p-4 flex flex-col gap-2.5">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h4 className="text-[#00236F] font-bold text-[16px] leading-tight">
-                                                        {phong.tenphong}
-                                                    </h4>
-                                                    <p className="text-[#54647A] text-[12px] mt-0.5">
-                                                        {phong.chinhanh || "Tòa A • Tầng 1"}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-[#00236F] font-bold text-[17px]">
-                                                        {(Number(phong.giatien) / 1000000).toFixed(1)}M
-                                                    </p>
-                                                    <p className="text-[#54647A] text-[9px] uppercase font-medium tracking-wider">
-                                                        VNĐ / THÁNG
-                                                    </p>
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-4 text-[#54647A] text-[12px]">
-                                                <div className="flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[17px]">group</span>
-                                                    <span>{phong.succhua || 4} người</span>
-                                                </div>
-                                                <div className="flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[17px]">square_foot</span>
-                                                    <span>{phong.dientich || 25}m²</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Hiển thị tiện ích có sẵn của phòng */}
-                                            <div className="flex flex-wrap gap-1.5 pt-1">
-                                                {phong.tienich?.includes("wifi") && (
-                                                    <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
-                                                        <span className="material-symbols-outlined text-[13px]">wifi</span> Wi-Fi
-                                                    </span>
-                                                )}
-                                                {phong.tienich?.includes("mayLanh") && (
-                                                    <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
-                                                        <span className="material-symbols-outlined text-[13px]">ac_unit</span> Máy lạnh
-                                                    </span>
-                                                )}
-                                                {phong.tienich?.includes("tuCaNhan") && (
-                                                    <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
-                                                        <span className="material-symbols-outlined text-[13px]">lock</span> Tủ cá nhân
-                                                    </span>
-                                                )}
-                                            </div>
+                                        {/* Action Buttons chuẩn 100% hình ảnh */}
+                                        <div className="p-4 pt-0 flex gap-2.5">
+                                            <button
+                                                onClick={() => alert(`Đã bấm đặt cọc cho ${phong.tenphong}`)}
+                                                className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
+                                            >
+                                                Đặt cọc
+                                            </button>
+                                            <button
+                                                onClick={() => btn_henXemPhong(phong)}
+                                                className={
+                                                    isWishlisted
+                                                        ? "flex-1 bg-[#D0E1FB] border border-[#00236F] text-[#00236F] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
+                                                        : "flex-1 bg-white border border-[#00236F] text-[#00236F] hover:bg-[#F7F9FB] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
+                                                }
+                                            >
+                                                {isWishlisted ? "Đã quan tâm" : "Hẹn xem phòng"}
+                                            </button>
                                         </div>
                                     </div>
-
-                                    {/* Action Buttons chuẩn 100% hình ảnh */}
-                                    <div className="p-4 pt-0 flex gap-2.5">
-                                        <button
-                                            onClick={() => alert(`Đã bấm đặt cọc cho ${phong.tenphong}`)}
-                                            className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
-                                        >
-                                            Đặt cọc
-                                        </button>
-                                        <button
-                                            onClick={() => btn_henXemPhong(phong)}
-                                            className={
-                                                isWishlisted
-                                                    ? "flex-1 bg-[#D0E1FB] border border-[#00236F] text-[#00236F] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
-                                                    : "flex-1 bg-white border border-[#00236F] text-[#00236F] hover:bg-[#F7F9FB] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
-                                            }
-                                        >
-                                            {isWishlisted ? "Đã quan tâm" : "Hẹn xem phòng"}
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
-            </div>
             </main>
 
             {/* Floating Wishlist Button cho Mobile khi có phòng trong danh sách */}
@@ -542,12 +542,12 @@ export const MHTimKiemPhong = () => {
                 </div>
             )}
 
-            <AuthModal 
-                isOpen={isAuthModalOpen} 
-                onClose={() => setIsAuthModalOpen(false)} 
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
                 onSuccess={(user) => {
                     setCurrentUser(user);
-                }} 
+                }}
             />
         </div>
     );

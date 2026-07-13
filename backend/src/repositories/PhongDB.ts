@@ -5,7 +5,7 @@ export class PhongDB {
     static async layDS(): Promise<PhongDTO[]> {
         console.log("PhongDB: layDS called (không tham số)");
         const query = `
-            SELECT p.MaPhong, p.TenPhong, p.ChiNhanh, p.TrangThai, 
+            SELECT p.MaPhong, p.TenPhong, p.ChiNhanh, p.TrangThai, p.HinhAnh,
                    lp.TenLoai, lp.GiaTien, lp.SucChua
             FROM Phong p
             JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai

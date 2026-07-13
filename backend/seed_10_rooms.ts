@@ -43,7 +43,9 @@ async function seedData() {
       // Phòng (chia ra Standard và VIP)
       const maLoai = i <= 5 ? 1 : 2;
       const tenPhong = `P.${100 + i}`;
-      await db.query(`INSERT INTO Phong(TenPhong, TrangThai, MaLoai) VALUES ('${tenPhong}', 1, ${maLoai})`);
+      const imgIdx = ((i - 1) % 6) + 1;
+      const hinhAnh = `http://localhost:3001/room_images/P10${imgIdx}.jpg`;
+      await db.query(`INSERT INTO Phong(TenPhong, TrangThai, HinhAnh, MaLoai) VALUES ('${tenPhong}', 1, '${hinhAnh}', ${maLoai})`);
 
       // Phân bổ mã
       const maKH = i;
