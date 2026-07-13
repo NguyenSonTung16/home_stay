@@ -128,4 +128,22 @@ export class PaypalService {
       throw error;
     }
   }
+  /**
+   * Lấy chi tiết Order từ PayPal (Dùng để đối soát hoặc kiểm tra trạng thái)
+   */
+  public async getOrder(orderId: string): Promise<any> {
+    try {
+      const accessToken = await this.getAccessToken();
+      const response = await axios.get(`${this.API_BASE}/v2/checkout/orders/${orderId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('PayPal Get Order Error:', error.response?.data || error.message);
+      throw error;
+    }
+  }
 }

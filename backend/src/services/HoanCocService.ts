@@ -147,7 +147,7 @@ export class HoanCocService {
       const result = await this.bangDoiSoatRepo.themPhanGhiMoi(bdsData);
       
       return {
-        ...result,
+        success: result,
         paypalResponse
       };
     } catch (error) {

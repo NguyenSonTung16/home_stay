@@ -16,7 +16,7 @@ INSERT INTO KhachHang(MaKH, HoTen, CCCD, Email, SDT, MaTK) VALUES (99, 'Nguyễn
 
 -- Data cho khách 1
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach1', '123', 'Khach', 1);
-INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach1', '00000000001', 'khach1@test.com', '090000001', 3);
+INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach1', '00000000001', 'khach1@test.com', '090000001', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach1'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai) VALUES ('P.101', 1, 1);
 INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.101', 1, 1);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 1, 1);
@@ -26,7 +26,7 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1001, 1);
 
 -- Data cho khách 2
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach2', '123', 'Khach', 1);
-INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach2', '00000000002', 'khach2@test.com', '090000002', 4);
+INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach2', '00000000002', 'khach2@test.com', '090000002', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach2'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai) VALUES ('P.102', 1, 1);
 INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.102', 1, 2);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 2, 2);
@@ -36,7 +36,7 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1002, 2);
 
 -- Data cho khách 3
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach3', '123', 'Khach', 1);
-INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach3', '00000000003', 'khach3@test.com', '090000003', 5);
+INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach3', '00000000003', 'khach3@test.com', '090000003', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach3'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai) VALUES ('P.103', 1, 1);
 INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.103', 1, 3);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 3, 3);
@@ -46,7 +46,7 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1003, 3);
 
 -- Data cho khách 4
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach4', '123', 'Khach', 1);
-INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach4', '00000000004', 'khach4@test.com', '090000004', 6);
+INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach4', '00000000004', 'khach4@test.com', '090000004', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach4'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai) VALUES ('P.104', 1, 1);
 INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.104', 1, 4);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 4, 4);
@@ -56,7 +56,7 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1004, 4);
 
 -- Data cho khách 5
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach5', '123', 'Khach', 1);
-INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach5', '00000000005', 'khach5@test.com', '090000005', 7);
+INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach5', '00000000005', 'khach5@test.com', '090000005', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach5'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai) VALUES ('P.105', 1, 1);
 INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.105', 1, 5);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 5, 5);
@@ -187,9 +187,25 @@ VALUES
 (2, 103)
 ON CONFLICT DO NOTHING;
 
+-- Seed dữ liệu cho Hóa đơn điện nước
+INSERT INTO HoaDonDienNuoc(MaPhong, Thang, CSDienCu, CSDienMoi, CSNuocCu, CSNuocMoi, TienDien, TienNuoc, TongTien, TrangThai)
+VALUES (1, '2026-07', 100, 250, 10, 25, 375000, 150000, 525000, 'ChuaThanhToan');
+
+INSERT INTO HoaDonDienNuoc(MaPhong, Thang, CSDienCu, CSDienMoi, CSNuocCu, CSNuocMoi, TienDien, TienNuoc, TongTien, TrangThai)
+VALUES (1, '2026-06', 0, 100, 0, 10, 250000, 100000, 350000, 'DaThanhToan');
+
+-- Seed dữ liệu cho Hóa đơn phí định kỳ
+INSERT INTO HoaDonPhiDinhKy(MaHD, Thang, TienPhong, TienDichVu, TongTien, TrangThai)
+VALUES (1001, '2026-07', 2000000, 200000, 2200000, 'ChuaThanhToan');
+
+INSERT INTO HoaDonPhiDinhKy(MaHD, Thang, TienPhong, TienDichVu, TongTien, TrangThai)
+VALUES (1001, '2026-06', 2000000, 200000, 2200000, 'DaThanhToan');
+
 -- Đồng bộ sequence sau khi seed dữ liệu ID cố định
 SELECT setval('taikhoan_matk_seq', COALESCE((SELECT MAX(MaTK) FROM TaiKhoan), 1));
 SELECT setval('khachhang_makh_seq', COALESCE((SELECT MAX(MaKH) FROM KhachHang), 1));
+SELECT setval('hoadondiennuoc_mahddn_seq', COALESCE((SELECT MAX(MaHDDN) FROM HoaDonDienNuoc), 1));
+SELECT setval('hoadonphidinhky_mapdk_seq', COALESCE((SELECT MAX(MaPDK) FROM HoaDonPhiDinhKy), 1));
 
 
 
