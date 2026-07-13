@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface PhieuCoc {
@@ -11,6 +12,7 @@ interface PhieuCoc {
 }
 
 export default function ThanhToanCoc() {
+  const navigate = useNavigate();
   const [phieuList, setPhieuList] = useState<PhieuCoc[]>([]);
   const [selectedPhieu, setSelectedPhieu] = useState<PhieuCoc | null>(null);
   const [ptThanhToan, setPtThanhToan] = useState('Chuyển khoản');
@@ -27,7 +29,13 @@ export default function ThanhToanCoc() {
   const fetchDanhSach = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('/api/booking/phieu-coc/chua-thanh-toan?maKH=1');
+      const storedUser = localStorage.getItem('currentUser');
+      let maKH = 1;
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        maKH = user.MaKH || user.makh || user.id || 1;
+      }
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/booking/phieu-coc/chua-thanh-toan?maKH=${maKH}`);
       setPhieuList(res.data.data || []);
     } catch (err: any) {
       setError('Không thể tải danh sách phiếu cọc.');
@@ -52,10 +60,11 @@ export default function ThanhToanCoc() {
     setError('');
 
     try {
-      await axios.post('/api/booking/thanh-toan/xac-nhan', {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/booking/thanh-toan/xac-nhan`, {
         maCoc: selectedPhieu.macoc,
         ptThanhToan,
-        maGiaoDich
+        maGiaoDich,
+        minhChungUrl: 'https://example.com/receipt.jpg'
       });
       setMessage(`Thanh toán cho phiếu #${selectedPhieu.macoc} (Phòng ${selectedPhieu.tenphong}) đã được ghi nhận. Chờ quản lý phê duyệt.`);
       setSelectedPhieu(null);
@@ -76,9 +85,35 @@ export default function ThanhToanCoc() {
     return new Date(dateStr).toLocaleDateString('vi-VN');
   };
 
+  const renderBottomNav = () => (
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E7EB] px-4 py-3 flex justify-around items-center md:hidden z-50">
+      <button onClick={() => navigate('/')} className="flex flex-col items-center gap-1 text-secondary">
+        <span className="material-symbols-outlined">home</span>
+        <span className="text-[10px]">Trang chủ</span>
+      </button>
+      <button onClick={() => navigate('/booking')} className="flex flex-col items-center gap-1 text-secondary">
+        <span className="material-symbols-outlined">calendar_today</span>
+        <span className="text-[10px]">Đặt phòng</span>
+      </button>
+      <button className="flex flex-col items-center gap-1 text-primary">
+        <span className="material-symbols-outlined">payments</span>
+        <span className="text-[10px]">Thanh toán</span>
+      </button>
+      <button onClick={() => navigate('/profile')} className="flex flex-col items-center gap-1 text-secondary">
+        <span className="material-symbols-outlined">person</span>
+        <span className="text-[10px]">Cá nhân</span>
+      </button>
+    </div>
+  );
+
   return (
-    <div className="p-4 md:p-6 w-full max-w-4xl mx-auto bg-surface min-h-screen">
-      <h1 className="text-[24px] font-bold text-primary mb-2 font-h1">Thanh Toán Tiền Cọc</h1>
+    <div className="p-4 md:p-6 w-full max-w-5xl mx-auto bg-surface min-h-screen pb-24 font-['Inter']">
+      <div className="flex items-center gap-2 mb-6">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-[#E0E3E5] text-[#00236F] hover:bg-gray-50 transition-colors shadow-sm">
+          <span className="material-symbols-outlined">arrow_back</span>
+        </button>
+        <h1 className="text-[24px] font-bold text-primary font-h1">Thanh toán cọc</h1>
+      </div>
       <p className="text-[14px] text-secondary mb-6 font-body">Dưới đây là các phiếu đặt cọc chưa thanh toán. Chọn một phiếu để tiến hành thanh toán.</p>
 
       {/* Alerts */}
@@ -283,6 +318,41 @@ export default function ThanhToanCoc() {
           </div>
         </div>
       )}
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <div
+            onClick={() => navigate('/')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">home_work</span>
+            <span className="text-[11px] font-normal mt-0.5">Tìm kiếm</span>
+        </div>
+
+        <div
+            onClick={() => navigate('/dat-lich-hen')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">calendar_today</span>
+            <span className="text-[11px] font-normal mt-0.5">Lịch hẹn</span>
+        </div>
+
+        <div
+            onClick={() => navigate('/hop-dong')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">receipt_long</span>
+            <span className="text-[11px] font-normal mt-0.5">Hợp đồng</span>
+        </div>
+
+        <div
+            onClick={() => navigate('/lich-su-lich-hen')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">history</span>
+            <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
+        </div>
+      </nav>
     </div>
   );
 }

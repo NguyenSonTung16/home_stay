@@ -12,11 +12,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import MobileBottomNav from './components/MobileBottomNav';
 import AppointmentCheck from './pages/AppointmentCheck';
 
-// Imported Liem's pages
-import DatCoc from './pages/DatCoc';
-import ThanhToanCoc from './pages/ThanhToanCoc';
 import XuLyHoSoDatCoc from './pages/XuLyHoSoDatCoc';
-import YeuCauTraPhong from './pages/YeuCauTraPhong';
 
 const MainLayout = () => (
   <div className="bg-surface font-body text-on-surface flex min-h-screen">
@@ -40,11 +36,6 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route element={<MainLayout />}>
               <Route path="/" element={<Dashboard />} />
-              
-              {/* Liêm's Routes (Customer/General) */}
-              <Route path="/dat-coc" element={<DatCoc />} />
-              <Route path="/thanh-toan-coc" element={<ThanhToanCoc />} />
-              <Route path="/yeu-cau-tra-phong" element={<YeuCauTraPhong />} />
               
               <Route element={<ProtectedRoute allowedRoles={['QuanLy', 'Admin', 'KeToan']} />}>
                 <Route path="/ho-so-dat-coc" element={<XuLyHoSoDatCoc />} />

@@ -24,32 +24,6 @@ const Sidebar: React.FC = () => {
       </div>
 
       <nav className="flex-1 space-y-1">
-        {/* Khách hàng hoặc người dùng thường */}
-        <div className="mt-4 mb-2 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-          Dịch vụ Khách hàng
-        </div>
-        <NavLink 
-          to="/dat-coc" 
-          className={({isActive}) => `w-full flex items-center px-gutter py-3 gap-3 transition-all ${isActive ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low' : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'}`}
-        >
-          <span className="material-symbols-outlined">add_circle</span>
-          <span className="font-body">Đặt cọc</span>
-        </NavLink>
-        <NavLink 
-          to="/thanh-toan-coc" 
-          className={({isActive}) => `w-full flex items-center px-gutter py-3 gap-3 transition-all ${isActive ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low' : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'}`}
-        >
-          <span className="material-symbols-outlined">payments</span>
-          <span className="font-body">Thanh toán cọc</span>
-        </NavLink>
-        <NavLink 
-          to="/yeu-cau-tra-phong" 
-          className={({isActive}) => `w-full flex items-center px-gutter py-3 gap-3 transition-all ${isActive ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low' : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'}`}
-        >
-          <span className="material-symbols-outlined">output</span>
-          <span className="font-body">Yêu cầu trả phòng</span>
-        </NavLink>
-
         {/* Quản lý / Admin / Nhân viên */}
         {(user?.role === 'QuanLy' || user?.role === 'Admin' || user?.role === 'KeToan' || user?.role === 'Sale') && (
           <>

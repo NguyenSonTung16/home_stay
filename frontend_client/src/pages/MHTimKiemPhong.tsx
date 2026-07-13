@@ -430,7 +430,7 @@ export const MHTimKiemPhong = () => {
                                     {/* Action Buttons chuẩn 100% hình ảnh */}
                                     <div className="p-4 pt-0 flex gap-2.5">
                                         <button
-                                            onClick={() => alert(`Đã bấm đặt cọc cho ${phong.tenphong}`)}
+                                            onClick={() => navigate('/dat-coc')}
                                             className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
                                         >
                                             Đặt cọc

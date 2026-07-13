@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface PhongInfo {
@@ -14,6 +15,7 @@ interface PhongInfo {
 }
 
 export default function DatCoc() {
+  const navigate = useNavigate();
   const [rooms, setRooms] = useState<PhongInfo[]>([]);
   const [selectedRoom, setSelectedRoom] = useState<PhongInfo | null>(null);
   const [soGiuong, setSoGiuong] = useState(1);
@@ -29,7 +31,7 @@ export default function DatCoc() {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('/api/booking/phong-trong');
+      const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/booking/phong-trong`);
       setRooms(res.data.data || []);
     } catch (err: any) {
       setError('Không thể tải danh sách phòng trống.');
@@ -52,15 +54,27 @@ export default function DatCoc() {
     setError('');
 
     try {
-      await axios.post('/api/booking/dat-coc', {
-        maKH: 1,
+      const storedUser = localStorage.getItem('currentUser');
+      let maKH = 1;
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        maKH = user.MaKH || user.makh || user.id || 1;
+      }
+      
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/booking/dat-coc`, {
+        maKH: maKH,
         maPhong: selectedRoom.maphong,
         soGiuong: soGiuong,
         soThangThue: 6
       });
-      setMessage(`Đặt cọc thành công cho phòng ${selectedRoom.tenphong}! Vui lòng chuyển sang "Thanh toán cọc" để hoàn tất.`);
+      setMessage(`Đặt cọc thành công cho phòng ${selectedRoom.tenphong}! Đang chuyển hướng đến Thanh toán cọc...`);
       setSelectedRoom(null);
       fetchRooms();
+      
+      // Navigate to ThanhToanCoc after a short delay
+      setTimeout(() => {
+        navigate('/thanh-toan-coc');
+      }, 1500);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Có lỗi xảy ra khi đặt cọc.');
     } finally {
@@ -75,8 +89,13 @@ export default function DatCoc() {
   const maxBeds = selectedRoom ? parseInt(String(selectedRoom.sogiuongtrong)) : 1;
 
   return (
-    <div className="p-4 md:p-6 w-full max-w-5xl mx-auto bg-surface min-h-screen">
-      <h1 className="text-[24px] font-bold text-primary mb-2 font-h1">Đăng ký Đặt cọc</h1>
+    <div className="p-4 md:p-6 w-full max-w-5xl mx-auto bg-surface min-h-screen pb-24 font-['Inter']">
+      <div className="flex items-center gap-2 mb-6">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center rounded-full bg-white border border-[#E0E3E5] text-[#00236F] hover:bg-gray-50 transition-colors shadow-sm">
+          <span className="material-symbols-outlined">arrow_back</span>
+        </button>
+        <h1 className="text-[24px] font-bold text-primary font-h1">Đăng ký Đặt cọc</h1>
+      </div>
       <p className="text-secondary mb-6 text-[14px] font-body">Chọn phòng trống bên dưới để tiến hành đặt cọc giữ chỗ.</p>
 
       {/* Alerts */}
@@ -241,6 +260,41 @@ export default function DatCoc() {
           </div>
         </div>
       )}
+
+      {/* Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <div
+            onClick={() => navigate('/')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">home_work</span>
+            <span className="text-[11px] font-normal mt-0.5">Tìm kiếm</span>
+        </div>
+
+        <div
+            onClick={() => navigate('/dat-lich-hen')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">calendar_today</span>
+            <span className="text-[11px] font-normal mt-0.5">Lịch hẹn</span>
+        </div>
+
+        <div
+            onClick={() => navigate('/hop-dong')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">receipt_long</span>
+            <span className="text-[11px] font-normal mt-0.5">Hợp đồng</span>
+        </div>
+
+        <div
+            onClick={() => navigate('/lich-su-lich-hen')}
+            className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+        >
+            <span className="material-symbols-outlined text-[20px]">history</span>
+            <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
+        </div>
+      </nav>
     </div>
   );
 }
