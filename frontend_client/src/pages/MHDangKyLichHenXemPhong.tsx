@@ -346,6 +346,14 @@ export const MHDangKyLichHenXemPhong = () => {
                     <span className="material-symbols-outlined text-[20px]">history</span>
                     <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
                 </div>
+
+                <div
+                    onClick={() => navigate('/thanh-toan-dinh-ky')}
+                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
+                >
+                    <span className="material-symbols-outlined text-[20px]">payments</span>
+                    <span className="text-[11px] font-normal mt-0.5">Thanh toán</span>
+                </div>
             </nav>
 
         </div>

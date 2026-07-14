@@ -8,11 +8,11 @@ async function resetDB() {
     const initSql = fs.readFileSync(path.join(__dirname, '../database/init.sql'), 'utf8');
     
     console.log('Executing init.sql (This will drop and recreate tables)...');
-    // Drop all tables first by dropping public schema
+    const dbUser = process.env.DB_USERNAME || 'homestay_user';
     await db.query(`
       DROP SCHEMA public CASCADE;
       CREATE SCHEMA public;
-      GRANT ALL ON SCHEMA public TO postgres;
+      GRANT ALL ON SCHEMA public TO "${dbUser}";
       GRANT ALL ON SCHEMA public TO public;
     `);
     await db.query(initSql);

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import routes from './src/routes';
+import { DonHangService } from './src/services/DonHangService';
 
 const app = express();
 
@@ -15,4 +16,6 @@ app.use('/api', routes);
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    // Khởi động cron job đối soát đơn hàng
+    DonHangService.startCronJob();
 });

@@ -18,5 +18,6 @@ const pool = new Pool({
 export const db = {
   query: async (text: string, params?: any[]) => {
     return await pool.query(text, params);
-  }
+  },
+  connect: () => pool.connect()
 };
