@@ -3,7 +3,7 @@ import { db } from '../config/db';
 export class HopDongRepository {
   async layDanhSachTheoTrangThai(trangThai: number): Promise<any> {
     const res = await db.query(`
-      SELECT DISTINCT ON (h.MaHD) h.*, k.HoTen, pkt.MaPKT, 
+      SELECT DISTINCT ON (h.MaHD) h.*, k.HoTen, pkt.MaPKT, y.NgayDuKien as ngayyeucau,
         CASE 
           WHEN y.TrangThai = 4 THEN 5 
           WHEN bds.MaBDS IS NULL THEN 1 

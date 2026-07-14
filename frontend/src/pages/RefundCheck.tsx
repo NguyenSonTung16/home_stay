@@ -20,7 +20,7 @@ const RefundCheck: React.FC = () => {
           const newRecords = res.data.data.map((row: any) => ({
             id: `HD-${row.mahd || row.MaHD}`,
             name: row.hoten || row.HoTen,
-            date: '20/10/2023', // Demo date
+            date: row.ngayyeucau ? new Date(row.ngayyeucau).toLocaleDateString('vi-VN') : 'Không rõ',
             status: row.trangthai === 1 ? 'Chờ duyệt' : (row.trangthai === 5 ? 'Chờ thu thêm' : 'Đã hoàn tất'),
             statusCode: row.trangthai
           }));
