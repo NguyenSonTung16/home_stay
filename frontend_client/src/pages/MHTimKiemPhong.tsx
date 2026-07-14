@@ -322,7 +322,10 @@ export const MHTimKiemPhong = () => {
                                 >
                                     <div>
                                         {/* Room Image */}
-                                        <div className="relative h-48 w-full bg-[#ECEEF0]">
+                                        <div 
+                                            className="relative h-48 w-full bg-[#ECEEF0] cursor-pointer"
+                                            onClick={() => navigate(`/room/${phong.maphong}`)}
+                                        >
                                             <img
                                                 alt={phong.tenphong}
                                                 className="w-full h-full object-cover"
@@ -345,7 +348,10 @@ export const MHTimKiemPhong = () => {
                                         <div className="p-4 flex flex-col gap-2.5">
                                             <div className="flex justify-between items-start">
                                                 <div>
-                                                    <h4 className="text-[#00236F] font-bold text-[16px] leading-tight">
+                                                    <h4 
+                                                        className="text-[#00236F] font-bold text-[16px] leading-tight cursor-pointer hover:underline"
+                                                        onClick={() => navigate(`/room/${phong.maphong}`)}
+                                                    >
                                                         {phong.tenphong}
                                                     </h4>
                                                     <p className="text-[#54647A] text-[12px] mt-0.5">
@@ -507,7 +513,10 @@ export const MHTimKiemPhong = () => {
                                         >
                                             <div className="flex items-center gap-3.5">
                                                 {/* Thumbnail ảnh phòng */}
-                                                <div className="w-16 h-16 rounded-xl bg-[#ECEEF0] overflow-hidden shrink-0 border border-[#E0E3E5]">
+                                                <div 
+                                                    className="w-16 h-16 rounded-xl bg-[#ECEEF0] overflow-hidden shrink-0 border border-[#E0E3E5] cursor-pointer"
+                                                    onClick={() => navigate(`/room/${phong.maphong}`)}
+                                                >
                                                     <img
                                                         src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=400&q=80"}
                                                         alt={phong.tenphong}
@@ -515,7 +524,12 @@ export const MHTimKiemPhong = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-[15px] text-[#00236F]">{phong.tenphong}</h4>
+                                                    <h4 
+                                                        className="font-bold text-[15px] text-[#00236F] cursor-pointer hover:underline"
+                                                        onClick={() => navigate(`/room/${phong.maphong}`)}
+                                                    >
+                                                        {phong.tenphong}
+                                                    </h4>
                                                     <p className="text-[12px] text-[#54647A]">{phong.chinhanh}</p>
                                                     <p className="text-[14px] font-bold text-[#00236F] mt-0.5">
                                                         {Number(phong.giatien).toLocaleString()}đ<span className="text-[11px] font-normal text-[#54647A]">/tháng</span>
