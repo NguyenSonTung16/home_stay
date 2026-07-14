@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AuthModal } from './AuthModal';
 import { useAuth } from '../context/AuthContext';
+import BottomNav from './BottomNav';
 
 export const ClientLayout: React.FC = () => {
     const navigate = useNavigate();
@@ -86,9 +87,11 @@ export const ClientLayout: React.FC = () => {
             </header>
 
             {/* Main Content Area */}
-            <main className="pt-[72px]">
+            <main className="pt-[72px] pb-[70px] md:pb-0">
                 <Outlet />
             </main>
+
+            <BottomNav />
 
             {/* Global Auth Modal */}
             <AuthModal

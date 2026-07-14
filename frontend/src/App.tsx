@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import RoomCheck from './pages/RoomCheck';
 import RefundCheck from './pages/RefundCheck';
 
+
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
@@ -54,6 +55,7 @@ function App() {
               {/* Appointment Check for Sales */}
               <Route element={<ProtectedRoute allowedRoles={['Sale', 'Admin']} />}>
                 <Route path="/appointment_check" element={<AppointmentCheck />} />
+                <Route path="/ho-so-dat-coc" element={<XuLyHoSoDatCoc />} />
               </Route>
             </Route>
           </Route>

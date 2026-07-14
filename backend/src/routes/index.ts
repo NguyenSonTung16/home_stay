@@ -6,6 +6,7 @@ import financeRoutes from './financeRoutes'; // Tùng
 import webhookRoutes from './webhookRoutes';
 import roomRoutes from './roomRoutes';
 import lichHenRoutes from './lichHenRoutes';
+import periodicPaymentRoutes from './periodicPaymentRoutes';
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use('/phong', roomRoutes);
 router.use('/lichhen', lichHenRoutes);
 router.use('/finance', financeRoutes);
 router.use('/webhook', webhookRoutes);
+router.use('/', periodicPaymentRoutes);
 
 export default router;

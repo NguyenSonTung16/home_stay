@@ -6,6 +6,10 @@ import { MHDangKyLichHenXemPhong } from './pages/MHDangKyLichHenXemPhong';
 import { MHLichSuLichHen } from './pages/MHLichSuLichHen';
 import { MHHopDongTraPhong } from './pages/MHHopDongTraPhong';
 import ThanhToanCoc from './pages/ThanhToanCoc';
+import { MHThanhToanDinhKy } from './pages/MHThanhToanDinhKy';
+import { MHThanhToan } from './pages/MHThanhToan';
+import { MHQuetMaQR } from './pages/MHQuetMaQR';
+import { MHThongBaoKetQua } from './pages/MHThongBaoKetQua';
 
 function App() {
   return (
@@ -18,6 +22,11 @@ function App() {
             <Route path="/lich-su-lich-hen" element={<MHLichSuLichHen />} />
             <Route path="/hop-dong" element={<MHHopDongTraPhong />} />
             <Route path="/thanh-toan-coc" element={<ThanhToanCoc />} />
+            
+            <Route path="/thanh-toan-dinh-ky" element={<MHThanhToanDinhKy />} />
+            <Route path="/thanh-toan/:loaiHoaDon/:maHoaDon" element={<MHThanhToan />} />
+            <Route path="/quet-qr/:maDH" element={<MHQuetMaQR />} />
+            <Route path="/thanh-toan-ket-qua" element={<MHThongBaoKetQua />} />
           </Route>
         </Routes>
       </Router>

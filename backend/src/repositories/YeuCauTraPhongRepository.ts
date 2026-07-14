@@ -42,20 +42,20 @@ export class YeuCauTraPhongRepository {
     await db.query('UPDATE YeuCauTraPhong SET TrangThai = $1, LyDo = $2 WHERE MaYC = $3', [trangThai, lyDo, maYC]);
   }
 
-  async create(data: { NgayDuKien: string, STKNhanCoc: string, TrangThai: number, LyDo: string, MaHD: number }): Promise<any> {
-    const res = await db.query(
-      `INSERT INTO YeuCauTraPhong (NgayDuKien, STKNhanCoc, TrangThai, LyDo, MaHD)
-       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-      [data.NgayDuKien, data.STKNhanCoc, data.TrangThai, data.LyDo, data.MaHD]
-    );
-    return res.rows[0];
-  }
-
   async taoYeuCauTraPhong(ngayDuKien: string, stk: string, trangThai: number, lyDo: string, maHD: number): Promise<any> {
     const res = await db.query(
       `INSERT INTO YeuCauTraPhong (NgayDuKien, STKNhanCoc, TrangThai, LyDo, MaHD) 
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [ngayDuKien, stk, trangThai, lyDo, maHD]
+    );
+    return res.rows[0];
+  }
+
+  async create(data: { NgayDuKien: string, STKNhanCoc: string, TrangThai: number, LyDo: string, MaHD: number }): Promise<any> {
+    const res = await db.query(
+      `INSERT INTO YeuCauTraPhong (NgayDuKien, STKNhanCoc, TrangThai, LyDo, MaHD)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [data.NgayDuKien, data.STKNhanCoc, data.TrangThai, data.LyDo, data.MaHD]
     );
     return res.rows[0];
   }

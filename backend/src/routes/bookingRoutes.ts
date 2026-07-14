@@ -1,9 +1,9 @@
 import { Router } from 'express';
+import { searchRooms, getRoomDetails, createAppointment } from '../controllers/BookingController';
 import { DatCocController } from '../controllers/DatCocController';
 import { ThanhToanCocController } from '../controllers/ThanhToanCocController';
 import { HoSoDatCocController } from '../controllers/HoSoDatCocController';
 import { YeuCauTraPhongController } from '../controllers/YeuCauTraPhongController';
-import { searchRooms, getRoomDetails, createAppointment } from '../controllers/BookingController';
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
