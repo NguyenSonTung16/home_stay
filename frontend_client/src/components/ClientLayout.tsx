@@ -59,13 +59,7 @@ export const ClientLayout: React.FC = () => {
                                         <p className="text-[13px] font-semibold text-[#191C1E] truncate">{displayUsername}</p>
                                     </div>
 
-                                    <button 
-                                        onClick={() => navigate('/yeu-cau-tra-phong')}
-                                        className="w-full text-left px-4 py-2 text-[14px] text-[#54647A] hover:bg-[#F7F9FB] hover:text-[#00236F] transition-colors flex items-center gap-2"
-                                    >
-                                        <span className="material-symbols-outlined text-[18px]">exit_to_app</span>
-                                        Yêu cầu trả phòng
-                                    </button>
+
                                     <button 
                                         onClick={logout}
                                         className="w-full text-left px-4 py-2 text-[14px] text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
