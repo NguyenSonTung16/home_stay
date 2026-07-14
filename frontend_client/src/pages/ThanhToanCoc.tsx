@@ -431,30 +431,7 @@ export default function ThanhToanCoc() {
                         {message}
                       </div>
                     )}
-                    <div className="bg-[#F7F9FB] rounded-xl p-5 border border-[#E5E7EB]">
-                      <p className="font-semibold text-[14px] text-[#1F2937] mb-3 flex items-center gap-2">
-                        <span className="material-symbols-outlined text-[18px] text-primary">account_balance</span>
-                        Thông tin chuyển khoản
-                      </p>
-                      <div className="space-y-2 text-[14px] font-body">
-                        <div className="flex justify-between border-b border-[#E5E7EB] pb-2">
-                          <span className="text-secondary">Ngân hàng</span>
-                          <span className="font-semibold text-[#1F2937]">Vietcombank (VCB)</span>
-                        </div>
-                        <div className="flex justify-between border-b border-[#E5E7EB] pb-2 pt-1">
-                          <span className="text-secondary">Số tài khoản</span>
-                          <span className="font-semibold text-primary tracking-wider">1234 5678 90</span>
-                        </div>
-                        <div className="flex justify-between border-b border-[#E5E7EB] pb-2 pt-1">
-                          <span className="text-secondary">Chủ tài khoản</span>
-                          <span className="font-semibold text-[#1F2937]">CTY QUAN LY HOMESTAY</span>
-                        </div>
-                        <div className="flex justify-between pt-1">
-                          <span className="text-secondary">Nội dung CK</span>
-                          <span className="font-bold text-danger bg-danger/10 px-2 py-0.5 rounded">DATCOC {selectedPhieu.macoc}</span>
-                        </div>
-                      </div>
-                    </div>
+
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
@@ -510,7 +487,7 @@ export default function ThanhToanCoc() {
                         disabled={submitting}
                         className={`flex-[2] text-white px-4 py-3 rounded-xl font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${ptThanhToan === 'PayPal' ? 'bg-[#003087] hover:bg-[#001C66]' : 'bg-primary hover:bg-primary/90'}`}
                       >
-                        {submitting ? 'Đang gửi...' : (ptThanhToan === 'PayPal' ? 'Chuyển đến PayPal' : 'Gửi xác nhận thanh toán')}
+                        {submitting ? 'Đang xử lý...' : (ptThanhToan === 'PayPal' ? 'Chuyển đến PayPal' : 'Thanh toán')}
                       </button>
                     </div>
                   </form>
