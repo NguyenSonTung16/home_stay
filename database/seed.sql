@@ -18,7 +18,7 @@ INSERT INTO KhachHang(MaKH, HoTen, CCCD, Email, SDT, MaTK) VALUES (99, 'Nguyễn
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach1', '123', 'Khach', 1);
 INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach1', '00000000001', 'khach1@test.com', '090000001', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach1'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai, HinhAnh) VALUES ('P.101', 1, 1, 'http://localhost:3000/room_images/P101.jpg');
-INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.101', 1, 1);
+INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.101', 1, 1), ('Giường phụ 1', 0, 1), ('Giường phụ 2', 0, 1);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 1, 1);
 INSERT INTO HopDong(MaHD, NgayHetHan, MaKHDaiDien, MaNV) VALUES (1001, '2026-12-31', 1, 1);
 INSERT INTO YeuCauTraPhong(NgayDuKien, TrangThai, MaHD) VALUES ('2024-01-01', 1, 1001);
@@ -28,17 +28,17 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1001, 1);
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach2', '123', 'Khach', 1);
 INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach2', '00000000002', 'khach2@test.com', '090000002', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach2'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai, HinhAnh) VALUES ('P.102', 1, 1, 'http://localhost:3000/room_images/P102.jpg');
-INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.102', 1, 2);
+INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.102', 1, 2), ('Giường phụ 1', 0, 2), ('Giường phụ 2', 0, 2);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 2, 2);
 INSERT INTO HopDong(MaHD, NgayHetHan, MaKHDaiDien, MaNV) VALUES (1002, '2026-12-31', 2, 1);
 INSERT INTO YeuCauTraPhong(NgayDuKien, TrangThai, MaHD) VALUES ('2024-01-01', 1, 1002);
-INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1002, 2);
+INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1002, 2); -- maHD 1002
 
 -- Data cho khách 3
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach3', '123', 'Khach', 1);
 INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach3', '00000000003', 'khach3@test.com', '090000003', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach3'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai, HinhAnh) VALUES ('P.103', 1, 1, 'http://localhost:3000/room_images/P103.jpg');
-INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.103', 1, 3);
+INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.103', 1, 3), ('Giường phụ 1', 0, 3), ('Giường phụ 2', 0, 3);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 3, 3);
 INSERT INTO HopDong(MaHD, NgayHetHan, MaKHDaiDien, MaNV) VALUES (1003, '2026-12-31', 3, 1);
 INSERT INTO YeuCauTraPhong(NgayDuKien, TrangThai, MaHD) VALUES ('2024-01-01', 1, 1003);
@@ -48,7 +48,7 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1003, 3);
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach4', '123', 'Khach', 1);
 INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach4', '00000000004', 'khach4@test.com', '090000004', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach4'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai, HinhAnh) VALUES ('P.104', 1, 1, 'http://localhost:3000/room_images/P104.jpg');
-INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.104', 1, 4);
+INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.104', 1, 4), ('Giường phụ 1', 0, 4), ('Giường phụ 2', 0, 4);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 4, 4);
 INSERT INTO HopDong(MaHD, NgayHetHan, MaKHDaiDien, MaNV) VALUES (1004, '2026-12-31', 4, 1);
 INSERT INTO YeuCauTraPhong(NgayDuKien, TrangThai, MaHD) VALUES ('2024-01-01', 1, 1004);
@@ -58,7 +58,7 @@ INSERT INTO ChiTietGiuong(MaHD, MaGiuong) VALUES (1004, 4);
 INSERT INTO TaiKhoan(Username, Password, VaiTro, TrangThai) VALUES ('khach5', '123', 'Khach', 1);
 INSERT INTO KhachHang(HoTen, CCCD, Email, SDT, MaTK) VALUES ('khach5', '00000000005', 'khach5@test.com', '090000005', (SELECT MaTK FROM TaiKhoan WHERE Username = 'khach5'));
 INSERT INTO Phong(TenPhong, TrangThai, MaLoai, HinhAnh) VALUES ('P.105', 1, 1, 'http://localhost:3000/room_images/P105.jpg');
-INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.105', 1, 5);
+INSERT INTO Giuong(TenGiuong, TrangThai, MaPhong) VALUES ('Giường chính phòng P.105', 1, 5), ('Giường phụ 1', 0, 5), ('Giường phụ 2', 0, 5);
 INSERT INTO PhieuDatCoc(SoTien, TrangThai, MaKH, MaPhong) VALUES (3000000, 1, 5, 5);
 INSERT INTO HopDong(MaHD, NgayHetHan, MaKHDaiDien, MaNV) VALUES (1005, '2026-12-31', 5, 1);
 INSERT INTO YeuCauTraPhong(NgayDuKien, TrangThai, MaHD) VALUES ('2024-01-01', 1, 1005);

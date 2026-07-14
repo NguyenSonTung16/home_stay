@@ -6,11 +6,14 @@ import Dashboard from './pages/Dashboard';
 import RoomCheck from './pages/RoomCheck';
 import RefundCheck from './pages/RefundCheck';
 
+
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './contexts/AuthContext';
 import MobileBottomNav from './components/MobileBottomNav';
 import AppointmentCheck from './pages/AppointmentCheck';
+
+import XuLyHoSoDatCoc from './pages/XuLyHoSoDatCoc';
 
 const MainLayout = () => (
   <div className="bg-surface font-body text-on-surface flex min-h-screen">
@@ -45,11 +48,10 @@ function App() {
                 <Route path="/refund_check" element={<RefundCheck />} />
               </Route>
               
-
-
               {/* Appointment Check for Sales */}
               <Route element={<ProtectedRoute allowedRoles={['Sale', 'Admin']} />}>
                 <Route path="/appointment_check" element={<AppointmentCheck />} />
+                <Route path="/ho-so-dat-coc" element={<XuLyHoSoDatCoc />} />
               </Route>
             </Route>
           </Route>

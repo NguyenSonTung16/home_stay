@@ -56,19 +56,34 @@ const Sidebar: React.FC = () => {
         )}
         
         {(user?.role === 'Sale' || user?.role === 'Admin') && (
-          <NavLink
-            to="/appointment_check"
-            className={({ isActive }) =>
-              `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
-                isActive
-                  ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
-                  : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
-              }`
-            }
-          >
-            <span className="material-symbols-outlined">calendar_month</span>
-            <span className="font-body">Xử lý lịch hẹn</span>
-          </NavLink>
+          <>
+            <NavLink
+              to="/appointment_check"
+              className={({ isActive }) =>
+                `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                  isActive
+                    ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                    : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+                }`
+              }
+            >
+              <span className="material-symbols-outlined">calendar_month</span>
+              <span className="font-body">Xử lý lịch hẹn</span>
+            </NavLink>
+            <NavLink
+              to="/ho-so-dat-coc"
+              className={({ isActive }) =>
+                `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                  isActive
+                    ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                    : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+                }`
+              }
+            >
+              <span className="material-symbols-outlined">folder_supervised</span>
+              <span className="font-body">Hồ sơ đặt cọc</span>
+            </NavLink>
+          </>
         )}
       </nav>
       <div className="px-gutter pt-4 mt-auto border-t border-outline-variant">

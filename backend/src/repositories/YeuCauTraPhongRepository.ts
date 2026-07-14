@@ -50,4 +50,13 @@ export class YeuCauTraPhongRepository {
     );
     return res.rows[0];
   }
+
+  async create(data: { NgayDuKien: string, STKNhanCoc: string, TrangThai: number, LyDo: string, MaHD: number }): Promise<any> {
+    const res = await db.query(
+      `INSERT INTO YeuCauTraPhong (NgayDuKien, STKNhanCoc, TrangThai, LyDo, MaHD)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [data.NgayDuKien, data.STKNhanCoc, data.TrangThai, data.LyDo, data.MaHD]
+    );
+    return res.rows[0];
+  }
 }

@@ -1,3 +1,4 @@
+import BottomNav from '../components/BottomNav';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from '../components/AuthModal';
@@ -25,6 +26,11 @@ export const MHTimKiemPhong = () => {
     // Quản lý Đăng nhập / Người dùng
     const [currentUser, setCurrentUser] = useState<any>(null);
 
+    // Quản lý Đặt cọc
+    const [selectedDepositRoom, setSelectedDepositRoom] = useState<any>(null);
+    const [soGiuongDeposit, setSoGiuongDeposit] = useState(1);
+    const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
+
     useEffect(() => {
         const storedUser = localStorage.getItem('currentUser');
         if (storedUser) {
@@ -39,6 +45,47 @@ export const MHTimKiemPhong = () => {
     const handleLogout = () => {
         localStorage.removeItem('currentUser');
         setCurrentUser(null);
+    };
+
+    const btn_submitDeposit = async () => {
+        if (!selectedDepositRoom) return;
+
+        // Bắt đăng nhập nếu chưa có
+        if (!currentUser) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
+        setIsSubmittingDeposit(true);
+        try {
+            const userId = currentUser.user?.makh || currentUser.makh || currentUser.user?.id || currentUser.id || 1; 
+
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/booking/dat-coc`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    maKH: userId,
+                    maPhong: selectedDepositRoom.maphong || selectedDepositRoom.MaPhong,
+                    soGiuong: soGiuongDeposit,
+                    soThangThue: 6
+                })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert(`Đặt cọc thành công cho phòng ${selectedDepositRoom.tenphong || selectedDepositRoom.TenPhong}! Chuyển hướng tới trang thanh toán...`);
+                setSelectedDepositRoom(null);
+                navigate('/thanh-toan-coc');
+            } else {
+                alert(data.message || 'Có lỗi xảy ra khi đặt cọc.');
+            }
+        } catch (error) {
+            alert('Lỗi kết nối máy chủ khi đặt cọc.');
+        } finally {
+            setIsSubmittingDeposit(false);
+        }
     };
 
 
@@ -436,7 +483,10 @@ export const MHTimKiemPhong = () => {
                                         {/* Action Buttons chuẩn 100% hình ảnh */}
                                         <div className="p-4 pt-0 flex gap-2.5">
                                             <button
-                                                onClick={() => alert(`Đã bấm đặt cọc cho ${phong.tenphong}`)}
+                                                onClick={() => {
+                                                    setSelectedDepositRoom(phong);
+                                                    setSoGiuongDeposit(1);
+                                                }}
                                                 className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
                                             >
                                                 Đặt cọc
@@ -472,47 +522,7 @@ export const MHTimKiemPhong = () => {
             )}
 
             {/* Bottom Navigation Bar luôn hiển thị ở dưới cùng */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <div
-                    onClick={() => navigate('/')}
-                    className="flex flex-col items-center justify-center bg-[#1E3A8A] text-white rounded-xl px-4 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">home_work</span>
-                    <span className="text-[11px] font-semibold mt-0.5">Tìm kiếm</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/dat-lich-hen')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                    <span className="text-[11px] font-normal mt-0.5">Lịch hẹn</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/hop-dong')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span className="text-[11px] font-normal mt-0.5">Hợp đồng</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/lich-su-lich-hen')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">history</span>
-                    <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/thanh-toan-dinh-ky')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">payments</span>
-                    <span className="text-[11px] font-normal mt-0.5">Thanh toán</span>
-                </div>
-            </nav>
+            <BottomNav />
 
             {/* Modal Danh Sách Phòng Quan Tâm */}
             {isModalOpen && (
@@ -603,8 +613,98 @@ export const MHTimKiemPhong = () => {
                 onClose={() => setIsAuthModalOpen(false)}
                 onSuccess={(user) => {
                     setCurrentUser(user);
+                    if (selectedDepositRoom) {
+                        btn_submitDeposit();
+                    }
                 }}
             />
+
+            {/* Modal Xác nhận Đặt cọc */}
+            {selectedDepositRoom && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4">
+                    <div className="bg-white rounded-2xl w-[90vw] max-w-[500px] flex flex-col shadow-2xl overflow-hidden border border-[#E0E3E5]">
+                        <div className="p-5 border-b border-[#E0E3E5] flex justify-between items-center bg-[#F7F9FB]">
+                            <h2 className="font-bold text-[19px] text-[#00236F] flex items-center gap-2">
+                                <span className="material-symbols-outlined">edit_note</span>
+                                Xác nhận đặt cọc
+                            </h2>
+                            <button
+                                onClick={() => setSelectedDepositRoom(null)}
+                                className="w-9 h-9 rounded-full bg-white border border-[#E0E3E5] flex items-center justify-center text-[#54647A] hover:text-[#00236F] hover:bg-gray-100 transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <h3 className="text-[18px] font-bold text-[#191C1E] mb-2">{selectedDepositRoom.tenphong || selectedDepositRoom.TenPhong}</h3>
+                            <p className="text-[13px] text-[#54647A] mb-4">Chi nhánh: {selectedDepositRoom.chinhanh}</p>
+
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-[#444651] mb-2">Số giường muốn thuê</label>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setSoGiuongDeposit(Math.max(1, soGiuongDeposit - 1))}
+                                            className="w-10 h-10 rounded-xl border border-[#C5C5D3] flex items-center justify-center hover:bg-gray-50 transition-colors text-[#54647A]"
+                                            disabled={soGiuongDeposit <= 1}
+                                        >
+                                            <span className="material-symbols-outlined">remove</span>
+                                        </button>
+                                        <span className="text-[20px] font-bold text-[#00236F] w-12 text-center">{soGiuongDeposit}</span>
+                                        <button
+                                            onClick={() => {
+                                                // TODO: Thay bằng số giường trống thực tế của phòng, tạm thời hardcode là 4
+                                                const maxBeds = 4;
+                                                setSoGiuongDeposit(Math.min(maxBeds, soGiuongDeposit + 1));
+                                            }}
+                                            className="w-10 h-10 rounded-xl border border-[#C5C5D3] flex items-center justify-center hover:bg-gray-50 transition-colors text-[#54647A]"
+                                            disabled={soGiuongDeposit >= 4} // Giả định max là 4
+                                        >
+                                            <span className="material-symbols-outlined">add</span>
+                                        </button>
+                                        <span className="text-[12px] text-[#54647A] ml-2">(Tối đa 4 giường)</span>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-[#F7F9FB] rounded-xl border border-[#E0E3E5] flex flex-col gap-2">
+                                    <div className="flex justify-between items-center text-[13px]">
+                                        <span className="text-[#54647A]">Giá thuê/giường/tháng</span>
+                                        <span className="font-semibold text-[#191C1E]">
+                                            {Number(selectedDepositRoom.giatien).toLocaleString()} đ
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[15px] pt-2 border-t border-[#E0E3E5]">
+                                        <span className="font-bold text-[#444651]">Tiền cọc (2 tháng)</span>
+                                        <span className="font-bold text-[#EF4444] text-[18px]">
+                                            {Number(selectedDepositRoom.giatien * 2 * soGiuongDeposit).toLocaleString()} đ
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-5 border-t border-[#E0E3E5] bg-[#F7F9FB] flex justify-end gap-3">
+                            <button
+                                onClick={() => setSelectedDepositRoom(null)}
+                                className="py-2.5 px-6 bg-white border border-[#C5C5D3] hover:bg-gray-50 text-[#191C1E] font-semibold text-[13px] rounded-xl transition-colors"
+                            >
+                                Hủy bỏ
+                            </button>
+                            <button
+                                onClick={btn_submitDeposit}
+                                disabled={isSubmittingDeposit}
+                                className="py-2.5 px-6 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                            >
+                                {isSubmittingDeposit ? (
+                                    <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Đang xử lý...</>
+                                ) : (
+                                    <><span className="material-symbols-outlined text-[18px]">lock</span> Xác nhận đặt cọc</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
