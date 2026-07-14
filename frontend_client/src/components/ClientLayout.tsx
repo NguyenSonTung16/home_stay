@@ -40,14 +40,7 @@ export const ClientLayout: React.FC = () => {
                 <div className="flex items-center gap-3">
                     {currentUser ? (
                         <>
-                            <button
-                                onClick={() => navigate('/thanh-toan-coc')}
-                                className="hidden sm:flex items-center gap-2 bg-[#F2F4F6] hover:bg-[#E0E3E5] text-[#00236F] px-4 py-2 rounded-full font-semibold text-[13px] transition-colors"
-                            >
-                                <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-                                Phiếu cọc của tôi
-                            </button>
-                            
+
                             <div 
                                 className="flex items-center gap-2 bg-[#F7F9FB] px-1.5 py-1.5 rounded-full border border-[#E0E3E5] cursor-pointer hover:bg-[#F2F4F6] transition-colors relative"
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
@@ -65,13 +58,7 @@ export const ClientLayout: React.FC = () => {
                                     <div className="px-4 py-2 border-b border-[#E0E3E5] sm:hidden">
                                         <p className="text-[13px] font-semibold text-[#191C1E] truncate">{displayUsername}</p>
                                     </div>
-                                    <button 
-                                        onClick={() => navigate('/thanh-toan-coc')}
-                                        className="w-full text-left px-4 py-2 text-[14px] text-[#54647A] hover:bg-[#F7F9FB] hover:text-[#00236F] transition-colors sm:hidden flex items-center gap-2"
-                                    >
-                                        <span className="material-symbols-outlined text-[18px]">receipt_long</span>
-                                        Phiếu cọc
-                                    </button>
+
                                     <button 
                                         onClick={() => navigate('/yeu-cau-tra-phong')}
                                         className="w-full text-left px-4 py-2 text-[14px] text-[#54647A] hover:bg-[#F7F9FB] hover:text-[#00236F] transition-colors flex items-center gap-2"

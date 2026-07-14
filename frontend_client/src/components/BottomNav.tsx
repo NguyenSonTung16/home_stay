@@ -7,7 +7,7 @@ const BottomNav: React.FC = () => {
 
     const tabs = [
         { path: '/', icon: 'home_work', label: 'Tìm kiếm' },
-        { path: '/thanh-toan-coc', icon: 'payments', label: 'Lịch sử cọc' },
+        { path: '/thanh-toan-coc', icon: 'receipt', label: 'Phiếu cọc' },
         { path: '/hop-dong', icon: 'receipt_long', label: 'Hợp đồng' },
         { path: '/lich-su-lich-hen', icon: 'history', label: 'Lịch sử hẹn' },
         { path: '/thanh-toan-dinh-ky', icon: 'payments', label: 'Thanh toán' },
