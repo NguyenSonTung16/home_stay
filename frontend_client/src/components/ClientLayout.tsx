@@ -110,11 +110,11 @@ export const ClientLayout: React.FC = () => {
                 </div>
 
                 <div
-                    onClick={() => navigate('/dat-lich-hen')}
-                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/dat-lich-hen') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
+                    onClick={() => navigate('/thanh-toan-dinh-ky')}
+                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/thanh-toan-dinh-ky') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
                 >
-                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/dat-lich-hen') ? 'font-semibold' : 'font-normal'}`}>Lịch hẹn</span>
+                    <span className="material-symbols-outlined text-[20px]">payments</span>
+                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/thanh-toan-dinh-ky') ? 'font-semibold' : 'font-normal'}`}>Thanh toán</span>
                 </div>
 
                 <div
