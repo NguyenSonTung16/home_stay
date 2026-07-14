@@ -161,6 +161,12 @@ export const MHHopDongTraPhong: React.FC = () => {
         const isDebt = hopDong.trangthai === 5 || yeuCau.trangthai === 4;
         const isCompleted = hopDong.trangthai === 4 || yeuCau.trangthai === 3 || yeuCau.trangthai === 5;
 
+        const formatDate = (dateString: string) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+        };
+
         return (
             <div className="w-full min-h-screen bg-[#F7F9FB] pb-24 font-['Inter']">
                 <div className="bg-[#00236F] text-white p-6 pt-10 rounded-b-[32px] shadow-sm mb-6">
@@ -168,34 +174,48 @@ export const MHHopDongTraPhong: React.FC = () => {
                 </div>
 
                 <div className="max-w-3xl mx-auto px-4 space-y-5">
-                    <div className="bg-white rounded-[20px] p-5 shadow-sm border border-[#E0E3E5] text-center">
+                    <div className="bg-white rounded-[20px] p-5 shadow-sm border border-[#E0E3E5] flex flex-col items-start text-left">
+                        <div className="flex items-center gap-4 mb-4">
+                            <div className="w-14 h-14 bg-[#F2F4F6] rounded-xl flex items-center justify-center shrink-0">
+                                <span className="material-symbols-outlined text-[#A0ABBA] text-[28px]">apartment</span>
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                    <h3 className="font-bold text-[16px] text-[#54647A]">HĐ #{hopDong.mahd}</h3>
+                                    <span className="w-1 h-1 rounded-full bg-[#C5C5D3]"></span>
+                                    <span className="font-bold text-[16px] text-[#7A8AA3]">P.{hopDong.maphong}</span>
+                                </div>
+                                <div className="text-[13px] text-[#A0ABBA] flex items-center gap-2 font-medium">
+                                    <span>Từ {formatDate(hopDong.ngaybatdau)}</span>
+                                    <span className="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+                                    <span>Đến {formatDate(hopDong.ngayketthuc)}</span>
+                                </div>
+                            </div>
+                        </div>
+
                         {yeuCau.trangthai === 1 && (
-                            <>
-                                <span className="material-symbols-outlined text-4xl text-[#00236F] mb-3">pending_actions</span>
-                                <h2 className="text-[17px] font-bold text-[#00236F] mb-1.5">Đã tiếp nhận yêu cầu</h2>
-                                <p className="text-[13px] text-[#54647A]">Vui lòng chờ quản lý tòa nhà liên hệ để kiểm tra phòng.</p>
-                            </>
+                            <div className="inline-flex items-center gap-1.5 bg-[#FEF7D9] text-[#B5850B] px-3.5 py-1.5 rounded-full text-[13px] font-bold">
+                                <span className="material-symbols-outlined text-[18px]">pending</span>
+                                Đã gửi yêu cầu
+                            </div>
                         )}
                         {yeuCau.trangthai === 2 && (
-                            <>
-                                <span className="material-symbols-outlined text-4xl text-[#00236F] mb-3">fact_check</span>
-                                <h2 className="text-[17px] font-bold text-[#00236F] mb-1.5">Đã kiểm tra phòng</h2>
-                                <p className="text-[13px] text-[#54647A]">Yêu cầu của bạn đang chờ kế toán đối soát tài chính và duyệt hoàn cọc.</p>
-                            </>
+                            <div className="inline-flex items-center gap-1.5 bg-[#E3F2FD] text-[#00236F] px-3.5 py-1.5 rounded-full text-[13px] font-bold">
+                                <span className="material-symbols-outlined text-[18px]">fact_check</span>
+                                Đã kiểm tra phòng
+                            </div>
                         )}
                         {isCompleted && (
-                            <>
-                                <span className="material-symbols-outlined text-4xl text-green-600 mb-3">check_circle</span>
-                                <h2 className="text-[17px] font-bold text-green-600 mb-1.5">Đã hoàn tất trả phòng</h2>
-                                <p className="text-[13px] text-[#54647A]">Hợp đồng của bạn đã được thanh lý thành công.</p>
-                            </>
+                            <div className="inline-flex items-center gap-1.5 bg-[#E8F5E9] text-[#2E7D32] px-3.5 py-1.5 rounded-full text-[13px] font-bold">
+                                <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                                Đã hoàn tất trả phòng
+                            </div>
                         )}
                         {isDebt && (
-                            <>
-                                <span className="material-symbols-outlined text-4xl text-red-500 mb-3">warning</span>
-                                <h2 className="text-[17px] font-bold text-red-500 mb-1.5">Chờ thanh toán công nợ</h2>
-                                <p className="text-[13px] text-[#54647A] mb-4">Bạn cần thanh toán khoản chi phí phát sinh để hoàn tất thủ tục thanh lý hợp đồng.</p>
-                            </>
+                            <div className="inline-flex items-center gap-1.5 bg-[#FFEBEE] text-[#C62828] px-3.5 py-1.5 rounded-full text-[13px] font-bold">
+                                <span className="material-symbols-outlined text-[18px]">warning</span>
+                                Chờ thanh toán công nợ
+                            </div>
                         )}
                     </div>
 
