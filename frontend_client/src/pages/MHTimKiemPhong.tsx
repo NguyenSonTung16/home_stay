@@ -318,13 +318,14 @@ export const MHTimKiemPhong = () => {
                             return (
                                 <div
                                     key={phong.maphong}
-                                    className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between"
+                                    onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
+                                    className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow"
                                 >
                                     <div>
                                         {/* Room Image */}
                                         <div 
                                             className="relative h-48 w-full bg-[#ECEEF0] cursor-pointer"
-                                            onClick={() => navigate(`/room/${phong.maphong}`)}
+                                            onClick={() => navigate(`/phong/${phong.maphong}`)}
                                         >
                                             <img
                                                 alt={phong.tenphong}
@@ -350,7 +351,7 @@ export const MHTimKiemPhong = () => {
                                                 <div>
                                                     <h4 
                                                         className="text-[#00236F] font-bold text-[16px] leading-tight cursor-pointer hover:underline"
-                                                        onClick={() => navigate(`/room/${phong.maphong}`)}
+                                                        onClick={() => navigate(`/phong/${phong.maphong}`)}
                                                     >
                                                         {phong.tenphong}
                                                     </h4>
@@ -403,13 +404,13 @@ export const MHTimKiemPhong = () => {
                                     {/* Action Buttons chuẩn 100% hình ảnh */}
                                     <div className="p-4 pt-0 flex gap-2.5">
                                         <button
-                                            onClick={() => setSelectedRoomToDeposit(phong)}
+                                            onClick={(e) => { e.stopPropagation(); setSelectedRoomToDeposit(phong); }}
                                             className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
                                         >
                                             Đặt cọc
                                         </button>
                                         <button
-                                            onClick={() => btn_henXemPhong(phong)}
+                                            onClick={(e) => { e.stopPropagation(); btn_henXemPhong(phong); }}
                                             className={
                                                 isWishlisted
                                                     ? "flex-1 bg-[#D0E1FB] border border-[#00236F] text-[#00236F] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
@@ -515,7 +516,7 @@ export const MHTimKiemPhong = () => {
                                                 {/* Thumbnail ảnh phòng */}
                                                 <div 
                                                     className="w-16 h-16 rounded-xl bg-[#ECEEF0] overflow-hidden shrink-0 border border-[#E0E3E5] cursor-pointer"
-                                                    onClick={() => navigate(`/room/${phong.maphong}`)}
+                                                    onClick={() => navigate(`/phong/${phong.maphong}`)}
                                                 >
                                                     <img
                                                         src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=400&q=80"}
@@ -526,7 +527,7 @@ export const MHTimKiemPhong = () => {
                                                 <div>
                                                     <h4 
                                                         className="font-bold text-[15px] text-[#00236F] cursor-pointer hover:underline"
-                                                        onClick={() => navigate(`/room/${phong.maphong}`)}
+                                                        onClick={() => navigate(`/phong/${phong.maphong}`)}
                                                     >
                                                         {phong.tenphong}
                                                     </h4>

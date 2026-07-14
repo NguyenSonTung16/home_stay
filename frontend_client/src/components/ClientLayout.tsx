@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AuthModal } from './AuthModal';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,9 @@ export const ClientLayout: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { currentUser, logout, isAuthModalOpen, closeAuthModal, openAuthModal, setCurrentUser } = useAuth();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const displayUsername = currentUser?.user?.username || (currentUser as any)?.username || (currentUser as any)?.hoten || 'khach1';
 
     const isActive = (path: string) => location.pathname === path;
 
@@ -45,18 +48,22 @@ export const ClientLayout: React.FC = () => {
                                 Phiếu cọc của tôi
                             </button>
                             
-                            <div className="flex items-center gap-2 bg-[#F7F9FB] px-1.5 py-1.5 rounded-full border border-[#E0E3E5] cursor-pointer hover:bg-[#F2F4F6] transition-colors group relative">
+                            <div 
+                                className="flex items-center gap-2 bg-[#F7F9FB] px-1.5 py-1.5 rounded-full border border-[#E0E3E5] cursor-pointer hover:bg-[#F2F4F6] transition-colors relative"
+                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            >
                                 <div className="w-8 h-8 rounded-full bg-[#E0E3E5] flex items-center justify-center overflow-hidden border border-white">
                                     <span className="material-symbols-outlined text-[#54647A] text-[20px]">person</span>
                                 </div>
-                                <span className="text-[13px] font-semibold text-[#191C1E] pr-2 max-w-[120px] truncate hidden sm:block">
-                                    {currentUser.username}
+                                <span className="text-[13px] font-semibold text-[#191C1E] pr-2 max-w-[120px] truncate block">
+                                    {displayUsername}
                                 </span>
                                 
                                 {/* Dropdown */}
-                                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#E0E3E5] py-2 hidden group-hover:block z-50">
+                                {isDropdownOpen && (
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#E0E3E5] py-2 z-50">
                                     <div className="px-4 py-2 border-b border-[#E0E3E5] sm:hidden">
-                                        <p className="text-[13px] font-semibold text-[#191C1E] truncate">{currentUser.username}</p>
+                                        <p className="text-[13px] font-semibold text-[#191C1E] truncate">{displayUsername}</p>
                                     </div>
                                     <button 
                                         onClick={() => navigate('/thanh-toan-coc')}
@@ -66,6 +73,13 @@ export const ClientLayout: React.FC = () => {
                                         Phiếu cọc
                                     </button>
                                     <button 
+                                        onClick={() => navigate('/yeu-cau-tra-phong')}
+                                        className="w-full text-left px-4 py-2 text-[14px] text-[#54647A] hover:bg-[#F7F9FB] hover:text-[#00236F] transition-colors flex items-center gap-2"
+                                    >
+                                        <span className="material-symbols-outlined text-[18px]">exit_to_app</span>
+                                        Yêu cầu trả phòng
+                                    </button>
+                                    <button 
                                         onClick={logout}
                                         className="w-full text-left px-4 py-2 text-[14px] text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
                                     >
@@ -73,6 +87,7 @@ export const ClientLayout: React.FC = () => {
                                         Đăng xuất
                                     </button>
                                 </div>
+                                )}
                             </div>
                         </>
                     ) : (

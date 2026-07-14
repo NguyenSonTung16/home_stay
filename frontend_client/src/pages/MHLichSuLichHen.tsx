@@ -7,7 +7,7 @@ export const MHLichSuLichHen: React.FC = () => {
     const navigate = useNavigate();
     const [danhSachPhieuHen, setDanhSachPhieuHen] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const { currentUser, openAuthModal } = useAuth();
+    const { currentUser } = useAuth();
 
     useEffect(() => {
         hienThi();
