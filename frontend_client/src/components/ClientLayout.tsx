@@ -106,37 +106,45 @@ export const ClientLayout: React.FC = () => {
             />
 
             {/* Bottom Navigation */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-1 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                 <div
                     onClick={() => navigate('/')}
-                    className={`flex flex-col items-center justify-center px-3 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
+                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
                 >
                     <span className="material-symbols-outlined text-[20px]">search</span>
-                    <span className={`text-[11px] mt-0.5 ${isActive('/') ? 'font-semibold' : 'font-normal'}`}>Tìm kiếm</span>
+                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/') ? 'font-semibold' : 'font-normal'}`}>Tìm kiếm</span>
                 </div>
 
                 <div
                     onClick={() => navigate('/dat-lich-hen')}
-                    className={`flex flex-col items-center justify-center px-3 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/dat-lich-hen') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
+                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/dat-lich-hen') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
                 >
                     <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                    <span className={`text-[11px] mt-0.5 ${isActive('/dat-lich-hen') ? 'font-semibold' : 'font-normal'}`}>Lịch hẹn</span>
+                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/dat-lich-hen') ? 'font-semibold' : 'font-normal'}`}>Lịch hẹn</span>
+                </div>
+
+                <div
+                    onClick={() => navigate('/thanh-toan-coc')}
+                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/thanh-toan-coc') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
+                >
+                    <span className="material-symbols-outlined text-[20px]">receipt</span>
+                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/thanh-toan-coc') ? 'font-semibold' : 'font-normal'}`}>Phiếu cọc</span>
                 </div>
 
                 <div
                     onClick={() => navigate('/hop-dong')}
-                    className={`flex flex-col items-center justify-center px-3 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/hop-dong') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
+                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/hop-dong') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
                 >
                     <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span className={`text-[11px] mt-0.5 ${isActive('/hop-dong') ? 'font-semibold' : 'font-normal'}`}>Hợp đồng</span>
+                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/hop-dong') ? 'font-semibold' : 'font-normal'}`}>Hợp đồng</span>
                 </div>
 
                 <div
                     onClick={() => navigate('/lich-su-lich-hen')}
-                    className={`flex flex-col items-center justify-center px-3 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/lich-su-lich-hen') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
+                    className={`flex flex-col items-center justify-center px-2 py-1.5 cursor-pointer active:scale-95 transition-all rounded-xl ${isActive('/lich-su-lich-hen') ? 'bg-[#1E3A8A] text-white' : 'text-[#54647A]'}`}
                 >
                     <span className="material-symbols-outlined text-[20px]">history</span>
-                    <span className={`text-[11px] mt-0.5 ${isActive('/lich-su-lich-hen') ? 'font-semibold' : 'font-normal'}`}>Lịch sử hẹn</span>
+                    <span className={`text-[10px] mt-0.5 whitespace-nowrap ${isActive('/lich-su-lich-hen') ? 'font-semibold' : 'font-normal'}`}>Lịch sử hẹn</span>
                 </div>
             </nav>
         </div>
