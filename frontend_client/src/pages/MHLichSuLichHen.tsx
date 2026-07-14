@@ -1,24 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthModal } from '../components/AuthModal';
+import { useAuth } from '../context/AuthContext';
+import { RequireLoginPlaceholder } from '../components/RequireLoginPlaceholder';
 
 export const MHLichSuLichHen: React.FC = () => {
     const navigate = useNavigate();
     const [danhSachPhieuHen, setDanhSachPhieuHen] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentUser, setCurrentUser] = useState<any>(null);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            try {
-                setCurrentUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Error parsing user from localStorage", e);
-            }
-        }
-    }, []);
+    const { currentUser, openAuthModal } = useAuth();
 
     useEffect(() => {
         hienThi();
@@ -93,49 +82,9 @@ export const MHLichSuLichHen: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#F7F9FB] text-[#191C1E] font-sans pb-24">
-            {/* Top App Bar */}
-            <header className="bg-white border-b border-[#E0E3E5] h-16 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 sm:px-8">
-                <div className="flex items-center gap-3">
-                    <button 
-                        onClick={() => navigate('/')}
-                        className="text-[#00236F] active:scale-95 transition-transform flex items-center gap-1"
-                    >
-                        <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-                        <span className="font-bold text-sm hidden sm:inline">Trang chủ</span>
-                    </button>
-                    <h1 className="text-[#00236F] font-extrabold text-[18px] sm:text-[20px] tracking-tight">FIT 4.0</h1>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    {currentUser ? (
-                        <div 
-                            className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs cursor-pointer"
-                            onClick={() => {
-                                if (window.confirm("Bạn có muốn đăng xuất?")) {
-                                    localStorage.removeItem('currentUser');
-                                    setCurrentUser(null);
-                                }
-                            }}
-                            title="Nhấn để đăng xuất"
-                        >
-                            <span className="material-symbols-outlined text-[18px]">person</span>
-                            <span>{currentUser?.user?.hoten || currentUser?.user?.username || currentUser?.username || currentUser?.hoten || currentUser?.email || "Guest"}</span>
-                        </div>
-                    ) : (
-                        <button
-                            onClick={() => setIsAuthModalOpen(true)}
-                            className="flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-[#00236F] text-white font-bold text-[13px] hover:bg-[#00184D] transition-all active:scale-95"
-                        >
-                            <span className="material-symbols-outlined text-[18px]">login</span>
-                            <span>Đăng nhập</span>
-                        </button>
-                    )}
-                </div>
-            </header>
-
+        <div className="bg-[#F7F9FB] text-[#191C1E] font-sans pb-10">
             {/* Main Container */}
-            <main className="pt-24 px-4 sm:px-8 lg:px-12 w-full max-w-[1600px] mx-auto">
+            <div className="px-4 sm:px-8 lg:px-12 w-full max-w-[1600px] mx-auto mt-6">
                 <div className="mb-6">
                     <h2 className="text-[22px] font-extrabold text-[#00236F]">Lịch Sử Lịch Hẹn</h2>
                     <p className="text-[#54647A] text-[14px] mt-1">
@@ -144,22 +93,9 @@ export const MHLichSuLichHen: React.FC = () => {
                 </div>
 
                 {!currentUser ? (
-                    <div className="bg-white p-8 sm:p-12 rounded-3xl border border-[#E0E3E5] text-center w-full max-w-2xl min-w-[340px] mx-auto shadow-sm my-12 flex flex-col items-center justify-center">
-                        <div className="w-16 h-16 rounded-2xl bg-[#EBF5FF] text-[#00236F] flex items-center justify-center mx-auto mb-4">
-                            <span className="material-symbols-outlined text-[32px]">lock</span>
-                        </div>
-                        <h3 className="text-[#00236F] font-bold text-[20px] mb-3">Vui lòng đăng nhập tài khoản</h3>
-                        <p className="text-[#54647A] text-[15px] mb-8 leading-relaxed max-w-lg mx-auto">
-                            Để bảo mật, mỗi tài khoản chỉ xem được lịch hẹn xem phòng tương ứng của chính mình. Vui lòng đăng nhập để xem danh sách!
-                        </p>
-                        <button
-                            onClick={() => setIsAuthModalOpen(true)}
-                            className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-[#00236F] text-white font-bold text-[15px] hover:bg-[#00184D] transition-all shadow-md active:scale-95 whitespace-nowrap"
-                        >
-                            <span className="material-symbols-outlined text-[22px]">login</span>
-                            <span>Đăng nhập ngay</span>
-                        </button>
-                    </div>
+                    <RequireLoginPlaceholder 
+                        message="Để bảo mật, mỗi tài khoản chỉ xem được lịch hẹn xem phòng tương ứng của chính mình. Vui lòng đăng nhập để xem danh sách!"
+                    />
                 ) : isLoading ? (
                     <div className="bg-white p-12 rounded-3xl border border-[#E0E3E5] text-center text-[#54647A] w-full max-w-2xl mx-auto my-12">
                         Đang tải danh sách lịch hẹn...
@@ -168,7 +104,7 @@ export const MHLichSuLichHen: React.FC = () => {
                     <div className="bg-white p-12 rounded-3xl border border-[#E0E3E5] text-center w-full max-w-2xl min-w-[340px] mx-auto my-12 flex flex-col items-center justify-center">
                         <span className="material-symbols-outlined text-[#C5C5D3] text-[56px] mb-3">event_busy</span>
                         <p className="text-[#191C1E] font-bold text-[18px]">Bạn chưa có lịch hẹn nào</p>
-                        <p className="text-[#54647A] text-[14px] mt-2 max-w-md mx-auto">Bạn có thể chọn phòng quan tâm và đặt lịch hẹn xem phòng mới.</p>
+                        <p className="text-[#54647A] text-[14px] mt-2 max-w-[400px] w-full mx-auto">Bạn có thể chọn phòng quan tâm và đặt lịch hẹn xem phòng mới.</p>
                         <button
                             onClick={() => navigate('/')}
                             className="mt-6 bg-[#00236F] text-white px-6 py-3 rounded-xl font-bold text-[14px] whitespace-nowrap hover:bg-[#00184D] transition-all shadow-md active:scale-95"
@@ -265,43 +201,8 @@ export const MHLichSuLichHen: React.FC = () => {
                         </div>
                     </>
                 )}
-            </main>
 
-            {/* Bottom Navigation Bar */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <div
-                    onClick={() => navigate('/')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">home_work</span>
-                    <span className="text-[11px] font-normal mt-0.5">Tìm kiếm</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/dat-lich-hen')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                    <span className="text-[11px] font-normal mt-0.5">Lịch hẹn</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/hop-dong')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span className="text-[11px] font-normal mt-0.5">Hợp đồng</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/lich-su-lich-hen')}
-                    className="flex flex-col items-center justify-center bg-[#1E3A8A] text-white rounded-xl px-4 py-1.5 cursor-pointer active:scale-95 transition-transform font-bold"
-                >
-                    <span className="material-symbols-outlined text-[20px]">history</span>
-                    <span className="text-[11px] mt-0.5">Lịch sử hẹn</span>
-                </div>
-            </nav>
-
+            </div>
         </div>
     );
 };

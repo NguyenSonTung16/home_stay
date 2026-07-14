@@ -12,7 +12,7 @@ async function resetDB() {
     await db.query(`
       DROP SCHEMA public CASCADE;
       CREATE SCHEMA public;
-      GRANT ALL ON SCHEMA public TO postgres;
+      GRANT ALL ON SCHEMA public TO homestay_user;
       GRANT ALL ON SCHEMA public TO public;
     `);
     await db.query(initSql);

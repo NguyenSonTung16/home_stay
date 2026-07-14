@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+import { useAuth } from '../context/AuthContext';
+import { RequireLoginPlaceholder } from '../components/RequireLoginPlaceholder';
 
 export const MHHopDongTraPhong: React.FC = () => {
     const navigate = useNavigate();
+    const { currentUser, openAuthModal } = useAuth();
     const [ngayTra, setNgayTra] = useState('');
     const [lyDo, setLyDo] = useState('');
     const [stk, setStk] = useState('');
@@ -143,63 +146,12 @@ export const MHHopDongTraPhong: React.FC = () => {
         }
     };
 
-    // Render Navigation
-    const renderBottomNav = () => (
-        <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-            <div
-                onClick={() => navigate('/')}
-                className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-            >
-                <span className="material-symbols-outlined text-[20px]">home_work</span>
-                <span className="text-[11px] font-normal mt-0.5">Tìm kiếm</span>
-            </div>
-
-            <div
-                onClick={() => navigate('/dat-lich-hen')}
-                className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-            >
-                <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                <span className="text-[11px] font-normal mt-0.5">Lịch hẹn</span>
-            </div>
-
-            <div
-                onClick={() => navigate('/hop-dong')}
-                className="flex flex-col items-center justify-center bg-[#1E3A8A] text-white rounded-xl px-4 py-1.5 cursor-pointer active:scale-95 transition-transform"
-            >
-                <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-                <span className="text-[11px] font-semibold mt-0.5">Hợp đồng</span>
-            </div>
-
-            <div
-                onClick={() => navigate('/lich-su-lich-hen')}
-                className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-            >
-                <span className="material-symbols-outlined text-[20px]">history</span>
-                <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
-            </div>
-        </nav>
-    );
-
-    if (loadingStatus) {
+    if (!currentUser) {
         return (
-            <div className="w-full min-h-screen flex items-center justify-center bg-[#F7F9FB]">
-                <span className="material-symbols-outlined animate-spin text-[#00236F] text-4xl">progress_activity</span>
-            </div>
-        );
-    }
-
-    if (!getToken()) {
-        return (
-            <div className="w-full min-h-screen bg-[#F7F9FB] flex flex-col items-center justify-center pb-20">
-                <span className="material-symbols-outlined text-6xl text-[#C5C5D3] mb-4">lock</span>
-                <p className="text-[#54647A] font-medium">Vui lòng đăng nhập để xem Hợp đồng</p>
-                <button 
-                    onClick={() => navigate('/')}
-                    className="mt-4 px-6 py-2 bg-[#00236F] text-white rounded-xl text-sm font-semibold"
-                >
-                    Quay về Trang chủ
-                </button>
-                {renderBottomNav()}
+            <div className="w-full min-h-screen bg-[#F7F9FB] flex flex-col pt-12 pb-20">
+                <RequireLoginPlaceholder 
+                    message="Vui lòng đăng nhập tài khoản của bạn để xem và quản lý Hợp đồng thuê phòng."
+                />
             </div>
         );
     }
@@ -312,7 +264,6 @@ export const MHHopDongTraPhong: React.FC = () => {
                         </div>
                     )}
                 </div>
-                {renderBottomNav()}
             </div>
         );
     }
@@ -420,7 +371,6 @@ export const MHHopDongTraPhong: React.FC = () => {
                     </form>
                 </div>
             </div>
-            {renderBottomNav()}
         </div>
     );
 };

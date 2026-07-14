@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AuthModal } from '../components/AuthModal';
+import { DatCocModal } from '../components/DatCocModal';
 
 export const MHTimKiemPhong = () => {
     const navigate = useNavigate();
@@ -10,36 +10,22 @@ export const MHTimKiemPhong = () => {
     const [danhSachPhong, setDanhSachPhong] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const ITEMS_PER_PAGE = 5;
+
     // Quản lý tiện ích
     const [amenities, setAmenities] = useState({
-        wifi: true,
-        mayLanh: true,
+        wifi: false,
+        mayLanh: false,
         tuCaNhan: false
     });
 
     // Quản lý Danh sách phòng quan tâm (localStorage)
     const [danhSachQuanTam, setDanhSachQuanTam] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
-    // Quản lý Đăng nhập / Người dùng
-    const [currentUser, setCurrentUser] = useState<any>(null);
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            try {
-                setCurrentUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Error parsing user from localStorage", e);
-            }
-        }
-    }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem('currentUser');
-        setCurrentUser(null);
-    };
+    
+    // Quản lý Modal Đặt cọc
+    const [selectedRoomToDeposit, setSelectedRoomToDeposit] = useState<any>(null);
 
 
     const loadDanhSachQuanTam = () => {
@@ -62,19 +48,29 @@ export const MHTimKiemPhong = () => {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/phong/search?${query.toString()}`);
             const result = await res.json();
             if (result.success && result.data && Array.isArray(result.data)) {
-                const enrichedData = result.data.map((p: any) => ({
-                    maphong: p.MaPhong || p.maphong,
-                    tenphong: p.TenPhong || p.tenphong,
-                    chinhanh: p.ChiNhanh || p.chinhanh || "TP. Hồ Chí Minh",
-                    giatien: Number(p.GiaTien || p.giatien || 0),
-                    succhua: Number(p.SucChua || p.succhua || 0),
-                    dientich: Number(p.DienTich || p.dientich || 25),
-                    trangthai: (p.TrangThai === 1 || p.TrangThai === "Còn trống" || p.trangthai === 1 || p.trangthai === "Còn trống") ? "Còn trống" : "Sắp hết",
-                    badgeColor: (p.TrangThai === "Sắp hết" || p.trangthai === "Sắp hết") ? "warning" : "success",
-                    tienich: p.TienIch || p.tienich || ["wifi", "mayLanh", "tuCaNhan"],
-                    hinhanh: p.HinhAnh || p.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
-                }));
-                setDanhSachPhong(enrichedData);
+                const enrichedData = result.data.map((p: any) => {
+                    const fakeTienIch = [];
+                    const id = Number(p.MaPhong || p.maphong || 1);
+                    if (id % 2 === 0 || id % 3 === 0) fakeTienIch.push("wifi");
+                    if (id % 2 !== 0) fakeTienIch.push("mayLanh");
+                    if (id % 4 === 0) fakeTienIch.push("tuCaNhan");
+
+                    return {
+                        maphong: p.MaPhong || p.maphong,
+                        tenphong: p.TenPhong || p.tenphong,
+                        chinhanh: p.ChiNhanh || p.chinhanh || "TP. Hồ Chí Minh",
+                        giatien: Number(p.GiaTien || p.giatien || 0),
+                        succhua: Number(p.SucChua || p.succhua || 0),
+                        sogiuongtrong: Number(p.SoGiuongTrong ?? p.sogiuongtrong ?? p.SucChua ?? p.succhua ?? 0),
+                        dientich: Number(p.DienTich || p.dientich || 25),
+                        trangthai: (p.TrangThai === 1 || p.TrangThai === "Còn trống" || p.trangthai === 1 || p.trangthai === "Còn trống") ? "Còn trống" : "Sắp hết",
+                        badgeColor: (p.TrangThai === "Sắp hết" || p.trangthai === "Sắp hết") ? "warning" : "success",
+                        tienich: p.TienIch || p.tienich || (fakeTienIch.length > 0 ? fakeTienIch : ["wifi", "mayLanh", "tuCaNhan"]),
+                        hinhanh: p.HinhAnh || p.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+                    };
+                });
+                const availableRooms = enrichedData.filter((p: any) => p.sogiuongtrong > 0);
+                setDanhSachPhong(availableRooms);
             } else {
                 setDanhSachPhong([]);
             }
@@ -94,7 +90,7 @@ export const MHTimKiemPhong = () => {
         const selectedIds = danhSachPhong.filter(p => p.selected).map(p => ({
             maphong: p.MaPhong || p.maphong,
             tenphong: p.TenPhong || p.tenphong,
-            giathue: p.GiaTien || p.giathue,
+            giatien: p.giatien,
             hinhanh: p.HinhAnh || p.hinhanh
         }));
         
@@ -128,14 +124,15 @@ export const MHTimKiemPhong = () => {
             const newList = [...danhSachQuanTam, {
                 maphong: phongId,
                 tenphong: phong.TenPhong || phong.tenphong,
-                giathue: phong.GiaTien || phong.giathue,
+                giatien: phong.giatien,
                 hinhanh: phong.HinhAnh || phong.hinhanh
             }];
             setDanhSachQuanTam(newList);
             localStorage.setItem("danhSachPhongQuanTam", JSON.stringify(newList));
-            alert(`Đã thêm "${phong.TenPhong || phong.tenphong}" vào danh sách quan tâm!`);
         } else {
-            alert("Phòng này đã có trong danh sách quan tâm của bạn.");
+            const newList = danhSachQuanTam.filter((p: any) => (p.maphong || p.MaPhong) !== phongId);
+            setDanhSachQuanTam(newList);
+            localStorage.setItem("danhSachPhongQuanTam", JSON.stringify(newList));
         }
     };
 
@@ -176,53 +173,17 @@ export const MHTimKiemPhong = () => {
         return true;
     });
 
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCapacity, slGiaTien, amenities]);
+
+    const totalPages = Math.ceil(filteredRooms.length / ITEMS_PER_PAGE);
+    const paginatedRooms = filteredRooms.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
     return (
-        <div className="min-h-screen bg-[#F7F9FB] text-[#191C1E] font-sans pb-24">
-            {/* Top App Bar chuẩn 100% hình ảnh mobile MH_tim_kiem_phong.png */}
-            <header className="bg-white border-b border-[#E0E3E5] h-14 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4">
-                <div className="flex items-center gap-3">
-                    <button className="text-[#00236F] active:scale-95 transition-transform flex items-center">
-                        <span className="material-symbols-outlined text-[26px]">menu</span>
-                    </button>
-                    <h1 className="text-[#00236F] font-bold text-[20px] tracking-tight">FIT 4.0</h1>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    {/* Nút Phòng quan tâm hiển thị trên Desktop hoặc khi có danh sách */}
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="hidden md:flex items-center gap-1.5 py-1.5 px-3.5 rounded-full bg-[#DCE1FF] border border-[#00236F] text-[#00236F] font-semibold text-[13px] transition-all active:scale-95"
-                    >
-                        <span className="material-symbols-outlined text-[18px]">favorite</span>
-                        <span>Phòng quan tâm</span>
-                        {danhSachQuanTam.length > 0 && (
-                            <span className="bg-[#EF4444] text-white rounded-full px-1.5 py-0.5 text-[11px] font-bold">
-                                {danhSachQuanTam.length}
-                            </span>
-                        )}
-                    </button>
-
-                    <div className="flex items-center gap-2">
-                        {currentUser ? (
-                            <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs cursor-pointer" onClick={handleLogout} title="Nhấn để đăng xuất">
-                                <span className="material-symbols-outlined text-[18px]">person</span>
-                                <span>{currentUser.user?.username || currentUser.username || currentUser.hoten || currentUser.email || "Guest"}</span>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => setIsAuthModalOpen(true)}
-                                className="flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-[#00236F] text-white font-bold text-[13px] hover:bg-[#00184D] transition-all active:scale-95"
-                            >
-                                <span className="material-symbols-outlined text-[18px]">login</span>
-                                <span>Đăng nhập</span>
-                            </button>
-                        )}
-                    </div>
-                </div>
-            </header>
-
+        <div className="bg-[#F7F9FB] text-[#191C1E] font-sans pb-24">
             {/* Main Container */}
-            <main className="pt-20 px-4 sm:px-6 lg:px-12 w-full max-w-[1800px] mx-auto">
+            <div className="px-4 sm:px-6 lg:px-12 w-full max-w-[1800px] mx-auto mt-6">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* CỘT TRÁI TRÊN PC / TRÊN CÙNG MOBILE: BỘ LỌC TÌM KIẾM */}
                     <div className="lg:col-span-4 lg:sticky lg:top-20">
@@ -270,7 +231,7 @@ export const MHTimKiemPhong = () => {
                                     <input
                                         className="w-full accent-[#00236F] h-2 bg-[#DCE1FF] rounded-lg cursor-pointer"
                                         max="10000000"
-                                        min="1500000"
+                                        min="0"
                                         step="500000"
                                         type="range"
                                         value={slGiaTien}
@@ -342,8 +303,14 @@ export const MHTimKiemPhong = () => {
                         </div>
 
                         {/* Room List / Grid - 2 cột trên PC, 1 cột trên mobile */}
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        {filteredRooms.map((phong: any) => {
+                        {paginatedRooms.length === 0 ? (
+                            <div className="text-center py-20 text-[#54647A] bg-white rounded-3xl border border-[#E0E3E5] shadow-sm">
+                                <span className="material-symbols-outlined text-[48px] text-[#C5C5D3] block mb-3 mx-auto">search_off</span>
+                                Không tìm thấy phòng phù hợp.
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                {paginatedRooms.map((phong: any) => {
                             const isWishlisted = danhSachQuanTam.some((p: any) => p.maphong === phong.maphong);
                             const badgeText = phong.trangthai || "Còn trống";
                             const isWarningBadge = badgeText === "Sắp hết" || phong.badgeColor === "warning";
@@ -430,7 +397,7 @@ export const MHTimKiemPhong = () => {
                                     {/* Action Buttons chuẩn 100% hình ảnh */}
                                     <div className="p-4 pt-0 flex gap-2.5">
                                         <button
-                                            onClick={() => navigate('/dat-coc')}
+                                            onClick={() => setSelectedRoomToDeposit(phong)}
                                             className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
                                         >
                                             Đặt cọc
@@ -449,10 +416,48 @@ export const MHTimKiemPhong = () => {
                                 </div>
                             );
                         })}
+                            </div>
+                        )}
+
+                        {/* Pagination Controls */}
+                        {totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-2 mt-8">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="w-10 h-10 flex justify-center items-center rounded-xl border border-[#C5C5D3] text-[#444651] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-colors"
+                                >
+                                    <span className="material-symbols-outlined">chevron_left</span>
+                                </button>
+                                
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                        <button
+                                            key={page}
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`w-10 h-10 rounded-xl font-bold text-[14px] transition-colors ${
+                                                currentPage === page 
+                                                    ? "bg-[#00236F] text-white" 
+                                                    : "text-[#444651] hover:bg-white"
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="w-10 h-10 flex justify-center items-center rounded-xl border border-[#C5C5D3] text-[#444651] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-colors"
+                                >
+                                    <span className="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
-            </main>
 
             {/* Floating Wishlist Button cho Mobile khi có phòng trong danh sách */}
             {danhSachQuanTam.length > 0 && (
@@ -465,40 +470,7 @@ export const MHTimKiemPhong = () => {
                 </button>
             )}
 
-            {/* Bottom Navigation Bar luôn hiển thị ở dưới cùng */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <div
-                    onClick={() => navigate('/')}
-                    className="flex flex-col items-center justify-center bg-[#1E3A8A] text-white rounded-xl px-4 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">home_work</span>
-                    <span className="text-[11px] font-semibold mt-0.5">Tìm kiếm</span>
-                </div>
 
-                <div
-                    onClick={() => navigate('/dat-lich-hen')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                    <span className="text-[11px] font-normal mt-0.5">Lịch hẹn</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/hop-dong')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span className="text-[11px] font-normal mt-0.5">Hợp đồng</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/lich-su-lich-hen')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">history</span>
-                    <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
-                </div>
-            </nav>
 
             {/* Modal Danh Sách Phòng Quan Tâm */}
             {isModalOpen && (
@@ -584,12 +556,10 @@ export const MHTimKiemPhong = () => {
                 </div>
             )}
 
-            <AuthModal 
-                isOpen={isAuthModalOpen} 
-                onClose={() => setIsAuthModalOpen(false)} 
-                onSuccess={(user) => {
-                    setCurrentUser(user);
-                }} 
+            <DatCocModal 
+                isOpen={!!selectedRoomToDeposit} 
+                onClose={() => setSelectedRoomToDeposit(null)} 
+                roomInfo={selectedRoomToDeposit} 
             />
         </div>
     );

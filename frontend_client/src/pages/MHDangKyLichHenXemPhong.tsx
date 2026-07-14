@@ -1,26 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { RequireLoginPlaceholder } from '../components/RequireLoginPlaceholder';
 
 export const MHDangKyLichHenXemPhong = () => {
     const navigate = useNavigate();
-
-    const [currentUser, setCurrentUser] = useState<any>(null);
-
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            try {
-                setCurrentUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Error parsing user from localStorage", e);
-            }
-        }
-    }, []);
-
+    const { currentUser, openAuthModal } = useAuth();
+    
     const [danhSachPhong, setDanhSachPhong] = useState<any[]>([]);
 
-    const [selectedDate, setSelectedDate] = useState<number>(8);
-    const [selectedMonthStr, setSelectedMonthStr] = useState<string>("Tháng 10, 2023");
+    const [selectedDate, setSelectedDate] = useState<string>(
+        new Date().toISOString().split('T')[0]
+    );
     const [selectedTime, setSelectedTime] = useState<string>("09:30");
     const [txtMoTa, setTxtMoTa] = useState<string>("");
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,8 +33,8 @@ export const MHDangKyLichHenXemPhong = () => {
     }, []);
 
     const btn_datLich = async () => {
-        if (!currentUser || (!currentUser.user && !currentUser.id)) {
-            alert("Vui lòng đăng nhập để đặt lịch hẹn!");
+        if (!currentUser) {
+            openAuthModal();
             return;
         }
 
@@ -64,7 +55,7 @@ export const MHDangKyLichHenXemPhong = () => {
             .filter(Boolean)
             .join(', ');
 
-        const formattedNgayHen = `2023-10-${selectedDate < 10 ? '0' + selectedDate : selectedDate}`;
+        const formattedNgayHen = selectedDate;
 
         setIsSubmitting(true);
         try {
@@ -97,53 +88,20 @@ export const MHDangKyLichHenXemPhong = () => {
         }
     };
 
-    const calendarDays = [
-        { day: 30, disabled: true },
-        { day: 1, disabled: false },
-        { day: 2, disabled: false },
-        { day: 3, disabled: false },
-        { day: 4, disabled: false },
-        { day: 5, disabled: false },
-        { day: 6, disabled: false },
-        { day: 7, disabled: false },
-        { day: 8, disabled: false },
-        { day: 9, disabled: false },
-        { day: 10, disabled: false },
-        { day: 11, disabled: false },
-        { day: 12, disabled: false },
-        { day: 13, disabled: false },
-        { day: 14, disabled: false },
-    ];
 
     const timeSlotsRow1 = ["08:00", "09:30", "14:00"];
     const timeSlotsRow2 = ["16:30"];
 
     return (
-        <div className="min-h-screen bg-[#F7F9FB] text-[#191C1E] font-sans pb-28">
-            {/* Top Bar */}
-            <header className="bg-white border-b border-[#E0E3E5] h-16 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 lg:px-8 shadow-sm">
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate('/')}
-                        className="text-[#00236F] active:scale-95 transition-transform flex items-center"
-                    >
-                        <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-                    </button>
-                    <h1 className="text-[#00236F] font-bold text-[18px] sm:text-[22px] leading-tight">
-                        Đặt lịch xem nhiều phòng
-                    </h1>
-                </div>
-
-                <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs">
-                        <span className="material-symbols-outlined text-[18px]">person</span>
-                        <span>{currentUser?.user?.hoten || currentUser?.user?.username || currentUser?.username || currentUser?.hoten || currentUser?.email || "Guest"}</span>
-                    </div>
-                </div>
-            </header>
-
+        <div className="bg-[#F7F9FB] text-[#191C1E] font-sans pb-10">
             {/* Main Container */}
-            <main className="pt-24 px-4 sm:px-8 lg:px-12 w-full max-w-[1600px] mx-auto">
+            <div className="px-4 sm:px-8 lg:px-12 w-full max-w-[1600px] mx-auto mt-6">
+                
+                {!currentUser ? (
+                    <RequireLoginPlaceholder 
+                        message="Để bảo mật, hệ thống cần biết bạn là ai trước khi cho phép đặt lịch hẹn xem phòng. Vui lòng đăng nhập để tiếp tục!"
+                    />
+                ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Cột trái trên Desktop / Phần trên Mobile: DANH SÁCH PHÒNG ĐÃ CHỌN */}
                     <div className="lg:col-span-5 flex flex-col gap-3">
@@ -176,7 +134,7 @@ export const MHDangKyLichHenXemPhong = () => {
                                             {phong.chinhanh || "Quận 1, TP. HCM"}
                                         </p>
                                         <p className="text-[#00236F] font-bold text-[14px] mt-1">
-                                            {(Number(phong.giatien) / 1000000).toFixed(1)}tr
+                                            {(Number(phong.giatien || phong.giathue || phong.GiaTien || 0) / 1000000).toFixed(1)}tr
                                             <span className="text-[#54647A] font-normal text-[11px]">/tháng</span>
                                         </p>
                                     </div>
@@ -189,46 +147,17 @@ export const MHDangKyLichHenXemPhong = () => {
                     <div className="lg:col-span-7 flex flex-col gap-6">
                         {/* CHỌN NGÀY XEM PHÒNG */}
                         <div>
-                            <div className="flex justify-between items-center mb-2.5">
-                                <h3 className="text-[13px] font-bold text-[#54647A] tracking-wider uppercase">
-                                    CHỌN NGÀY XEM PHÒNG
-                                </h3>
-                                <span className="text-[13px] text-[#00236F] font-bold">
-                                    {selectedMonthStr}
-                                </span>
-                            </div>
-
+                            <h3 className="text-[13px] font-bold text-[#54647A] tracking-wider uppercase mb-2.5">
+                                CHỌN NGÀY XEM PHÒNG
+                            </h3>
                             <div className="bg-white rounded-2xl p-5 border border-[#E0E3E5] shadow-sm">
-                                <div className="grid grid-cols-7 text-center pb-3 border-b border-[#F2F4F6]">
-                                    {["CN", "T2", "T3", "T4", "T5", "T6", "T7"].map((wd, i) => (
-                                        <span key={i} className="text-[#54647A] text-[12px] font-semibold">
-                                            {wd}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                <div className="grid grid-cols-7 gap-y-3 pt-3 text-center">
-                                    {calendarDays.map((item, idx) => {
-                                        const isSelected = item.day === selectedDate && !item.disabled;
-                                        return (
-                                            <div key={idx} className="flex justify-center items-center">
-                                                <button
-                                                    disabled={item.disabled}
-                                                    onClick={() => setSelectedDate(item.day)}
-                                                    className={
-                                                        isSelected
-                                                            ? "w-10 h-10 rounded-xl bg-[#00236F] text-white font-bold text-[14px] flex items-center justify-center shadow-md scale-105 transition-all"
-                                                            : item.disabled
-                                                                ? "w-10 h-10 text-[#C5C5D3] font-normal text-[14px] cursor-not-allowed"
-                                                                : "w-10 h-10 text-[#191C1E] font-medium text-[14px] hover:bg-[#F7F9FB] rounded-xl transition-all"
-                                                    }
-                                                >
-                                                    {item.day}
-                                                </button>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                <input 
+                                    type="date"
+                                    min={new Date().toISOString().split('T')[0]}
+                                    value={selectedDate}
+                                    onChange={(e) => setSelectedDate(e.target.value)}
+                                    className="w-full p-3.5 rounded-xl border border-[#C5C5D3] focus:border-[#00236F] outline-none text-[14px]"
+                                />
                             </div>
                         </div>
 
@@ -311,42 +240,8 @@ export const MHDangKyLichHenXemPhong = () => {
                         </button>
                     </div>
                 </div>
-            </main>
-
-            {/* Bottom Navigation Bar luôn hiển thị cố định ở cạnh dưới cùng */}
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-[#E0E3E5] flex justify-around items-center px-2 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-                <div
-                    onClick={() => navigate('/')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">home_work</span>
-                    <span className="text-[11px] font-normal mt-0.5">Tìm kiếm</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/dat-lich-hen')}
-                    className="flex flex-col items-center justify-center bg-[#1E3A8A] text-white rounded-xl px-4 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">calendar_today</span>
-                    <span className="text-[11px] font-semibold mt-0.5">Lịch hẹn</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/hop-dong')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">receipt_long</span>
-                    <span className="text-[11px] font-normal mt-0.5">Hợp đồng</span>
-                </div>
-
-                <div
-                    onClick={() => navigate('/lich-su-lich-hen')}
-                    className="flex flex-col items-center justify-center text-[#54647A] px-3 py-1.5 cursor-pointer active:scale-95 transition-transform"
-                >
-                    <span className="material-symbols-outlined text-[20px]">history</span>
-                    <span className="text-[11px] font-normal mt-0.5">Lịch sử hẹn</span>
-                </div>
-            </nav>
+                )}
+            </div>
 
         </div>
     );

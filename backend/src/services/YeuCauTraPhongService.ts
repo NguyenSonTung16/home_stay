@@ -9,7 +9,7 @@ export class YeuCauTraPhongService {
     const { maHD, ngayDuKien, lyDo, stkNhanCoc } = data;
 
     // Validate if contract exists
-    const hd = await this.hopDongRepo.getById(maHD);
+    const hd = await this.hopDongRepo.layThongTin(maHD);
     if (!hd) {
       throw new Error('Hợp đồng không tồn tại.');
     }

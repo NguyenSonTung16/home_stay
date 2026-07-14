@@ -6,10 +6,13 @@ export class PhongDB {
         console.log("PhongDB: layDS called (không tham số)");
         const query = `
             SELECT p.MaPhong, p.TenPhong, p.ChiNhanh, p.TrangThai, 
-                   lp.TenLoai, lp.GiaTien, lp.SucChua
+                   lp.TenLoai, lp.GiaTien, lp.SucChua,
+                   lp.SucChua - COUNT(CASE WHEN g.TrangThai = 1 THEN 1 END) AS sogiuongtrong
             FROM Phong p
             JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
+            LEFT JOIN Giuong g ON g.MaPhong = p.MaPhong
             WHERE p.TrangThai = 1
+            GROUP BY p.MaPhong, p.TenPhong, p.ChiNhanh, p.TrangThai, lp.TenLoai, lp.GiaTien, lp.SucChua
         `;
         const result = await db.query(query);
         const rows = result.rows || [];
@@ -21,6 +24,7 @@ export class PhongDB {
             TenLoai: r.tenloai || r.TenLoai,
             GiaTien: Number(r.giatien || r.GiaTien || 0),
             SucChua: Number(r.succhua || r.SucChua || 0),
+            SoGiuongTrong: Number(r.sogiuongtrong || 0),
             DienTich: Number(r.dientich || r.DienTich || 25),
             TienIch: r.tienich || r.TienIch || ["wifi", "mayLanh", "tuCaNhan"],
             HinhAnh: r.hinhanh || r.HinhAnh
