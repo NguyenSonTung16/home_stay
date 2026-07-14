@@ -54,6 +54,22 @@ const Sidebar: React.FC = () => {
             <span className="font-body">Xử lý hoàn cọc</span>
           </NavLink>
         )}
+
+        {(user?.role === 'KeToan' || user?.role === 'Admin') && (
+          <NavLink
+            to="/doi-soat"
+            className={({ isActive }) =>
+              `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                isActive
+                  ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                  : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+              }`
+            }
+          >
+            <span className="material-symbols-outlined">account_balance_wallet</span>
+            <span className="font-body">Đối soát dòng tiền</span>
+          </NavLink>
+        )}
         
         {(user?.role === 'Sale' || user?.role === 'Admin') && (
           <>

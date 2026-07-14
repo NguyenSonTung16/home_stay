@@ -74,10 +74,10 @@ export const MHTimKiemPhong = () => {
             });
             const data = await res.json();
             
-            if (res.ok) {
+            if (res.ok && data.success && data.data) {
                 alert(`Đặt cọc thành công cho phòng ${selectedDepositRoom.tenphong || selectedDepositRoom.TenPhong}! Chuyển hướng tới trang thanh toán...`);
                 setSelectedDepositRoom(null);
-                navigate('/thanh-toan-coc');
+                navigate(`/xac-nhan-dat-coc/${data.data.maPDC}`);
             } else {
                 alert(data.message || 'Có lỗi xảy ra khi đặt cọc.');
             }

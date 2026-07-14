@@ -1,294 +1,265 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useLichSuDatCoc } from '../hooks/useLichSuDatCoc';
 
-interface PhieuCoc {
-  macoc: number;
-  sotien: string;
-  ngaycoc: string;
-  trangthai: number;
-  tenphong: string;
-  giatien: string;
-}
+const formatCurrency = (val: number) => val.toLocaleString('vi-VN') + 'đ';
+const formatDate = (dateStr: string | null) => {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('vi-VN');
+};
 
-export default function ThanhToanCoc() {
-  const [phieuList, setPhieuList] = useState<PhieuCoc[]>([]);
-  const [selectedPhieu, setSelectedPhieu] = useState<PhieuCoc | null>(null);
-  const [ptThanhToan, setPtThanhToan] = useState('Chuyển khoản');
-  const [maGiaoDich, setMaGiaoDich] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
+// Sub-component cho đồng hồ đếm ngược của card "Đang chờ"
+const CardCountDown: React.FC<{ targetTime: string }> = ({ targetTime }) => {
+  const [remaining, setRemaining] = useState<number>(0);
 
   React.useEffect(() => {
-    fetchDanhSach();
-  }, []);
+    const tick = () => {
+      const diff = new Date(targetTime).getTime() - Date.now();
+      setRemaining(Math.max(0, diff));
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [targetTime]);
 
-  const fetchDanhSach = async () => {
-    try {
-      setLoading(true);
-      const userDataStr = localStorage.getItem('currentUser');
-      const userData = userDataStr ? JSON.parse(userDataStr) : {};
-      const maKH = Number(userData.user?.makh || userData.user?.id || userData.makh || userData.id) || 1;
+  const hours = Math.floor(remaining / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  const isExpired = remaining === 0;
 
-      const res = await axios.get(`/api/booking/phieu-coc/chua-thanh-toan?maKH=${maKH}`);
-      setPhieuList(res.data.data || []);
-    } catch (err: any) {
-      setError('Không thể tải danh sách phiếu cọc.');
-    } finally {
-      setLoading(false);
+  if (isExpired) {
+    return <span className="text-red-500 font-semibold flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">warning</span> Hết hạn</span>;
+  }
+
+  const colorClass = remaining < 3600000 ? 'text-red-500 font-semibold' : 'text-amber-600 font-medium';
+
+  return (
+    <span className={`${colorClass} flex items-center gap-1 text-[11px]`}>
+      <span className="material-symbols-outlined text-[13px]">schedule</span>
+      Còn lại: {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+    </span>
+  );
+};
+
+// Skeleton Loader
+const SkeletonCard = () => (
+  <div className="bg-white border border-[#E0E3E5] rounded-2xl p-5 space-y-4 animate-pulse shadow-sm">
+    <div className="flex justify-between items-center">
+      <div className="h-4 bg-slate-200 rounded w-1/3"></div>
+      <div className="h-6 bg-slate-200 rounded-full w-20"></div>
+    </div>
+    <div className="flex justify-between items-center">
+      <div className="h-6 bg-slate-200 rounded w-1/4"></div>
+      <div className="h-4 bg-slate-200 rounded w-16"></div>
+    </div>
+    <div className="pt-3 border-t border-slate-100 flex justify-between items-center">
+      <div className="h-3 bg-slate-200 rounded w-1/2"></div>
+      <div className="h-4 bg-slate-200 rounded-full w-4"></div>
+    </div>
+  </div>
+);
+
+export default function ThanhToanCoc() {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'Tất cả' | 'Đang chờ' | 'Đã hoàn tất' | 'Đã hủy'>('Tất cả');
+
+  // Lấy maKH từ currentUser trong localStorage
+  const userDataStr = localStorage.getItem('currentUser');
+  const userData = userDataStr ? JSON.parse(userDataStr) : {};
+  const maKH = Number(userData.user?.makh || userData.user?.id || userData.makh || userData.id) || 1;
+
+  const { data: list, counts, loading, error } = useLichSuDatCoc(maKH, activeTab);
+
+  // Trả về badge cấu hình cho thẻ trạng thái
+  const getBadgeStyle = (status: string) => {
+    switch (status) {
+      case 'DaThanhToan':
+        return { text: 'Đã hoàn tất', bg: 'bg-green-100 text-green-700 border-green-200' };
+      case 'DaHuy':
+        return { text: 'Đã hủy', bg: 'bg-gray-100 text-gray-600 border-gray-200' };
+      case 'ChoXacNhanTienMat':
+        return { text: 'Chờ xác nhận', bg: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+      case 'ChoThanhToan':
+      default:
+        return { text: 'Chờ thanh toán', bg: 'bg-orange-100 text-orange-700 border-orange-200' };
     }
-  };
-
-  const handleSelect = (phieu: PhieuCoc) => {
-    setSelectedPhieu(phieu);
-    setMaGiaoDich('');
-    setPtThanhToan('Chuyển khoản');
-    setMessage('');
-    setError('');
-  };
-
-  const handleThanhToan = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedPhieu) return;
-    setSubmitting(true);
-    setMessage('');
-    setError('');
-
-    try {
-      await axios.post('/api/booking/thanh-toan/xac-nhan', {
-        maCoc: selectedPhieu.macoc,
-        ptThanhToan,
-        maGiaoDich
-      });
-      setMessage(`Thanh toán cho phiếu #${selectedPhieu.macoc} (Phòng ${selectedPhieu.tenphong}) đã được ghi nhận. Chờ quản lý phê duyệt.`);
-      setSelectedPhieu(null);
-      fetchDanhSach();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Có lỗi xảy ra khi xác nhận thanh toán.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const formatCurrency = (val: string | number) => {
-    return parseInt(String(val)).toLocaleString('vi-VN') + ' đ';
-  };
-
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return '—';
-    return new Date(dateStr).toLocaleDateString('vi-VN');
   };
 
   return (
-    <div className="p-4 md:p-6 w-full max-w-4xl mx-auto bg-surface min-h-screen">
-      <h1 className="text-[24px] font-bold text-primary mb-2 font-h1">Thanh Toán Tiền Cọc</h1>
-      <p className="text-[14px] text-secondary mb-6 font-body">Dưới đây là các phiếu đặt cọc chưa thanh toán. Chọn một phiếu để tiến hành thanh toán.</p>
+    <div className="w-full min-h-screen bg-[#F7F9FB] pb-28 font-['Inter'] flex flex-col">
+      {/* Header */}
+      <div className="bg-[#00236F] text-white p-6 pt-10 rounded-b-[32px] shadow-sm mb-6 flex-shrink-0">
+        <h1 className="text-lg font-bold">Lịch Sử Đặt Cọc</h1>
+        <p className="text-xs text-white/70 mt-1">Quản lý và theo dõi toàn bộ lịch sử các giao dịch đặt cọc giữ chỗ của bạn.</p>
+      </div>
 
-      {/* Alerts */}
-      {message && (
-        <div className="p-4 mb-6 bg-success/10 border border-success/30 text-success rounded-lg flex items-start gap-3">
-          <span className="material-symbols-outlined mt-0.5">check_circle</span>
-          <span className="text-[14px] font-body">{message}</span>
-          <button onClick={() => setMessage('')} className="ml-auto material-symbols-outlined text-success">close</button>
-        </div>
-      )}
-      {error && (
-        <div className="p-4 mb-6 bg-danger/10 border border-danger/30 text-danger rounded-lg flex items-start gap-3">
-          <span className="material-symbols-outlined mt-0.5">error</span>
-          <span className="text-[14px] font-body">{error}</span>
-          <button onClick={() => setError('')} className="ml-auto material-symbols-outlined text-danger">close</button>
-        </div>
-      )}
-
-      {loading ? (
-        <div className="text-center py-16 text-secondary">
-          <span className="material-symbols-outlined text-5xl animate-spin mb-3">progress_activity</span>
-          <p className="text-[14px] font-body">Đang tải...</p>
-        </div>
-      ) : phieuList.length === 0 && !message ? (
-        <div className="text-center py-16 text-secondary">
-          <span className="material-symbols-outlined text-5xl mb-3">receipt_long</span>
-          <p className="text-[14px] font-body">Không có phiếu đặt cọc nào cần thanh toán.</p>
-          <p className="text-[12px] mt-2 font-caption">Bạn có thể tạo phiếu mới ở trang <strong className="text-primary">Đặt cọc</strong>.</p>
-        </div>
-      ) : (
-        <div className="mb-6">
-          {/* Desktop Table (hidden on mobile) */}
-          <div className="hidden md:block bg-white rounded-lg border border-[#D1D5DB] overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-[#F7F9FB] border-b border-[#E5E7EB]">
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4B5563] uppercase tracking-wider">Mã phiếu</th>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4B5563] uppercase tracking-wider">Phòng</th>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4B5563] uppercase tracking-wider">Ngày tạo</th>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4B5563] uppercase tracking-wider text-right">Số tiền</th>
-                  <th className="px-4 py-3 text-[12px] font-bold text-[#4B5563] uppercase tracking-wider text-center">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody className="text-[14px] font-body text-[#1F2937]">
-                {phieuList.map(p => {
-                  const isSelected = selectedPhieu?.macoc === p.macoc;
-                  return (
-                    <tr
-                      key={p.macoc}
-                      onClick={() => handleSelect(p)}
-                      className={`border-b border-[#E5E7EB] cursor-pointer transition-colors ${
-                        isSelected ? 'bg-primary/5' : 'hover:bg-[#F9FAFB]'
-                      }`}
-                    >
-                      <td className="px-4 py-3 font-semibold text-primary">#{p.macoc}</td>
-                      <td className="px-4 py-3 font-medium">{p.tenphong}</td>
-                      <td className="px-4 py-3 text-secondary">{formatDate(p.ngaycoc)}</td>
-                      <td className="px-4 py-3 font-bold text-danger text-right">{formatCurrency(p.sotien)}</td>
-                      <td className="px-4 py-3 text-center">
-                        <button
-                          className={`text-[12px] font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                            isSelected ? 'bg-primary text-white' : 'bg-[#E5E7EB] text-[#4B5563] hover:bg-[#D1D5DB]'
-                          }`}
-                        >
-                          {isSelected ? 'Đang chọn' : 'Thanh toán'}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+      {/* Main Container */}
+      <div className="max-w-2xl w-full mx-auto px-4 flex-grow space-y-6">
+        
+        {/* Error Alert */}
+        {error && (
+          <div className="p-4 bg-red-50 text-red-600 rounded-xl text-xs font-semibold border border-red-100 flex items-center gap-2">
+            <span className="material-symbols-outlined text-lg">error</span>{error}
           </div>
+        )}
 
-          {/* Mobile Card-based List (hidden on desktop) */}
-          <div className="md:hidden space-y-3">
-            {phieuList.map(p => {
-              const isSelected = selectedPhieu?.macoc === p.macoc;
+        {/* Tab lọc trạng thái */}
+        <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none flex-shrink-0">
+          {([
+            { key: 'Tất cả', count: counts.all, color: 'bg-slate-100 text-slate-700' },
+            { key: 'Đang chờ', count: counts.pending, color: 'bg-orange-100 text-orange-700' },
+            { key: 'Đã hoàn tất', count: counts.completed, color: 'bg-green-100 text-green-700' },
+            { key: 'Đã hủy', count: counts.canceled, color: 'bg-gray-100 text-gray-600' }
+          ] as const).map((tab) => {
+            const active = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-bold transition-all whitespace-nowrap border ${
+                  active
+                    ? 'bg-[#00236F] text-white border-[#00236F]'
+                    : 'bg-white text-[#54647A] border-[#E0E3E5] hover:bg-slate-50'
+                }`}
+              >
+                {tab.key}
+                {tab.count > 0 && (
+                  <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-extrabold ${active ? 'bg-white text-[#00236F]' : tab.color}`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Cards Layout */}
+        {loading ? (
+          <div className="flex flex-col gap-4">
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ) : list.length === 0 ? (
+          /* Empty State */
+          <div className="bg-white border border-[#E0E3E5] rounded-2xl p-8 text-center text-[#54647A] py-16 shadow-sm flex flex-col items-center gap-4">
+            <span className="material-symbols-outlined text-5xl text-[#C5C5D3]">receipt_long</span>
+            <div>
+              <p className="font-semibold text-sm text-[#191C1E]">
+                {activeTab === 'Tất cả' && 'Bạn chưa có phiếu đặt cọc nào'}
+                {activeTab === 'Đang chờ' && 'Không có phiếu nào đang chờ thanh toán'}
+                {activeTab === 'Đã hoàn tất' && 'Chưa có giao dịch đặt cọc thành công nào'}
+                {activeTab === 'Đã hủy' && 'Chưa có giao dịch đặt cọc nào bị hủy'}
+              </p>
+              {activeTab === 'Tất cả' && (
+                <p className="text-xs text-[#54647A] mt-1">Tìm kiếm phòng và tiến hành đặt cọc ngay.</p>
+              )}
+            </div>
+            {activeTab === 'Tất cả' && (
+              <button
+                onClick={() => navigate('/')}
+                className="px-6 py-2.5 bg-[#00236F] text-white rounded-xl text-xs font-bold hover:bg-[#1E3A8A] active:scale-95 transition-all shadow-sm flex items-center gap-2"
+              >
+                <span className="material-symbols-outlined text-[16px]">search</span>
+                Tìm phòng ngay
+              </button>
+            )}
+          </div>
+        ) : (
+          /* Cards List */
+          <div className="flex flex-col gap-4">
+            {list.map((phieu) => {
+              const badge = getBadgeStyle(phieu.trangthai);
+              const isPendingPayment = phieu.trangthai === 'ChoThanhToan';
+              const isWaitingConfirm = phieu.trangthai === 'ChoXacNhanTienMat';
+              const isCompleted = phieu.trangthai === 'DaThanhToan';
+              const isCanceled = phieu.trangthai === 'DaHuy';
+
               return (
                 <div
-                  key={p.macoc}
-                  onClick={() => handleSelect(p)}
-                  className={`bg-white border rounded-lg p-4 cursor-pointer transition-all ${
-                    isSelected ? 'border-primary shadow-sm' : 'border-[#D1D5DB]'
-                  }`}
+                  key={phieu.macoc}
+                  onClick={() => navigate(`/ket-qua-dat-coc/${phieu.macoc}`)}
+                  className="bg-white border border-[#E0E3E5] hover:border-[#00236F]/30 hover:shadow-md rounded-2xl p-5 flex flex-col justify-between cursor-pointer transition-all active:scale-[0.99] relative group shadow-sm"
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className="text-[12px] font-bold text-primary uppercase">Phiếu #{p.macoc}</span>
-                      <h3 className="text-[16px] font-semibold text-[#1F2937]">{p.tenphong}</h3>
+                  <div className="space-y-3.5">
+                    {/* Dòng trên: Tên phòng + Trạng thái */}
+                    <div className="flex justify-between items-center gap-3">
+                      <span className="font-bold text-[15px] text-[#191C1E] group-hover:text-[#00236F] transition">
+                        Phòng {phieu.tenphong || '—'}
+                      </span>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold border ${badge.bg}`}>
+                        {badge.text}
+                      </span>
                     </div>
-                    <span className="text-[16px] font-bold text-danger">{formatCurrency(p.sotien)}</span>
+
+                    {/* Dòng giữa: Số tiền cọc + Phương thức */}
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-lg font-extrabold text-[#191C1E]">
+                        {formatCurrency(Number(phieu.tiencoc))}
+                      </span>
+                      <span className="text-[11px] text-[#54647A] flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px]">
+                          {phieu.ptthanhtoan === 'ChuyenKhoan' ? 'credit_card' : 'payments'}
+                        </span>
+                        {phieu.ptthanhtoan === 'ChuyenKhoan' ? 'Chuyển khoản / PayPal' : phieu.ptthanhtoan === 'TienMat' ? 'Tiền mặt' : '—'}
+                      </span>
+                    </div>
+
+                    {/* Dòng dưới: Countdown / Thời gian */}
+                    <div className="pt-3 border-t border-slate-100 flex justify-between items-center gap-4 text-[11px]">
+                      <div>
+                        {isPendingPayment && <CardCountDown targetTime={phieu.thoigianhethan} />}
+                        {isWaitingConfirm && (
+                          <span className="text-[#54647A] flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[13px] text-amber-500">pending</span>
+                            Chờ đối soát từ: {formatDate(phieu.thoigiantao)}
+                          </span>
+                        )}
+                        {isCompleted && (
+                          <span className="text-green-600 font-medium flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[13px]">check_circle</span>
+                            Duyệt ngày: {formatDate(phieu.thoigianxacnhan)}
+                          </span>
+                        )}
+                        {isCanceled && (
+                          <span className="text-red-500 font-medium flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[13px]">cancel</span>
+                            Đã hủy (Quá hạn 24h)
+                          </span>
+                        )}
+                      </div>
+
+                      <span className="material-symbols-outlined text-[18px] text-[#C5C5D3] group-hover:text-[#00236F] group-hover:translate-x-0.5 transition-all">
+                        chevron_right
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mt-3 pt-3 border-t border-[#E5E7EB]">
-                    <span className="text-[12px] text-secondary">{formatDate(p.ngaycoc)}</span>
-                    <button
-                      className={`text-[12px] font-semibold px-4 py-1.5 rounded-lg transition-colors ${
-                        isSelected ? 'bg-primary text-white' : 'border border-secondary text-secondary'
-                      }`}
-                    >
-                      {isSelected ? 'Đang chọn' : 'Thanh toán'}
-                    </button>
-                  </div>
+
+                  {/* Nút CTA "Tiếp tục thanh toán" cho card đang chờ */}
+                  {isPendingPayment && (
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex justify-end">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Không kích hoạt onClick của Card cha
+                          navigate(`/xac-nhan-dat-coc/${phieu.macoc}`);
+                        }}
+                        className="px-4 py-2 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-bold text-[11px] rounded-lg shadow-sm active:scale-95 transition-all flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[13px]">payment</span>
+                        Tiếp tục thanh toán
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
-      {/* Payment form */}
-      {selectedPhieu && (
-        <div className="bg-white border-[2px] border-primary rounded-lg p-6 shadow-lg">
-          <h2 className="text-[18px] font-semibold text-gray-900 mb-6 flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary">payments</span>
-            Thanh toán phiếu #{selectedPhieu.macoc} — Phòng {selectedPhieu.tenphong}
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Payment info */}
-            <div>
-              <div className="bg-primary/5 border border-primary/20 rounded-lg p-5 mb-4 text-center">
-                <p className="text-[12px] font-semibold text-secondary mb-1 uppercase tracking-wider">Số tiền cần thanh toán</p>
-                <p className="text-[28px] font-bold text-danger">{formatCurrency(selectedPhieu.sotien)}</p>
-              </div>
-
-              <div className="bg-[#F7F9FB] rounded-lg p-5 border border-[#E5E7EB]">
-                <p className="font-semibold text-[14px] text-[#1F2937] mb-3 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-[18px] text-primary">account_balance</span>
-                  Thông tin chuyển khoản
-                </p>
-                <div className="space-y-2 text-[14px] font-body">
-                  <div className="flex justify-between border-b border-[#E5E7EB] pb-2">
-                    <span className="text-secondary">Ngân hàng</span>
-                    <span className="font-semibold text-[#1F2937]">Vietcombank (VCB)</span>
-                  </div>
-                  <div className="flex justify-between border-b border-[#E5E7EB] pb-2 pt-1">
-                    <span className="text-secondary">Số tài khoản</span>
-                    <span className="font-semibold text-primary tracking-wider">1234 5678 90</span>
-                  </div>
-                  <div className="flex justify-between border-b border-[#E5E7EB] pb-2 pt-1">
-                    <span className="text-secondary">Chủ tài khoản</span>
-                    <span className="font-semibold text-[#1F2937]">CONG TY HOMESTAY</span>
-                  </div>
-                  <div className="flex justify-between pt-1">
-                    <span className="text-secondary">Nội dung CK</span>
-                    <span className="font-bold text-danger bg-danger/10 px-2 py-0.5 rounded">DATCOC {selectedPhieu.macoc}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Form */}
-            <form onSubmit={handleThanhToan} className="flex flex-col gap-4">
-              <div>
-                <label className="block text-[14px] font-semibold text-[#374151] mb-2">Phương thức thanh toán</label>
-                <select
-                  className="w-full px-4 py-3 border border-[#D1D5DB] bg-white rounded-lg focus:outline-none focus:border-primary focus:ring-[2px] focus:ring-primary/20 text-[14px] font-body text-[#1F2937] transition-shadow"
-                  value={ptThanhToan}
-                  onChange={e => setPtThanhToan(e.target.value)}
-                >
-                  <option value="Chuyển khoản">Chuyển khoản ngân hàng</option>
-                  <option value="Tiền mặt">Tiền mặt (nộp tại quầy)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[14px] font-semibold text-[#374151] mb-2">
-                  Mã giao dịch {ptThanhToan === 'Chuyển khoản' ? '(Trên app ngân hàng)' : '(Nhân viên ghi nhận)'}
-                </label>
-                <input
-                  type="text"
-                  required
-                  className="w-full px-4 py-3 border border-[#D1D5DB] bg-white rounded-lg focus:outline-none focus:border-primary focus:ring-[2px] focus:ring-primary/20 text-[14px] font-body text-[#1F2937] transition-shadow"
-                  placeholder="VD: CK20250712001"
-                  value={maGiaoDich}
-                  onChange={e => setMaGiaoDich(e.target.value)}
-                />
-              </div>
-
-              <div className="flex flex-col md:flex-row gap-3 mt-auto pt-4">
-                <button
-                  type="button"
-                  onClick={() => setSelectedPhieu(null)}
-                  className="px-[24px] py-[12px] border border-secondary bg-white text-secondary font-body font-semibold rounded-lg hover:bg-[#F9FAFB] transition-colors text-[14px] text-center"
-                >
-                  Hủy bỏ
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 bg-primary text-white px-[24px] py-[12px] rounded-lg font-body font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-[14px]"
-                >
-                  {submitting ? (
-                    <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Đang gửi...</>
-                  ) : (
-                    <><span className="material-symbols-outlined text-[18px]">send</span> Gửi xác nhận</>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
       <BottomNav />
-</div>
+    </div>
   );
 }

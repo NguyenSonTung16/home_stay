@@ -7,6 +7,8 @@ import webhookRoutes from './webhookRoutes';
 import roomRoutes from './roomRoutes';
 import lichHenRoutes from './lichHenRoutes';
 import periodicPaymentRoutes from './periodicPaymentRoutes';
+import doiSoatRoutes from './doiSoatRoutes';
+import baoCaoRoutes from './baoCaoRoutes';
 
 const router = Router();
 
@@ -17,6 +19,8 @@ router.use('/phong', roomRoutes);
 router.use('/lichhen', lichHenRoutes);
 router.use('/finance', financeRoutes);
 router.use('/webhook', webhookRoutes);
+router.use('/doi-soat', doiSoatRoutes);
+router.use('/bao-cao', baoCaoRoutes);
 router.use('/', periodicPaymentRoutes);
 
 export default router;

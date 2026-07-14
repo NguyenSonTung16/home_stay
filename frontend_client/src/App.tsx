@@ -12,6 +12,8 @@ import Roomdetail from './pages/Roomdetail';
 
 import ThanhToanCoc from './pages/ThanhToanCoc';
 import YeuCauTraPhong from './pages/YeuCauTraPhong';
+import XacNhanDatCoc from './pages/XacNhanDatCoc';
+import KetQuaDatCoc from './pages/KetQuaDatCoc';
 
 function App() {
   return (
@@ -31,6 +33,10 @@ function App() {
         {/* Liêm's routes */}
         <Route path="/thanh-toan-coc" element={<ThanhToanCoc />} />
         <Route path="/yeu-cau-tra-phong" element={<YeuCauTraPhong />} />
+
+        {/* Thanh toán cọc — Tùng's feature */}
+        <Route path="/xac-nhan-dat-coc/:maPDC" element={<XacNhanDatCoc />} />
+        <Route path="/ket-qua-dat-coc/:maPDC" element={<KetQuaDatCoc />} />
       </Routes>
     </Router>
   );

@@ -75,6 +75,16 @@ export class PaypalService {
     try {
       const accessToken = await this.getAccessToken();
 
+      // Xác định return_url và cancel_url dựa trên referenceId
+      let returnUrl = 'http://localhost:5173/thanh-toan-ket-qua';
+      let cancelUrl = 'http://localhost:5173/thanh-toan-ket-qua';
+
+      if (referenceId.startsWith('DATCOC_')) {
+        const maPDC = referenceId.split('_')[1];
+        returnUrl = `http://localhost:5173/xac-nhan-dat-coc/${maPDC}`;
+        cancelUrl = `http://localhost:5173/xac-nhan-dat-coc/${maPDC}`;
+      }
+
       const payload = {
         intent: 'CAPTURE',
         purchase_units: [
@@ -85,7 +95,12 @@ export class PaypalService {
               value: amountUSD.toFixed(2)
             }
           }
-        ]
+        ],
+        application_context: {
+          return_url: returnUrl,
+          cancel_url: cancelUrl,
+          user_action: 'PAY_NOW' // Hiển thị nút "Pay Now" để hoàn tất thanh toán trực tiếp
+        }
       };
 
       const response = await axios.post(`${this.API_BASE}/v2/checkout/orders`, payload, {
