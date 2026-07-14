@@ -63,6 +63,7 @@ CREATE TABLE Phong (
     TrangThai INT NOT NULL,
     ChiNhanh VARCHAR(100),
     TieuChiGioiTinh VARCHAR(20),
+    HinhAnh VARCHAR(255),
     MaLoai INT NOT NULL,
     FOREIGN KEY (MaLoai) REFERENCES LoaiPhong(MaLoai)
 );

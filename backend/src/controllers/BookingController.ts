@@ -48,8 +48,8 @@ export const getRoomDetails = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const query = `
-      SELECT p.MaPhong as "id", p.TenPhong as "name", p.TrangThai as "status", p.ChiNhanh as "branch", p.TieuChiGioiTinh as "gender",
-             lp.TenLoai as "type", lp.GiaTien as "price", lp.SucChua as "capacity",
+      SELECT p.MaPhong as "id", p.MaPhong as "maphong", p.TenPhong as "name", p.TenPhong as "tenphong", p.TrangThai as "status", p.ChiNhanh as "branch", p.ChiNhanh as "chinhanh", p.TieuChiGioiTinh as "gender", p.HinhAnh as "image", p.HinhAnh as "hinhanh",
+             lp.TenLoai as "type", lp.GiaTien as "price", lp.GiaTien as "giatien", lp.SucChua as "capacity", lp.SucChua as "succhua",
              (
                SELECT json_agg(dvp.TenDichVu)
                FROM ChiTietDichVuPhong ct

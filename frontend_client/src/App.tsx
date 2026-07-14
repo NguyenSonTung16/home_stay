@@ -8,12 +8,14 @@ import { MHThanhToanDinhKy } from './pages/MHThanhToanDinhKy';
 import { MHThanhToan } from './pages/MHThanhToan';
 import { MHQuetMaQR } from './pages/MHQuetMaQR';
 import { MHThongBaoKetQua } from './pages/MHThongBaoKetQua';
+import Roomdetail from './pages/Roomdetail';
 
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<MHTimKiemPhong />} />
+        <Route path="/phong/:id" element={<Roomdetail />} />
         <Route path="/search-demo" element={<Search />} />
         <Route path="/dat-lich-hen" element={<MHDangKyLichHenXemPhong />} />
         <Route path="/lich-su-lich-hen" element={<MHLichSuLichHen />} />

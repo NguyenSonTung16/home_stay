@@ -153,17 +153,17 @@ INSERT INTO ChiTietDichVuPhong(MaLoai, MaDVP) VALUES (2, 1), (2, 2), (2, 3), (2,
 INSERT INTO ChiTietDichVuPhong(MaLoai, MaDVP) VALUES (3, 1), (3, 2), (3, 3), (3, 5) ON CONFLICT DO NOTHING;
 INSERT INTO ChiTietDichVuPhong(MaLoai, MaDVP) VALUES (4, 1), (4, 2), (4, 3), (4, 4), (4, 5) ON CONFLICT DO NOTHING;
 
-INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, MaLoai) VALUES (101, 'Studio Cao Cấp - T12', 1, 'Quận 1, TP. HCM', 'Nam/Nữ', 4) 
-ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh;
+INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, HinhAnh, MaLoai) VALUES (101, 'Studio Cao Cấp - T12', 1, 'Quận 1, TP. HCM', 'Nam/Nữ', 'http://localhost:3000/room_images/P101.jpg', 4) 
+ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh, HinhAnh = EXCLUDED.HinhAnh;
 
-INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, MaLoai) VALUES (102, 'Căn Hộ Deluxe - B04', 1, 'Quận 3, TP. HCM', 'Nam/Nữ', 2) 
-ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh;
+INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, HinhAnh, MaLoai) VALUES (102, 'Căn Hộ Deluxe - B04', 1, 'Quận 3, TP. HCM', 'Nam/Nữ', 'http://localhost:3000/room_images/P102.jpg', 2) 
+ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh, HinhAnh = EXCLUDED.HinhAnh;
 
-INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, MaLoai) VALUES (103, 'Phòng Suite View Sông', 1, 'Bình Thạnh, TP. HCM', 'Nam/Nữ', 3) 
-ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh;
+INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, HinhAnh, MaLoai) VALUES (103, 'Phòng Suite View Sông', 1, 'Bình Thạnh, TP. HCM', 'Nam/Nữ', 'http://localhost:3000/room_images/P103.jpg', 3) 
+ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh, HinhAnh = EXCLUDED.HinhAnh;
 
-INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, MaLoai) VALUES (104, 'Căn Hộ Duplex - Tầng Thượng', 1, 'Quận 2, TP. HCM', 'Nam/Nữ', 1) 
-ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh;
+INSERT INTO Phong(MaPhong, TenPhong, TrangThai, ChiNhanh, TieuChiGioiTinh, HinhAnh, MaLoai) VALUES (104, 'Căn Hộ Duplex - Tầng Thượng', 1, 'Quận 2, TP. HCM', 'Nam/Nữ', 'http://localhost:3000/room_images/P104.jpg', 1) 
+ON CONFLICT (MaPhong) DO UPDATE SET TenPhong = EXCLUDED.TenPhong, ChiNhanh = EXCLUDED.ChiNhanh, TieuChiGioiTinh = EXCLUDED.TieuChiGioiTinh, HinhAnh = EXCLUDED.HinhAnh;
 
 -- Liên kết khách hàng vào hợp đồng để test lấy hoá đơn
 INSERT INTO ThanhVienThue(MaHD, MaKH) VALUES (9999, 99) ON CONFLICT DO NOTHING;
