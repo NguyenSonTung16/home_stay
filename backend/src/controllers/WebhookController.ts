@@ -7,6 +7,8 @@ const donHangService = new DonHangService();
 export class WebhookController {
   public handlePaypalWebhook = async (req: Request, res: Response) => {
     try {
+      const signature = req.headers['paypal-transmission-sig'] as string;
+      const webhookId = process.env.PAYPAL_WEBHOOK_ID as string;
       const event = req.body;
       const eventType = event.event_type;
       console.log('Received PayPal Webhook:', eventType);
@@ -35,6 +37,14 @@ export class WebhookController {
           }
         } else if (eventType === 'CHECKOUT.ORDER.APPROVED') {
           maDH = event.resource?.id;
+          try {
+            console.log(`[WebhookController] Auto-capturing order ${maDH} from Webhook`);
+            const { PaypalService } = await import('../services/PaypalService');
+            const paypalService = new PaypalService();
+            await paypalService.captureOrder(maDH);
+          } catch (error) {
+            console.error(`[WebhookController] Failed to auto-capture order ${maDH}:`, error);
+          }
         } else {
           maDH = event.orderId || event.id || event.resource?.id;
         }

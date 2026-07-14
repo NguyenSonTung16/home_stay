@@ -18,19 +18,14 @@ export class HoSoDatCocService {
     }
 
     if (isDuyet) {
-      // Approve: Change status to 3 (Đã xác nhận cọc)
-      await this.phieuDatCocRepo.updateStatus(maCoc, 3);
-      // In a real system, we'd also generate HopDong or notify customer.
-      return { success: true, message: 'Đã duyệt hồ sơ đặt cọc thành công.' };
+      // Approve: Change status to 1 (Cần thanh toán) — cho phép khách hàng tiến hành thanh toán
+      await this.phieuDatCocRepo.updateStatus(maCoc, 1);
+      return { success: true, message: 'Đã duyệt hồ sơ đặt cọc. Khách hàng có thể tiến hành thanh toán.' };
     } else {
       // Reject: Change status to 4 (Từ chối/Hủy)
       await this.phieuDatCocRepo.updateStatus(maCoc, 4);
-      // We should also free up the beds (status = 0) in GiuongRepository.
-      const { GiuongRepository } = require('../repositories/GiuongRepository');
-      const giuongRepo = new GiuongRepository();
-      // Need a way to link which beds were reserved, simplify by freeing all in the room or matching count
-      // For now, assume it's just rejecting the paper.
-      
+      // Because we use virtual capacity calculation, changing status to 4 
+      // automatically frees up the reserved beds for this room.
       return { success: true, message: 'Đã từ chối hồ sơ đặt cọc.' };
     }
   }

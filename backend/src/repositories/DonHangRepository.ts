@@ -7,7 +7,7 @@ export class DonHangRepository {
    */
   public async taoDonHang(
     maDH: string,
-    loaiHoaDon: 'DienNuoc' | 'PhiDinhKy',
+    loaiHoaDon: 'DienNuoc' | 'PhiDinhKy' | 'DatCoc',
     phuongThuc: string,
     tongTien: number,
     maHoaDon: number,

@@ -17,7 +17,7 @@ export class DonHangService {
    * Tạo đơn hàng nháp và trả về mã QR thanh toán (approve link)
    */
   public async taoMaQR(
-    loaiHoaDon: 'DienNuoc' | 'PhiDinhKy',
+    loaiHoaDon: 'DienNuoc' | 'PhiDinhKy' | 'DatCoc',
     phuongThuc: string,
     maHoaDon: number,
     idempotencyKey?: string
@@ -52,6 +52,11 @@ export class DonHangService {
       if (!pdk) throw new Error(`Không tìm thấy hóa đơn định kỳ #${maHoaDon}`);
       if (pdk.trangthai === 'DaThanhToan') throw new Error('Hóa đơn định kỳ đã được thanh toán trước đó');
       tongTien = Number(pdk.tongtien);
+    } else if (loaiHoaDon === 'DatCoc') {
+      const pdc = await db.query('SELECT * FROM PhieuDatCoc WHERE MaCoc = $1', [maHoaDon]);
+      if (pdc.rows.length === 0) throw new Error(`Không tìm thấy phiếu đặt cọc #${maHoaDon}`);
+      if (pdc.rows[0].trangthai === 3) throw new Error('Phiếu đặt cọc đã được thanh toán trước đó');
+      tongTien = Number(pdc.rows[0].sotien);
     } else {
       throw new Error('Loại hóa đơn không hợp lệ');
     }
@@ -127,6 +132,9 @@ export class DonHangService {
         } else if (donHang.loaihoadon === 'PhiDinhKy') {
           const queryUpdateBill = `UPDATE HoaDonPhiDinhKy SET TrangThai = 'DaThanhToan' WHERE MaPDK = $1`;
           await client.query(queryUpdateBill, [donHang.mahoadon]);
+        } else if (donHang.loaihoadon === 'DatCoc') {
+          const queryUpdateBill = `UPDATE PhieuDatCoc SET TrangThai = 2, PTThanhToan = 'PayPal', MaGiaoDich = $2 WHERE MaCoc = $1`;
+          await client.query(queryUpdateBill, [donHang.mahoadon, maDH]);
         }
       }
 

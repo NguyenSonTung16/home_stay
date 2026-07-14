@@ -7,7 +7,7 @@ export enum DonHangTrangThai {
 
 export interface DonHangDTO {
   madh: string;
-  loaihoadon: 'DienNuoc' | 'PhiDinhKy';
+  loaihoadon: 'DienNuoc' | 'PhiDinhKy' | 'DatCoc';
   phuongthuc: string;
   tongtien: number;
   mahoadon: number;

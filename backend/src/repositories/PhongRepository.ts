@@ -10,14 +10,17 @@ export class PhongRepository {
     const res = await db.query(`
       SELECT p.MaPhong, p.TenPhong, p.ChiNhanh, p.TieuChiGioiTinh,
              lp.TenLoai, lp.GiaTien, lp.SucChua,
-             lp.SucChua - COUNT(CASE WHEN g.TrangThai = 1 THEN 1 END) AS sogiuongtrong,
-             COUNT(g.MaGiuong) AS tonggiuong
+             (lp.SucChua 
+              - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
+              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+             )::int AS sogiuongtrong,
+             (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong) AS tonggiuong
       FROM Phong p
       JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
-      LEFT JOIN Giuong g ON g.MaPhong = p.MaPhong
-      GROUP BY p.MaPhong, p.TenPhong, p.ChiNhanh, p.TieuChiGioiTinh,
-               lp.TenLoai, lp.GiaTien, lp.SucChua
-      HAVING (lp.SucChua - COUNT(CASE WHEN g.TrangThai = 1 THEN 1 END)) > 0
+      WHERE (lp.SucChua 
+              - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
+              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+             ) > 0
       ORDER BY p.MaPhong
     `);
     return res.rows;

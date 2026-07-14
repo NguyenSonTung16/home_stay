@@ -34,7 +34,7 @@ export class PhieuDatCocRepository {
       FROM PhieuDatCoc p
       JOIN KhachHang k ON p.MaKH = k.MaKH
       JOIN Phong ph ON p.MaPhong = ph.MaPhong
-      WHERE p.TrangThai = 2 -- 2: Chờ duyệt hồ sơ (đã up bill)
+      WHERE p.TrangThai = 0 -- 0: Chờ Sale duyệt (yêu cầu mới từ khách hàng)
     `);
     return res.rows;
   }

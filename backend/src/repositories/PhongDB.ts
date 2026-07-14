@@ -7,7 +7,10 @@ export class PhongDB {
         const query = `
             SELECT p.MaPhong, p.TenPhong, p.ChiNhanh, p.TrangThai, p.HinhAnh,
                    lp.TenLoai, lp.GiaTien, lp.SucChua,
-                   lp.SucChua - COUNT(CASE WHEN g.TrangThai = 1 THEN 1 END) AS sogiuongtrong
+                   (lp.SucChua 
+                    - COUNT(CASE WHEN g.TrangThai = 1 THEN 1 END)
+                    - COALESCE((SELECT SUM(pdc.SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+                   )::int AS sogiuongtrong
             FROM Phong p
             JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
             LEFT JOIN Giuong g ON g.MaPhong = p.MaPhong

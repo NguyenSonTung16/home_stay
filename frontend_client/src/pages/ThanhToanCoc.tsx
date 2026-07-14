@@ -46,7 +46,7 @@ export default function ThanhToanCoc() {
     if (!currentUser) return;
     try {
       setLoading(true);
-      const maKH = currentUser.user?.makh || currentUser.user?.id || currentUser.id;
+      const maKH = currentUser.user?.makh || currentUser.user?.id || (currentUser as any).id;
       const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/booking/phieu-coc/danh-sach?maKH=${maKH}`);
       setPhieuList(res.data.data || []);
     } catch (err: any) {
@@ -59,7 +59,7 @@ export default function ThanhToanCoc() {
   const handleSelect = (phieu: PhieuCoc) => {
     setSelectedPhieu(phieu);
     setMaGiaoDich('');
-    setPtThanhToan('Chuyển khoản');
+    setPtThanhToan('Tiền mặt');
     setMinhChung(null);
     setMessage('');
     setError('');
@@ -69,7 +69,7 @@ export default function ThanhToanCoc() {
     e.preventDefault();
     if (!selectedPhieu) return;
     
-    if (ptThanhToan === 'Chuyển khoản' && !minhChung && !maGiaoDich) {
+    if (ptThanhToan === 'Tiền mặt' && !minhChung && !maGiaoDich) {
       setError('Vui lòng nhập mã giao dịch hoặc tải lên ảnh minh chứng.');
       return;
     }
@@ -79,6 +79,35 @@ export default function ThanhToanCoc() {
     setError('');
 
     try {
+      if (ptThanhToan === 'PayPal') {
+        const token = currentUser?.token || localStorage.getItem('token');
+        const donHangRes = await fetch(`${import.meta.env.VITE_API_URL}/api/don-hang`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+            'idempotency-key': `IDEM_DatCoc_${selectedPhieu.macoc}_${Date.now()}`
+          },
+          body: JSON.stringify({
+            loaiHoaDon: 'DatCoc',
+            phuongThuc: 'PayPal',
+            maHoaDon: Number(selectedPhieu.macoc)
+          })
+        });
+        const donHangData = await donHangRes.json();
+        if (donHangData.success && donHangData.data?.qrImageUrl) {
+          // URL thực sự của paypal nằm trong query data của qrImageUrl
+          const rawData = new URL(donHangData.data.qrImageUrl).searchParams.get('data');
+          if (rawData) {
+            window.location.href = decodeURIComponent(rawData);
+            return;
+          }
+        }
+        alert('Lỗi tạo đơn hàng PayPal: ' + (donHangData.message || 'Unknown error'));
+        setSubmitting(false);
+        return;
+      }
+
       const formData = new FormData();
       formData.append('maCoc', selectedPhieu.macoc.toString());
       formData.append('ptThanhToan', ptThanhToan);
@@ -93,9 +122,21 @@ export default function ThanhToanCoc() {
       });
       const data = await res.json();
       if (data.success) {
-        alert('Xác nhận thanh toán thành công!');
-        setSelectedPhieu(null);
-        fetchDanhSach();
+        navigate('/thanh-toan-ket-qua', {
+          state: {
+            status: 'DaThanhToan',
+            maDH: maGiaoDich || `CASH-${selectedPhieu.macoc}`,
+            orderDetails: {
+              maDH: maGiaoDich || `CASH-${selectedPhieu.macoc}`,
+              trangThai: 'DaThanhToan',
+              thoiGianHetHan: new Date().toISOString(),
+              tongTien: Number(selectedPhieu.sotien),
+              loaiHoaDon: 'DatCoc',
+              maHoaDon: selectedPhieu.macoc,
+              phuongThuc: ptThanhToan
+            }
+          }
+        });
       } else {
         alert(data.message || 'Có lỗi xảy ra');
       }
@@ -129,9 +170,8 @@ export default function ThanhToanCoc() {
     switch (status) {
       case 0: return <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-[12px] font-bold">Chờ Sale duyệt</span>;
       case 1: return <span className="bg-warning/10 text-warning px-3 py-1 rounded-full text-[12px] font-bold">Cần thanh toán</span>;
-      case 2: return <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-[12px] font-bold">Chờ Kế toán duyệt</span>;
-      case 3: return <span className="bg-success/10 text-success px-3 py-1 rounded-full text-[12px] font-bold">Đã hoàn tất</span>;
-      default: return <span className="bg-danger/10 text-danger px-3 py-1 rounded-full text-[12px] font-bold">Đã Hủy</span>;
+      case 2: return <span className="bg-success/10 text-success px-3 py-1 rounded-full text-[12px] font-bold">Đặt cọc thành công</span>;
+      default: return <span className="bg-danger/10 text-danger px-3 py-1 rounded-full text-[12px] font-bold">Thất bại</span>;
     }
   };
 
@@ -196,9 +236,8 @@ export default function ThanhToanCoc() {
                 <option value="all">Tất cả</option>
                 <option value="0">Chờ Sale duyệt</option>
                 <option value="1">Cần thanh toán</option>
-                <option value="2">Chờ Kế toán duyệt</option>
-                <option value="3">Đã hoàn tất</option>
-                <option value="4">Đã Hủy</option>
+                <option value="2">Đặt cọc thành công</option>
+                <option value="4">Thất bại</option>
               </select>
             </div>
 
@@ -382,6 +421,16 @@ export default function ThanhToanCoc() {
                   </div>
 
                   <form onSubmit={handleThanhToan} className="space-y-4">
+                    {error && (
+                      <div className="bg-danger/10 border border-danger/20 text-danger px-4 py-3 rounded-xl text-[14px]">
+                        {error}
+                      </div>
+                    )}
+                    {message && (
+                      <div className="bg-success/10 border border-success/20 text-success px-4 py-3 rounded-xl text-[14px]">
+                        {message}
+                      </div>
+                    )}
                     <div className="bg-[#F7F9FB] rounded-xl p-5 border border-[#E5E7EB]">
                       <p className="font-semibold text-[14px] text-[#1F2937] mb-3 flex items-center gap-2">
                         <span className="material-symbols-outlined text-[18px] text-primary">account_balance</span>
@@ -415,25 +464,27 @@ export default function ThanhToanCoc() {
                           value={ptThanhToan}
                           onChange={e => setPtThanhToan(e.target.value)}
                         >
-                          <option value="Chuyển khoản">Chuyển khoản</option>
                           <option value="Tiền mặt">Tiền mặt</option>
+                          <option value="PayPal">Thanh toán Online (PayPal)</option>
                         </select>
                       </div>
 
-                      <div>
-                        <label className="block text-[13px] font-semibold text-[#374151] mb-2">Mã giao dịch</label>
-                        <input
-                          type="text"
-                          required={ptThanhToan !== 'Chuyển khoản' && !minhChung}
-                          className="w-full px-4 py-2.5 border border-[#D1D5DB] bg-white rounded-lg focus:outline-none focus:border-primary text-[14px]"
-                          placeholder="Nhập mã giao dịch..."
-                          value={maGiaoDich}
-                          onChange={e => setMaGiaoDich(e.target.value)}
-                        />
-                      </div>
+                      {ptThanhToan !== 'PayPal' && (
+                        <div>
+                          <label className="block text-[13px] font-semibold text-[#374151] mb-2">Mã giao dịch</label>
+                          <input
+                            type="text"
+                            required={ptThanhToan !== 'Tiền mặt' && !minhChung}
+                            className="w-full px-4 py-2.5 border border-[#D1D5DB] bg-white rounded-lg focus:outline-none focus:border-primary text-[14px]"
+                            placeholder="Nhập mã giao dịch..."
+                            value={maGiaoDich}
+                            onChange={e => setMaGiaoDich(e.target.value)}
+                          />
+                        </div>
+                      )}
                     </div>
 
-                    {ptThanhToan === 'Chuyển khoản' && (
+                    {ptThanhToan === 'Tiền mặt' && (
                       <div>
                         <label className="block text-[13px] font-semibold text-[#374151] mb-2">Hình ảnh minh chứng (Biên lai)</label>
                         <input
@@ -457,9 +508,9 @@ export default function ThanhToanCoc() {
                       <button
                         type="submit"
                         disabled={submitting}
-                        className="flex-[2] bg-primary text-white px-4 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                        className={`flex-[2] text-white px-4 py-3 rounded-xl font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2 ${ptThanhToan === 'PayPal' ? 'bg-[#003087] hover:bg-[#001C66]' : 'bg-primary hover:bg-primary/90'}`}
                       >
-                        {submitting ? 'Đang gửi...' : 'Gửi xác nhận thanh toán'}
+                        {submitting ? 'Đang gửi...' : (ptThanhToan === 'PayPal' ? 'Chuyển đến PayPal' : 'Gửi xác nhận thanh toán')}
                       </button>
                     </div>
                   </form>

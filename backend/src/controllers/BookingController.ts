@@ -10,6 +10,10 @@ export const searchRooms = async (req: Request, res: Response) => {
     let query = `
       SELECT p.MaPhong as "id", p.TenPhong as "name", p.TrangThai as "status", p.ChiNhanh as "branch", p.TieuChiGioiTinh as "gender",
              lp.TenLoai as "type", lp.GiaTien as "price", lp.SucChua as "capacity",
+             (lp.SucChua 
+              - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
+              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+             )::int AS "sogiuongtrong",
              (
                SELECT json_agg(dvp.TenDichVu)
                FROM ChiTietDichVuPhong ct
@@ -18,7 +22,10 @@ export const searchRooms = async (req: Request, res: Response) => {
              ) as "amenities"
       FROM Phong p
       JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
-      WHERE 1=1
+      WHERE (lp.SucChua 
+              - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
+              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+             ) > 0
     `;
     const params: any[] = [];
     let paramIndex = 1;
@@ -50,6 +57,10 @@ export const getRoomDetails = async (req: Request, res: Response) => {
     const query = `
       SELECT p.MaPhong as "id", p.MaPhong as "maphong", p.TenPhong as "name", p.TenPhong as "tenphong", p.TrangThai as "status", p.ChiNhanh as "branch", p.ChiNhanh as "chinhanh", p.TieuChiGioiTinh as "gender", p.HinhAnh as "image", p.HinhAnh as "hinhanh",
              lp.TenLoai as "type", lp.GiaTien as "price", lp.GiaTien as "giatien", lp.SucChua as "capacity", lp.SucChua as "succhua",
+             (lp.SucChua 
+              - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
+              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+             )::int AS "sogiuongtrong",
              (
                SELECT json_agg(dvp.TenDichVu)
                FROM ChiTietDichVuPhong ct

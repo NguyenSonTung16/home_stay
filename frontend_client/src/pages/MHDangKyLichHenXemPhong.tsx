@@ -32,6 +32,12 @@ export const MHDangKyLichHenXemPhong = () => {
         setDanhSachPhong([]);
     }, []);
 
+    const handleRemovePhong = (maPhongToRemove: any) => {
+        const updatedList = danhSachPhong.filter(p => (p.maphong || p.MaPhong) !== maPhongToRemove);
+        setDanhSachPhong(updatedList);
+        localStorage.setItem("danhSachPhongQuanTam", JSON.stringify(updatedList));
+    };
+
     const btn_datLich = async () => {
         if (!currentUser) {
             openAuthModal();
@@ -119,14 +125,21 @@ export const MHDangKyLichHenXemPhong = () => {
                             {danhSachPhong.map((phong, index) => (
                                 <div
                                     key={phong.maphong || index}
-                                    className="bg-white border border-[#E0E3E5] rounded-2xl p-3 flex items-center gap-3.5 min-w-[240px] lg:w-full shadow-sm flex-shrink-0 hover:border-[#00236F] transition-colors"
+                                    className="bg-white border border-[#E0E3E5] rounded-2xl p-3 flex items-center gap-3.5 min-w-[240px] lg:w-full shadow-sm flex-shrink-0 hover:border-[#00236F] transition-colors relative"
                                 >
+                                    <button
+                                        onClick={() => handleRemovePhong(phong.maphong || phong.MaPhong)}
+                                        className="absolute top-2 right-2 text-[#757682] hover:text-red-500 transition-colors bg-white rounded-full p-0.5 flex items-center justify-center shadow-sm border border-[#E0E3E5]"
+                                        title="Xóa phòng này"
+                                    >
+                                        <span className="material-symbols-outlined text-[16px]">close</span>
+                                    </button>
                                     <img
                                         src={phong.hinhanh || "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=300&q=80"}
                                         alt={phong.tenphong}
                                         className="w-16 h-16 rounded-xl object-cover flex-shrink-0"
                                     />
-                                    <div className="overflow-hidden flex-1">
+                                    <div className="overflow-hidden flex-1 pr-4">
                                         <h4 className="text-[#00236F] font-bold text-[14px] truncate">
                                             {phong.tenphong}
                                         </h4>

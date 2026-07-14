@@ -3,9 +3,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export class PaypalService {
-  private readonly CLIENT_ID = process.env.PAYPAL_CLIENT_ID;
-  private readonly SECRET = process.env.PAYPAL_SECRET;
-  private readonly API_BASE = process.env.PAYPAL_API_BASE || 'https://api-m.sandbox.paypal.com';
+  private readonly CLIENT_ID = process.env.PAYPAL_CLIENT_ID?.trim();
+  private readonly SECRET = process.env.PAYPAL_SECRET?.trim();
+  private readonly API_BASE = process.env.PAYPAL_API_BASE?.trim() || 'https://api-m.sandbox.paypal.com';
 
   private async getAccessToken(): Promise<string> {
     try {
@@ -85,7 +85,11 @@ export class PaypalService {
               value: amountUSD.toFixed(2)
             }
           }
-        ]
+        ],
+        application_context: {
+          return_url: 'http://localhost:5173/thanh-toan-ket-qua',
+          cancel_url: 'http://localhost:5173/thanh-toan-ket-qua'
+        }
       };
 
       const response = await axios.post(`${this.API_BASE}/v2/checkout/orders`, payload, {

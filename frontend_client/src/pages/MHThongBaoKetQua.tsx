@@ -51,7 +51,12 @@ const Toast: React.FC<ToastProps> = ({ message, visible, onClose }) => (
 export const MHThongBaoKetQua: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { status, maDH } = (location.state as { status: string; maDH: string }) || { status: 'ThatBai', maDH: '' };
+  const searchParams = new URLSearchParams(location.search);
+  const tokenFromUrl = searchParams.get('token');
+  const { status, maDH, orderDetails: stateOrderDetails } = (location.state as { status: string; maDH: string; orderDetails?: OrderDetails }) || { 
+    status: tokenFromUrl ? 'DaThanhToan' : 'ThatBai', 
+    maDH: tokenFromUrl || '' 
+  };
 
   const [loading, setLoading] = useState(true);
   const [orderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
@@ -78,6 +83,11 @@ export const MHThongBaoKetQua: React.FC = () => {
 
   useEffect(() => {
     const fetchDetails = async () => {
+      if (stateOrderDetails) {
+        setOrderDetails(stateOrderDetails);
+        setLoading(false);
+        return;
+      }
       if (!maDH) { setLoading(false); return; }
       try {
         const res = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/don-hang/${maDH}/status`, {
@@ -213,7 +223,7 @@ export const MHThongBaoKetQua: React.FC = () => {
       {/* ── Header ── */}
       <div style={HEADER}>
         <button
-          onClick={() => navigate('/thanh-toan-dinh-ky')}
+          onClick={() => navigate(orderDetails?.loaiHoaDon === 'DatCoc' ? '/thanh-toan-coc' : '/thanh-toan-dinh-ky')}
           style={{ background: 'rgba(255,255,255,0.12)', border: 'none', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
         >
           <span className="material-symbols-outlined" style={{ color: 'white', fontSize: '20px' }}>arrow_back</span>
@@ -385,9 +395,13 @@ export const MHThongBaoKetQua: React.FC = () => {
                       )}
 
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #F8FAFC', gap: '16px' }}>
-                        <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 500, flexShrink: 0 }}>Cổng thanh toán</span>
+                        <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 500, flexShrink: 0 }}>
+                          {(orderDetails.phuongThuc === 'Tiền mặt' || orderDetails.phuongThuc === 'Chuyển khoản') ? 'Hình thức thanh toán' : 'Cổng thanh toán'}
+                        </span>
                         <span style={{ fontSize: '13px', fontWeight: 600, color: '#00236F', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>account_balance_wallet</span>
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+                            {(orderDetails.phuongThuc === 'Tiền mặt' || orderDetails.phuongThuc === 'Chuyển khoản') ? 'payments' : 'account_balance_wallet'}
+                          </span>
                           {orderDetails.phuongThuc || 'PayPal'}
                         </span>
                       </div>
@@ -462,7 +476,7 @@ export const MHThongBaoKetQua: React.FC = () => {
           {/* ── Action buttons ── */}
           <div style={BTN_ROW}>
             <button
-              onClick={() => navigate('/thanh-toan-dinh-ky')}
+              onClick={() => navigate(orderDetails?.loaiHoaDon === 'DatCoc' ? '/thanh-toan-coc' : '/thanh-toan-dinh-ky')}
               style={{ flex: 1, padding: '14px 20px', background: 'linear-gradient(135deg, #00236F, #1E3A8A)', color: 'white', border: 'none', borderRadius: '14px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxShadow: '0 4px 16px rgba(0,35,111,0.25)', transition: 'transform 0.15s', boxSizing: 'border-box' }}
               onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.02)')}
               onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
@@ -485,7 +499,7 @@ export const MHThongBaoKetQua: React.FC = () => {
 
             {(status === 'ThatBai' || status === 'HetHan') && (
               <button
-                onClick={() => navigate('/thanh-toan-dinh-ky')}
+                onClick={() => navigate(orderDetails?.loaiHoaDon === 'DatCoc' ? '/thanh-toan-coc' : '/thanh-toan-dinh-ky')}
                 style={{ flex: 1, padding: '14px 20px', background: '#FFF7ED', color: '#C2410C', border: '2px solid #FDBA74', borderRadius: '14px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', boxSizing: 'border-box' }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>refresh</span>

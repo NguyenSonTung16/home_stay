@@ -33,7 +33,7 @@ export class ThanhToanCocService {
 
     return {
       success: true,
-      message: 'Đã lưu thông tin thanh toán, chờ quản lý duyệt.'
+      message: 'Thanh toán thành công! Đặt cọc đã hoàn tất.'
     };
   }
 

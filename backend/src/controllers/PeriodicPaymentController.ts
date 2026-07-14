@@ -12,7 +12,7 @@ const donHangService = new DonHangService();
 
 // Schema validate cho DonHang
 const createOrderSchema = z.object({
-  loaiHoaDon: z.enum(['DienNuoc', 'PhiDinhKy']),
+  loaiHoaDon: z.enum(['DienNuoc', 'PhiDinhKy', 'DatCoc']),
   phuongThuc: z.string().min(1, 'Phương thức thanh toán không được rỗng'),
   maHoaDon: z.number().int().positive('Mã hóa đơn phải là số nguyên dương')
 });
@@ -104,7 +104,26 @@ export class PeriodicPaymentController {
 
       // Kiểm tra xem đơn hàng đã quá hạn chưa tại thời điểm truy vấn
       let trangThaiHienTai = donHang.trangthai;
-      if (trangThaiHienTai === 'DangCho' && new Date(donHang.thoigianhethan) < new Date()) {
+      if (trangThaiHienTai === 'DangCho' && donHang.phuongthuc === 'PayPal') {
+        try {
+          const { PaypalService } = await import('../services/PaypalService');
+          const paypalService = new PaypalService();
+          const paypalOrder = await paypalService.getOrder(String(maDH));
+          if (paypalOrder.status === 'APPROVED') {
+            await paypalService.captureOrder(String(maDH));
+            trangThaiHienTai = 'DaThanhToan' as any;
+            await donHangService.chuyenTTDonHang(String(maDH), trangThaiHienTai);
+          } else if (paypalOrder.status === 'COMPLETED') {
+            trangThaiHienTai = 'DaThanhToan' as any;
+            await donHangService.chuyenTTDonHang(String(maDH), trangThaiHienTai);
+          } else if (new Date(donHang.thoigianhethan) < new Date()) {
+            trangThaiHienTai = 'HetHan' as any;
+            await donHangService.chuyenTTDonHang(String(maDH), trangThaiHienTai);
+          }
+        } catch (error) {
+          console.error('[PeriodicPaymentController] Sync Paypal Status error:', error);
+        }
+      } else if (trangThaiHienTai === 'DangCho' && new Date(donHang.thoigianhethan) < new Date()) {
         trangThaiHienTai = 'HetHan' as any;
         await donHangService.chuyenTTDonHang(String(maDH), trangThaiHienTai);
       }
