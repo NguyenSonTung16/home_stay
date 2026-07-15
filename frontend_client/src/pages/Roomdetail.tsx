@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { AuthModal } from '../components/AuthModal';
+import { DatCocModal } from '../components/DatCocModal';
+import { useAuth } from '../context/AuthContext';
 
 const Roomdetail = () => {
  const { id } = useParams();
@@ -299,91 +301,12 @@ const Roomdetail = () => {
  onClose={() => setIsAuthModalOpen(false)}
  />
 
- {/* Modal Xác nhận Đặt cọc */}
- {selectedDepositRoom && (
- <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4">
- <div className="bg-white rounded-2xl w-[90vw] max-w-[500px] flex flex-col shadow-2xl overflow-hidden border border-[#E0E3E5]">
- <div className="p-5 border-b border-[#E0E3E5] flex justify-between items-center bg-[#F7F9FB]">
- <h2 className="font-bold text-[19px] text-[#00236F] flex items-center gap-2">
- <span className="material-symbols-outlined">edit_note</span>
- Xác nhận đặt cọc
- </h2>
- <button
- onClick={() => setSelectedDepositRoom(null)}
- className="w-9 h-9 rounded-full bg-white border border-[#E0E3E5] flex items-center justify-center text-[#54647A] hover:text-[#00236F] hover:bg-gray-100 transition-colors"
- >
- <span className="material-symbols-outlined">close</span>
- </button>
- </div>
- <div className="p-6">
- <h3 className="text-[18px] font-bold text-[#191C1E] mb-2">{selectedDepositRoom.tenphong || selectedDepositRoom.TenPhong || selectedDepositRoom.name}</h3>
- <p className="text-[13px] text-[#54647A] mb-4">Chi nhánh: {selectedDepositRoom.chinhanh || selectedDepositRoom.ChiNhanh || selectedDepositRoom.branch}</p>
-
- <div className="flex flex-col gap-4">
- <div>
- <label className="block text-[13px] font-semibold text-[#444651] mb-2">Số giường muốn thuê</label>
- <div className="flex items-center gap-2">
- <button
- onClick={() => setSoGiuongDeposit(Math.max(1, soGiuongDeposit - 1))}
- className="w-10 h-10 rounded-xl border border-[#C5C5D3] flex items-center justify-center hover:bg-gray-50 transition-colors text-[#54647A]"
- disabled={soGiuongDeposit <= 1}
- >
- <span className="material-symbols-outlined">remove</span>
- </button>
- <span className="text-[20px] font-bold text-[#00236F] w-12 text-center">{soGiuongDeposit}</span>
- <button
- onClick={() => {
- const maxBeds = 4;
- setSoGiuongDeposit(Math.min(maxBeds, soGiuongDeposit + 1));
- }}
- className="w-10 h-10 rounded-xl border border-[#C5C5D3] flex items-center justify-center hover:bg-gray-50 transition-colors text-[#54647A]"
- disabled={soGiuongDeposit >= 4}
- >
- <span className="material-symbols-outlined">add</span>
- </button>
- <span className="text-[12px] text-[#54647A] ml-2">(Tối đa 4 giường)</span>
- </div>
- </div>
-
- <div className="p-4 bg-[#F7F9FB] rounded-xl border border-[#E0E3E5] flex flex-col gap-2">
- <div className="flex justify-between items-center text-[13px]">
- <span className="text-[#54647A]">Giá thuê/giường/tháng</span>
- <span className="font-semibold text-[#191C1E]">
- {Number(selectedDepositRoom.giatien || selectedDepositRoom.price || selectedDepositRoom.GiaTien).toLocaleString()} đ
- </span>
- </div>
- <div className="flex justify-between items-center text-[15px] pt-2 border-t border-[#E0E3E5]">
- <span className="font-bold text-[#444651]">Tiền cọc (2 tháng)</span>
- <span className="font-bold text-[#EF4444] text-[18px]">
- {Number((selectedDepositRoom.giatien || selectedDepositRoom.price || selectedDepositRoom.GiaTien) * 2 * soGiuongDeposit).toLocaleString()} đ
- </span>
- </div>
- </div>
- </div>
- </div>
-
- <div className="p-5 border-t border-[#E0E3E5] bg-[#F7F9FB] flex justify-end gap-3">
- <button
- onClick={() => setSelectedDepositRoom(null)}
- className="py-2.5 px-6 bg-white border border-[#C5C5D3] hover:bg-gray-50 text-[#191C1E] font-semibold text-[13px] rounded-xl transition-colors"
- >
- Hủy bỏ
- </button>
- <button
- onClick={btn_submitDeposit}
- disabled={isSubmittingDeposit}
- className="py-2.5 px-6 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
- >
- {isSubmittingDeposit ? (
- <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Đang xử lý...</>
- ) : (
- <><span className="material-symbols-outlined text-[18px]">lock</span> Xác nhận đặt cọc</>
- )}
- </button>
- </div>
- </div>
- </div>
- )}
+ {/* Modal Xác nhận Đặt cọc (Sử dụng component rời) */}
+ <DatCocModal
+ isOpen={!!selectedDepositRoom}
+ onClose={() => setSelectedDepositRoom(null)}
+ roomInfo={selectedDepositRoom}
+ />
  </>
  );
 };

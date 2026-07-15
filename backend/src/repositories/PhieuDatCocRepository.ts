@@ -82,13 +82,16 @@ export class PhieuDatCocRepository {
     maKH: number;
     maPhong: number;
     soTien: number;
+    gioiTinh?: string;
+    soNguoiO?: number;
+    ngayDuKienVao?: string;
   }): Promise<PhieuDatCoc> {
     const res = await client.query(
       `INSERT INTO PhieuDatCoc
-         (MaKH, MaPhong, SoTien, TrangThaiMoi)
-       VALUES ($1, $2, $3, 'ChoDuyet')
+         (MaKH, MaPhong, SoTien, TrangThaiMoi, GioiTinh, SoNguoiO, NgayDuKienVao)
+       VALUES ($1, $2, $3, 'ChoDuyet', $4, $5, $6)
        RETURNING *`,
-      [data.maKH, data.maPhong, data.soTien]
+      [data.maKH, data.maPhong, data.soTien, data.gioiTinh, data.soNguoiO, data.ngayDuKienVao || null]
     );
     return res.rows[0];
   }

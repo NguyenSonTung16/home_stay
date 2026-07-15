@@ -9,7 +9,7 @@ export class BaoCaoRepository {
     granularity: 'day' | 'week' | 'month' | 'year';
     chiNhanh?: string;
   }): Promise<any[]> {
-    let whereClauses = ['thoigian >= $1::timestamp', 'thoigian <= $2::timestamp'];
+    let whereClauses = ['thoigian >= $1::timestamp', 'thoigian <= $2::timestamp + interval \'23 hours 59 minutes 59 seconds\''];
     const params: any[] = [filters.tuNgay, filters.denNgay];
     let idx = 3;
 
@@ -102,10 +102,11 @@ export class BaoCaoRepository {
     const queryStr = `
       SELECT SUM(sotien) as tong
       FROM (
-        SELECT pdc.SoTien as sotien, pdc.ThoiGianXacNhan as thoigian, p.ChiNhanh as chinhanh
+        SELECT pdc.SoTien as sotien, ctdc.ThoiGianXacNhan as thoigian, p.ChiNhanh as chinhanh
         FROM PhieuDatCoc pdc
+        JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
         LEFT JOIN Phong p ON pdc.MaPhong = p.MaPhong
-        WHERE pdc.TrangThaiMoi = 'DaThanhToan' AND pdc.ThoiGianXacNhan IS NOT NULL
+        WHERE pdc.TrangThaiMoi = 'DaThanhToan' AND ctdc.ThoiGianXacNhan IS NOT NULL
 
         UNION ALL
 
@@ -143,11 +144,12 @@ export class BaoCaoRepository {
     let pdcQuery = `
       SELECT SUM(pdc.SoTien) as tong
       FROM PhieuDatCoc pdc
+      JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
       LEFT JOIN Phong p ON pdc.MaPhong = p.MaPhong
       WHERE pdc.TrangThaiMoi = 'ChoThanhToan' 
-        AND pdc.ThoiGianHetHan > NOW()
-        AND EXTRACT(MONTH FROM pdc.ThoiGianTao) = $1
-        AND EXTRACT(YEAR FROM pdc.ThoiGianTao) = $2
+        AND ctdc.ThoiGianHetHan > NOW()
+        AND EXTRACT(MONTH FROM pdc.NgayCoc) = $1
+        AND EXTRACT(YEAR FROM pdc.NgayCoc) = $2
     `;
     const pdcParams: any[] = [thang, nam];
     if (chiNhanh) {
@@ -227,10 +229,11 @@ export class BaoCaoRepository {
         COALESCE(chinhanh, 'Chưa xác định') as chinhanh,
         SUM(sotien) as tongdoanhthu
       FROM (
-        SELECT pdc.SoTien as sotien, pdc.ThoiGianXacNhan as thoigian, p.ChiNhanh as chinhanh
+        SELECT pdc.SoTien as sotien, ctdc.ThoiGianXacNhan as thoigian, p.ChiNhanh as chinhanh
         FROM PhieuDatCoc pdc
+        JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
         LEFT JOIN Phong p ON pdc.MaPhong = p.MaPhong
-        WHERE pdc.TrangThaiMoi = 'DaThanhToan' AND pdc.ThoiGianXacNhan IS NOT NULL
+        WHERE pdc.TrangThaiMoi = 'DaThanhToan' AND ctdc.ThoiGianXacNhan IS NOT NULL
 
         UNION ALL
 

@@ -22,7 +22,7 @@ export class PhieuDatCocService {
   // 1. TẠO PHIẾU ĐẶT CỌC (POST /dat-coc)
   // Transaction 2 bước: INSERT PhieuDatCoc → INSERT ChiTietXuLyDatCoc
   // ─────────────────────────────────────────────────────────────────────────
-  async taoDatCoc(maKH: number, maGiuong: number | null, soGiuongThue: number, maPhong?: number | null): Promise<any> {
+  async taoDatCoc(maKH: number, maGiuong: number | null, soGiuongThue: number, maPhong?: number | null, gioiTinh?: string, soNguoiO?: number, ngayDuKienVao?: string): Promise<any> {
     const client = await db.connect();
     try {
       await client.query('BEGIN');
@@ -67,11 +67,14 @@ export class PhieuDatCocService {
       const tienCoc = tienThuePerThang * 2 * soGiuongThue;
       const thoiGianHetHan = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      // BƯỚC 1: INSERT PhieuDatCoc (8 cột gốc)
+      // BƯỚC 1: INSERT PhieuDatCoc
       const phieu = await this.repo.taoPhieu(client, {
         maKH,
         maPhong: giuong.maphong,
         soTien: tienCoc,
+        gioiTinh,
+        soNguoiO,
+        ngayDuKienVao,
       });
 
       // BƯỚC 2: INSERT ChiTietXuLyDatCoc (trong cùng transaction)

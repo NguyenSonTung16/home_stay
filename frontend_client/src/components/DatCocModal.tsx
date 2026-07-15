@@ -21,6 +21,9 @@ export const DatCocModal: React.FC<DatCocModalProps> = ({ isOpen, onClose, roomI
   const [error, setError] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
+  const [isGiuongOpen, setIsGiuongOpen] = useState(false);
+  const [isGioiTinhOpen, setIsGioiTinhOpen] = useState(false);
+
   if (!isOpen || !roomInfo) return null;
 
   const handleSubmit = async () => {
@@ -161,7 +164,7 @@ export const DatCocModal: React.FC<DatCocModalProps> = ({ isOpen, onClose, roomI
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-[20px] w-[90vw] md:w-[450px] min-w-[320px] max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-[#E0E3E5]"
+        className="bg-white rounded-[20px] w-[95vw] md:w-[450px] max-w-[450px] max-h-[90vh] flex flex-col shadow-2xl overflow-hidden border border-[#E0E3E5]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -194,32 +197,72 @@ export const DatCocModal: React.FC<DatCocModalProps> = ({ isOpen, onClose, roomI
           <div className="space-y-4">
             <div>
               <label className="block text-[13px] font-semibold text-[#191C1E] mb-2">Số giường cần thuê</label>
-              <select 
-                className="w-full p-3.5 rounded-xl border border-[#C5C5D3] focus:border-[#00236F] outline-none text-[14px]"
-                value={soGiuong}
-                onChange={(e) => setSoGiuong(Number(e.target.value))}
-                disabled={maxBeds === 0}
-              >
-                {maxBeds === 0 ? (
-                  <option value={0}>Phòng đã hết giường trống</option>
-                ) : (
-                  Array.from({length: maxBeds}, (_, i) => i + 1).map(n => (
-                    <option key={n} value={n}>{n} giường {n === roomCapacity ? '(Nguyên phòng)' : ''}</option>
-                  ))
+              <div className="relative w-full">
+                <div 
+                  className={`w-full rounded-xl border ${isGiuongOpen ? 'border-[#00236F]' : 'border-[#C5C5D3]'} bg-white cursor-pointer flex items-center justify-between px-3.5 py-3.5`}
+                  onClick={() => !maxBeds ? null : setIsGiuongOpen(!isGiuongOpen)}
+                >
+                  <span className="text-[14px] text-[#191C1E] select-none">
+                    {maxBeds === 0 ? 'Phòng đã hết giường' : `${soGiuong} giường ${soGiuong === roomCapacity ? '(Nguyên phòng)' : ''}`}
+                  </span>
+                  <span className={`material-symbols-outlined text-[#54647A] text-[20px] transition-transform ${isGiuongOpen ? 'rotate-180' : ''}`}>
+                    expand_more
+                  </span>
+                </div>
+                {isGiuongOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsGiuongOpen(false)}></div>
+                    <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white border border-[#C5C5D3] rounded-xl shadow-lg z-50 overflow-hidden">
+                      {Array.from({length: maxBeds}, (_, i) => i + 1).map(n => (
+                        <div 
+                          key={n}
+                          className={`px-3.5 py-3 text-[14px] cursor-pointer hover:bg-gray-50 transition-colors ${soGiuong === n ? 'bg-[#F0F4F8] text-[#00236F] font-medium' : 'text-[#191C1E]'}`}
+                          onClick={() => {
+                            setSoGiuong(n);
+                            setIsGiuongOpen(false);
+                          }}
+                        >
+                          {n} giường {n === roomCapacity ? '(Nguyên phòng)' : ''}
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
-              </select>
+              </div>
             </div>
 
             <div>
               <label className="block text-[13px] font-semibold text-[#191C1E] mb-2">Giới tính người ở</label>
-              <select 
-                className="w-full p-3.5 rounded-xl border border-[#C5C5D3] focus:border-[#00236F] outline-none text-[14px]"
-                value={gioiTinh}
-                onChange={(e) => setGioiTinh(e.target.value)}
-              >
-                <option value="Nam">Nam</option>
-                <option value="Nữ">Nữ</option>
-              </select>
+              <div className="relative w-full">
+                <div 
+                  className={`w-full rounded-xl border ${isGioiTinhOpen ? 'border-[#00236F]' : 'border-[#C5C5D3]'} bg-white cursor-pointer flex items-center justify-between px-3.5 py-3.5`}
+                  onClick={() => setIsGioiTinhOpen(!isGioiTinhOpen)}
+                >
+                  <span className="text-[14px] text-[#191C1E] select-none">{gioiTinh}</span>
+                  <span className={`material-symbols-outlined text-[#54647A] text-[20px] transition-transform ${isGioiTinhOpen ? 'rotate-180' : ''}`}>
+                    expand_more
+                  </span>
+                </div>
+                {isGioiTinhOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsGioiTinhOpen(false)}></div>
+                    <div className="absolute top-[calc(100%+4px)] left-0 w-full bg-white border border-[#C5C5D3] rounded-xl shadow-lg z-50 overflow-hidden">
+                      {['Nam', 'Nữ'].map(option => (
+                        <div 
+                          key={option}
+                          className={`px-3.5 py-3 text-[14px] cursor-pointer hover:bg-gray-50 transition-colors ${gioiTinh === option ? 'bg-[#F0F4F8] text-[#00236F] font-medium' : 'text-[#191C1E]'}`}
+                          onClick={() => {
+                            setGioiTinh(option);
+                            setIsGioiTinhOpen(false);
+                          }}
+                        >
+                          {option}
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             <div>

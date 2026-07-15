@@ -237,103 +237,12 @@ export const MHThongBaoKetQua: React.FC = () => {
       <div style={{ flex: 1, boxSizing: 'border-box' }}>
         <div style={CONTAINER}>
 
-          {/* Breadcrumb */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#64748B', flexWrap: 'wrap' }}>
-            <span style={{ cursor: 'pointer', color: '#00236F' }} onClick={() => navigate('/')}>Trang chủ</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chevron_right</span>
-            <span style={{ cursor: 'pointer', color: '#00236F' }} onClick={() => navigate('/hop-dong')}>Hợp đồng</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chevron_right</span>
-            <span style={{ cursor: 'pointer', color: '#00236F' }} onClick={() => navigate('/thanh-toan-dinh-ky')}>Thanh toán</span>
-            <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>chevron_right</span>
-            <span style={{ color: '#475569', fontWeight: 600 }}>Kết quả giao dịch</span>
-          </div>
+
 
           {/* ── Two-column grid ── */}
           <div style={TWO_COL}>
 
-            {/* ── LEFT COLUMN: Status card + Timeline ── */}
-            <div style={LEFT_COL}>
-              <div style={CARD}>
-                {/* Status gradient header */}
-                <div style={{
-                  background: `linear-gradient(145deg, ${cfg.gradientFrom}, ${cfg.gradientTo})`,
-                  padding: '32px 24px', textAlign: 'center',
-                  borderBottom: `1px solid ${cfg.borderColor}`,
-                }}>
-                  {/* Big icon */}
-                  <div style={{
-                    width: '88px', height: '88px', borderRadius: '50%',
-                    background: 'white', border: `3px solid ${cfg.borderColor}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 16px', boxShadow: `0 0 0 8px ${cfg.ringColor}`,
-                  }}>
-                    <span className="material-symbols-outlined" style={{ fontSize: '48px', color: cfg.iconColor }}>
-                      {cfg.icon}
-                    </span>
-                  </div>
 
-                  {/* Badge */}
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: cfg.badge.bg, border: `1.5px solid ${cfg.borderColor}`, borderRadius: '20px', padding: '4px 14px', marginBottom: '12px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: cfg.badge.color, flexShrink: 0 }} />
-                    <span style={{ fontSize: '11px', fontWeight: 700, color: cfg.badge.color, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{cfg.badge.text}</span>
-                  </div>
-
-                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: cfg.titleColor, margin: '0 0 10px', lineHeight: 1.3 }}>
-                    {cfg.title}
-                  </h2>
-                  <p style={{ fontSize: '12px', color: '#64748B', lineHeight: 1.8, margin: 0 }}>
-                    {cfg.desc}
-                  </p>
-                </div>
-
-                {/* Timeline */}
-                <div style={{ padding: '24px' }}>
-                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>
-                    Tiến trình giao dịch
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                    {TIMELINE_STEPS.map((step, idx) => {
-                      const stepNum = idx + 1;
-                      const done = stepNum <= activeStep;
-                      const current = stepNum === activeStep + 1 && status !== 'DaThanhToan';
-                      const failed = (status === 'ThatBai' || status === 'HetHan') && stepNum === activeStep + 1;
-                      const isLast = idx === TIMELINE_STEPS.length - 1;
-
-                      return (
-                        <div key={idx} style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
-                          {/* Icon + connector */}
-                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0 }}>
-                            <div style={{
-                              width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                              background: done ? '#059669' : failed ? '#DC2626' : '#F1F5F9',
-                              border: `2px solid ${done ? '#059669' : failed ? '#DC2626' : '#E2E8F0'}`,
-                              boxShadow: done ? '0 0 0 4px #D1FAE5' : 'none',
-                              transition: 'all 0.3s ease',
-                            }}>
-                              <span className="material-symbols-outlined" style={{ fontSize: '16px', color: done ? 'white' : failed ? 'white' : '#CBD5E1' }}>
-                                {done ? 'check' : failed ? 'close' : 'radio_button_unchecked'}
-                              </span>
-                            </div>
-                            {!isLast && (
-                              <div style={{ width: '2px', height: '28px', background: done ? '#D1FAE5' : '#F1F5F9', margin: '3px 0', borderRadius: '2px' }} />
-                            )}
-                          </div>
-                          {/* Text */}
-                          <div style={{ paddingBottom: isLast ? 0 : '12px', paddingTop: '4px' }}>
-                            <div style={{ fontSize: '13px', fontWeight: done ? 700 : 500, color: done ? '#0F172A' : '#94A3B8' }}>
-                              {step.label}
-                            </div>
-                            <div style={{ fontSize: '11px', color: '#CBD5E1', marginTop: '2px', lineHeight: 1.5 }}>
-                              {step.desc}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
 
             {/* ── RIGHT COLUMN: Transaction details card ── */}
             <div style={RIGHT_COL}>

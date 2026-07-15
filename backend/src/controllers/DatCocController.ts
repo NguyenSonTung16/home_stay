@@ -11,6 +11,9 @@ const TaoDatCocSchema = z.object({
   maPhong: z.coerce.number().int().positive().optional().nullable(),
   soGiuongThue: z.coerce.number().int().min(1).max(20).optional().nullable(),
   soGiuong: z.coerce.number().int().min(1).max(20).optional().nullable(),
+  gioiTinh: z.string().optional().nullable(),
+  soNguoiO: z.coerce.number().int().positive().optional().nullable(),
+  ngayDuKienVao: z.string().optional().nullable(),
 });
 
 const GuiChungTuSchema = z.object({
@@ -32,10 +35,10 @@ export class DatCocController {
         res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ', errors: parsed.error.flatten() });
         return;
       }
-      const { maKH, maGiuong, maPhong, soGiuongThue, soGiuong } = parsed.data;
+      const { maKH, maGiuong, maPhong, soGiuongThue, soGiuong, gioiTinh, soNguoiO, ngayDuKienVao } = parsed.data;
       const parsedSoGiuongThue = soGiuongThue ?? soGiuong ?? 1;
 
-      const result = await service.taoDatCoc(maKH, maGiuong || null, parsedSoGiuongThue, maPhong || null);
+      const result = await service.taoDatCoc(maKH, maGiuong || null, parsedSoGiuongThue, maPhong || null, gioiTinh || undefined, soNguoiO || undefined, ngayDuKienVao || undefined);
       res.status(201).json({ success: true, data: result });
     } catch (err: any) {
       const status = err.status || 500;
