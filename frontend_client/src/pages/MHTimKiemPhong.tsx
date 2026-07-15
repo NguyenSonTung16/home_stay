@@ -398,7 +398,8 @@ export const MHTimKiemPhong = () => {
                                 return (
                                     <div
                                         key={phong.maphong}
-                                        className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between"
+                                        onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
+                                        className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow"
                                     >
                                         <div>
                                             {/* Room Image */}
@@ -483,7 +484,8 @@ export const MHTimKiemPhong = () => {
                                         {/* Action Buttons chuẩn 100% hình ảnh */}
                                         <div className="p-4 pt-0 flex gap-2.5">
                                             <button
-                                                onClick={() => {
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
                                                     setSelectedDepositRoom(phong);
                                                     setSoGiuongDeposit(1);
                                                 }}
@@ -492,7 +494,7 @@ export const MHTimKiemPhong = () => {
                                                 Đặt cọc
                                             </button>
                                             <button
-                                                onClick={() => btn_henXemPhong(phong)}
+                                                onClick={(e) => { e.stopPropagation(); btn_henXemPhong(phong); }}
                                                 className={
                                                     isWishlisted
                                                         ? "flex-1 bg-[#D0E1FB] border border-[#00236F] text-[#00236F] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
