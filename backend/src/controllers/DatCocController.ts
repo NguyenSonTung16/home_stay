@@ -110,7 +110,7 @@ export class DatCocController {
       
       // Lấy toàn bộ để đếm số lượng (counts) cho các tab
       const allData = await repo.layTheoKhachHang(maKH);
-      const pending = allData.filter(p => ['ChoThanhToan', 'ChoXacNhanTienMat'].includes(p.trangthai)).length;
+      const pending = allData.filter(p => ['ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat'].includes(p.trangthai)).length;
       const completed = allData.filter(p => p.trangthai === 'DaThanhToan').length;
       const canceled = allData.filter(p => p.trangthai === 'DaHuy').length;
 

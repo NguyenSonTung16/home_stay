@@ -80,6 +80,8 @@ export default function ThanhToanCoc() {
         return { text: 'Đã hủy', bg: 'bg-gray-100 text-gray-600 border-gray-200' };
       case 'ChoXacNhanTienMat':
         return { text: 'Chờ xác nhận', bg: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+      case 'ChoDuyet':
+        return { text: 'Chờ Sale duyệt', bg: 'bg-purple-100 text-purple-800 border-purple-200' };
       case 'ChoThanhToan':
       default:
         return { text: 'Chờ thanh toán', bg: 'bg-orange-100 text-orange-700 border-orange-200' };
@@ -174,6 +176,7 @@ export default function ThanhToanCoc() {
               const badge = getBadgeStyle(phieu.trangthai);
               const isPendingPayment = phieu.trangthai === 'ChoThanhToan';
               const isWaitingConfirm = phieu.trangthai === 'ChoXacNhanTienMat';
+              const isPendingApproval = phieu.trangthai === 'ChoDuyet';
               const isCompleted = phieu.trangthai === 'DaThanhToan';
               const isCanceled = phieu.trangthai === 'DaHuy';
 
@@ -211,6 +214,12 @@ export default function ThanhToanCoc() {
                     <div className="pt-3 border-t border-slate-100 flex justify-between items-center gap-4 text-[11px]">
                       <div>
                         {isPendingPayment && <CardCountDown targetTime={phieu.thoigianhethan} />}
+                        {isPendingApproval && (
+                          <span className="text-[#54647A] flex items-center gap-1">
+                            <span className="material-symbols-outlined text-[13px] text-purple-500">hourglass_empty</span>
+                            Chờ Sale xác nhận
+                          </span>
+                        )}
                         {isWaitingConfirm && (
                           <span className="text-[#54647A] flex items-center gap-1">
                             <span className="material-symbols-outlined text-[13px] text-amber-500">pending</span>

@@ -85,9 +85,9 @@ const Roomdetail = () => {
  const data = await res.json();
  
  if (res.ok && data.success && data.data) {
- alert(`Đặt cọc thành công! Chuyển hướng tới trang thanh toán...`);
+ alert(`Yêu cầu đặt cọc đã được gửi. Vui lòng chờ Sale duyệt!`);
  setSelectedDepositRoom(null);
- navigate(`/xac-nhan-dat-coc/${data.data.maPDC}`);
+ navigate(`/thanh-toan-coc`);
  } else {
  alert(data.message || 'Có lỗi xảy ra khi đặt cọc.');
  }

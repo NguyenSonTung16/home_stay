@@ -11,6 +11,7 @@ interface HoSo {
   hoten: string;
   sdt: string;
   tenphong: string;
+  trangthaimoi: string;
 }
 
 export default function XuLyHoSoDatCoc() {
@@ -77,7 +78,7 @@ export default function XuLyHoSoDatCoc() {
   return (
     <div className="p-6 w-full max-w-6xl mx-auto bg-surface min-h-screen">
       <h1 className="text-[24px] font-bold text-primary mb-2 font-h1">Quản Lý - Xử lý hồ sơ đặt cọc</h1>
-      <p className="text-[14px] text-secondary mb-6 font-body">Danh sách các khoản thanh toán cọc đang chờ kế toán/quản lý đối chiếu biên lai.</p>
+      <p className="text-[14px] text-secondary mb-6 font-body">Danh sách các khoản xin giữ chỗ (Chờ Duyệt) hoặc đối chiếu biên lai (Chờ Xác Nhận Tiền Mặt).</p>
 
       {/* Alerts */}
       {message && (
@@ -124,6 +125,11 @@ export default function XuLyHoSoDatCoc() {
                   <td className="px-4 py-3">
                     <div className="font-semibold text-primary">#{hs.macoc}</div>
                     <div className="text-[12px] text-secondary font-caption">{formatDate(hs.ngaycoc)}</div>
+                    {hs.trangthaimoi === 'ChoDuyet' || hs.trangthai === 2 ? (
+                      <span className="mt-1 inline-block bg-purple-100 text-purple-700 font-bold px-2 py-0.5 rounded text-[10px]">Xin giữ chỗ</span>
+                    ) : (
+                      <span className="mt-1 inline-block bg-yellow-100 text-yellow-700 font-bold px-2 py-0.5 rounded text-[10px]">Chờ xác nhận tiền</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="font-semibold">{hs.hoten}</div>
@@ -147,7 +153,7 @@ export default function XuLyHoSoDatCoc() {
                         onClick={() => handleDuyet(hs.macoc, true)}
                         disabled={processingId !== null}
                         className="bg-success text-white text-[12px] font-bold px-3 py-1.5 rounded-lg hover:bg-success/90 transition-colors disabled:opacity-50 flex items-center gap-1"
-                        title="Phê duyệt (Tiền đã vào tài khoản)"
+                        title={hs.trangthaimoi === 'ChoDuyet' || hs.trangthai === 2 ? "Duyệt hồ sơ xin giữ chỗ" : "Phê duyệt (Tiền đã vào tài khoản)"}
                       >
                         <span className="material-symbols-outlined text-[16px]">check</span> Duyệt
                       </button>
@@ -155,7 +161,7 @@ export default function XuLyHoSoDatCoc() {
                         onClick={() => handleDuyet(hs.macoc, false)}
                         disabled={processingId !== null}
                         className="bg-danger text-white text-[12px] font-bold px-3 py-1.5 rounded-lg hover:bg-danger/90 transition-colors disabled:opacity-50 flex items-center gap-1"
-                        title="Từ chối (Sai thông tin / Không nhận được tiền)"
+                        title={hs.trangthaimoi === 'ChoDuyet' || hs.trangthai === 2 ? "Từ chối xin giữ chỗ" : "Từ chối (Sai thông tin / Không nhận được tiền)"}
                       >
                         <span className="material-symbols-outlined text-[16px]">close</span> Từ chối
                       </button>

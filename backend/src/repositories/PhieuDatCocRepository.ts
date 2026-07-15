@@ -51,7 +51,7 @@ export class PhieuDatCocRepository {
       FROM PhieuDatCoc p
       JOIN KhachHang k ON p.MaKH = k.MaKH
       JOIN Phong ph ON p.MaPhong = ph.MaPhong
-      WHERE p.TrangThai = 2 OR p.TrangThaiMoi = 'ChoXacNhanTienMat'
+      WHERE p.TrangThai = 2 OR p.TrangThaiMoi = 'ChoDuyet' OR p.TrangThaiMoi = 'ChoXacNhanTienMat'
       ORDER BY p.MaCoc DESC
     `);
     return res.rows;
@@ -90,7 +90,7 @@ export class PhieuDatCocRepository {
       `INSERT INTO PhieuDatCoc 
          (MaKH, MaGiuong, MaPhong, SoGiuongThue, TienThuePerThang, TienCoc,
           TrangThai, TrangThaiMoi, ThoiGianTao, ThoiGianHetHan, SoTien)
-       VALUES ($1, $2, $3, $4, $5, $6, 1, 'ChoThanhToan', NOW(), $7, $6)
+       VALUES ($1, $2, $3, $4, $5, $6, 2, 'ChoDuyet', NOW(), $7, $6)
        RETURNING *`,
       [
         data.maKH,
@@ -211,7 +211,7 @@ export class PhieuDatCocRepository {
 
     if (trangThai) {
       if (trangThai === 'DangCho') {
-        queryStr += ` AND pdc.TrangThaiMoi IN ('ChoThanhToan', 'ChoXacNhanTienMat')`;
+        queryStr += ` AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat')`;
       } else if (trangThai === 'DaThanhToan') {
         queryStr += ` AND pdc.TrangThaiMoi = 'DaThanhToan'`;
       } else if (trangThai === 'DaHuy') {
