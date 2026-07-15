@@ -47,6 +47,22 @@ export class WebhookPaymentController {
         return;
       }
 
+      // Nếu nhận được APPROVED event, tiến hành capture thay vì cập nhật trạng thái ngay
+      if (eventType === 'CHECKOUT.ORDER.APPROVED') {
+        console.log(`[WebhookPaymentController] Nhận event APPROVED cho ${maDH}. Đang tiến hành capture...`);
+        try {
+          const { PaypalService } = await import('../services/PaypalService');
+          const paypalService = new PaypalService();
+          await paypalService.captureOrder(maDH);
+          res.status(200).json({ success: true, message: 'APPROVED event received, capture initiated' });
+          return;
+        } catch (captureErr: any) {
+          console.error(`[WebhookPaymentController] Lỗi capture từ APPROVED webhook cho ${maDH}:`, captureErr.message);
+          res.status(500).json({ success: false, message: 'Failed to capture order: ' + captureErr.message });
+          return;
+        }
+      }
+
       // 3. Kiểm tra trạng thái thanh toán từ event
       let newStatus: DonHangTrangThai = DonHangTrangThai.DaThanhToan;
       if (eventType && (eventType.endsWith('.FAILED') || eventType.endsWith('.DENIED'))) {

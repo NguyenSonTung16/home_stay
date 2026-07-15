@@ -14,6 +14,9 @@ import MobileBottomNav from './components/MobileBottomNav';
 import AppointmentCheck from './pages/AppointmentCheck';
 
 import XuLyHoSoDatCoc from './pages/XuLyHoSoDatCoc';
+import DoiSoat from './pages/DoiSoat';
+import ChiTietHoaDonDinhKy from './pages/ChiTietHoaDonDinhKy';
+import ChiTietHoaDonDienNuoc from './pages/ChiTietHoaDonDienNuoc';
 
 const MainLayout = () => (
   <div className="bg-surface font-body text-on-surface flex min-h-screen">
@@ -50,6 +53,13 @@ function App() {
               {/* Only KeToan can access RefundCheck */}
               <Route element={<ProtectedRoute allowedRoles={['KeToan', 'Admin']} />}>
                 <Route path="/refund_check" element={<RefundCheck />} />
+              </Route>
+
+              {/* Only KeToan and Admin can access DoiSoat */}
+              <Route element={<ProtectedRoute allowedRoles={['KeToan', 'Admin']} />}>
+                <Route path="/doi-soat" element={<DoiSoat />} />
+                <Route path="/doi-soat/hoa-don-dinh-ky/:maDH" element={<ChiTietHoaDonDinhKy />} />
+                <Route path="/doi-soat/hoa-don-dien-nuoc/:maDH" element={<ChiTietHoaDonDienNuoc />} />
               </Route>
               
               {/* Appointment Check for Sales */}

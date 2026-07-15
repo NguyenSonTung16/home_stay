@@ -159,7 +159,31 @@ export class DonHangService {
    * Lấy chi tiết đơn hàng (Dùng cho polling status)
    */
   public async layChiTiet(maDH: string): Promise<DonHangDTO | null> {
-    return await this.repository.layTheoId(maDH);
+    let donHang = await this.repository.layTheoId(maDH);
+    if (!donHang) return null;
+
+    // Auto-capture nếu ở trạng thái DangCho và phương thức là Chuyển khoản (PayPal)
+    if (donHang.trangthai === DonHangTrangThai.DangCho && donHang.phuongthuc === 'ChuyenKhoan') {
+      try {
+        const orderData = await this.paypalService.getOrder(maDH);
+        if (orderData.status === 'APPROVED') {
+          console.log(`[DonHangService] Phát hiện Order ${maDH} APPROVED. Tiến hành capture...`);
+          const captureData = await this.paypalService.captureOrder(maDH);
+          if (captureData.status === 'COMPLETED') {
+            await this.chuyenTTDonHang(maDH, DonHangTrangThai.DaThanhToan);
+            donHang = await this.repository.layTheoId(maDH); // reload
+          }
+        } else if (orderData.status === 'COMPLETED') {
+          console.log(`[DonHangService] Phát hiện Order ${maDH} COMPLETED. Đồng bộ DB...`);
+          await this.chuyenTTDonHang(maDH, DonHangTrangThai.DaThanhToan);
+          donHang = await this.repository.layTheoId(maDH); // reload
+        }
+      } catch (err: any) {
+        console.error(`[DonHangService] Lỗi tự động capture/kiểm tra đơn PayPal ${maDH}:`, err.message);
+      }
+    }
+
+    return donHang;
   }
 
   /**

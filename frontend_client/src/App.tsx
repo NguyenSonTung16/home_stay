@@ -12,6 +12,8 @@ import { MHQuetMaQR } from './pages/MHQuetMaQR';
 import { MHThongBaoKetQua } from './pages/MHThongBaoKetQua';
 import Roomdetail from './pages/Roomdetail';
 import YeuCauTraPhong from './pages/YeuCauTraPhong';
+import XacNhanDatCoc from './pages/XacNhanDatCoc';
+import KetQuaDatCoc from './pages/KetQuaDatCoc';
 
 function App() {
   return (
@@ -31,6 +33,10 @@ function App() {
             <Route path="/thanh-toan/:loaiHoaDon/:maHoaDon" element={<MHThanhToan />} />
             <Route path="/quet-qr/:maDH" element={<MHQuetMaQR />} />
             <Route path="/thanh-toan-ket-qua" element={<MHThongBaoKetQua />} />
+
+            {/* Thanh toán cọc — Tin's feature */}
+            <Route path="/xac-nhan-dat-coc/:maPDC" element={<XacNhanDatCoc />} />
+            <Route path="/ket-qua-dat-coc/:maPDC" element={<KetQuaDatCoc />} />
           </Route>
         </Routes>
       </Router>

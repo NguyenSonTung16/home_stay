@@ -22,76 +22,86 @@ const Sidebar: React.FC = () => {
           <p className="font-caption text-secondary">Property Management</p>
         </div>
       </div>
-
       <nav className="flex-1 space-y-1">
-        {/* Quản lý / Admin / Nhân viên */}
-        {(user?.role === 'QuanLy' || user?.role === 'Admin' || user?.role === 'KeToan' || user?.role === 'Sale') && (
+        {(user?.role === 'QuanLy' || user?.role === 'Admin') && (
+          <NavLink
+            to="/room_check"
+            className={({ isActive }) =>
+              `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                isActive
+                  ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                  : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+              }`
+            }
+          >
+            <span className="material-symbols-outlined">exit_to_app</span>
+            <span className="font-body">Xử lý trả phòng</span>
+          </NavLink>
+        )}
+
+        {(user?.role === 'KeToan' || user?.role === 'Admin') && (
+          <NavLink
+            to="/refund_check"
+            className={({ isActive }) =>
+              `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                isActive
+                  ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                  : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+              }`
+            }
+          >
+            <span className="material-symbols-outlined">payments</span>
+            <span className="font-body">Xử lý hoàn cọc</span>
+          </NavLink>
+        )}
+
+        {(user?.role === 'KeToan' || user?.role === 'Admin') && (
+          <NavLink
+            to="/doi-soat"
+            className={({ isActive }) =>
+              `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                isActive
+                  ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                  : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+              }`
+            }
+          >
+            <span className="material-symbols-outlined">account_balance_wallet</span>
+            <span className="font-body">Đối soát dòng tiền</span>
+          </NavLink>
+        )}
+        
+        {(user?.role === 'Sale' || user?.role === 'Admin') && (
           <>
-            <div className="mt-8 mb-2 px-6 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-              Quản lý (Nội bộ)
-            </div>
-
-            {(user?.role === 'QuanLy' || user?.role === 'Admin' || user?.role === 'KeToan') && (
-              <NavLink 
-                to="/ho-so-dat-coc" 
-                className={({isActive}) => `w-full flex items-center px-gutter py-3 gap-3 transition-all ${isActive ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low' : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'}`}
-              >
-                <span className="material-symbols-outlined">folder_supervised</span>
-                <span className="font-body">Hồ sơ đặt cọc</span>
-              </NavLink>
-            )}
-
-            {(user?.role === 'QuanLy' || user?.role === 'Admin') && (
-              <NavLink
-                to="/room_check"
-                className={({ isActive }) =>
-                  `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
-                    isActive
-                      ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low'
-                      : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined">exit_to_app</span>
-                <span className="font-body">Xử lý trả phòng</span>
-              </NavLink>
-            )}
-
-            {(user?.role === 'KeToan' || user?.role === 'Admin') && (
-              <NavLink
-                to="/refund_check"
-                className={({ isActive }) =>
-                  `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
-                    isActive
-                      ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low'
-                      : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined">payments</span>
-                <span className="font-body">Xử lý hoàn cọc</span>
-              </NavLink>
-            )}
-            
-            {(user?.role === 'Sale' || user?.role === 'Admin') && (
-              <NavLink
-                to="/appointment_check"
-                className={({ isActive }) =>
-                  `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
-                    isActive
-                      ? 'text-primary font-bold border-l-4 border-primary bg-surface-container-low'
-                      : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined">calendar_month</span>
-                <span className="font-body">Xử lý lịch hẹn</span>
-              </NavLink>
-            )}
+            <NavLink
+              to="/appointment_check"
+              className={({ isActive }) =>
+                `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                  isActive
+                    ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                    : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+                }`
+              }
+            >
+              <span className="material-symbols-outlined">calendar_month</span>
+              <span className="font-body">Xử lý lịch hẹn</span>
+            </NavLink>
+            <NavLink
+              to="/ho-so-dat-coc"
+              className={({ isActive }) =>
+                `w-full flex items-center px-gutter py-3 gap-3 transition-all ${
+                  isActive
+                    ? 'text-primary dark:text-inverse-primary font-bold border-l-4 border-primary dark:border-inverse-primary bg-surface-container-low dark:bg-surface-container-high'
+                    : 'text-secondary hover:bg-surface-container hover:text-primary font-body border-l-4 border-transparent'
+                }`
+              }
+            >
+              <span className="material-symbols-outlined">folder_supervised</span>
+              <span className="font-body">Hồ sơ đặt cọc</span>
+            </NavLink>
           </>
         )}
       </nav>
-
       <div className="px-gutter pt-4 mt-auto border-t border-outline-variant">
         <button className="flex items-center w-full px-4 py-2 gap-3 text-secondary hover:text-primary hover:bg-surface-container transition-colors rounded-lg mb-2">
           <span className="material-symbols-outlined">settings</span>

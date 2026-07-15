@@ -1,6 +1,7 @@
+import BottomNav from '../components/BottomNav';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { DatCocModal } from '../components/DatCocModal';
+import { AuthModal } from '../components/AuthModal';
 
 export const MHTimKiemPhong = () => {
     const navigate = useNavigate();
@@ -10,22 +11,82 @@ export const MHTimKiemPhong = () => {
     const [danhSachPhong, setDanhSachPhong] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const ITEMS_PER_PAGE = 5;
-
     // Quản lý tiện ích
     const [amenities, setAmenities] = useState({
-        wifi: false,
-        mayLanh: false,
+        wifi: true,
+        mayLanh: true,
         tuCaNhan: false
     });
 
     // Quản lý Danh sách phòng quan tâm (localStorage)
     const [danhSachQuanTam, setDanhSachQuanTam] = useState<any[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    // Quản lý Modal Đặt cọc
-    const [selectedRoomToDeposit, setSelectedRoomToDeposit] = useState<any>(null);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+    // Quản lý Đăng nhập / Người dùng
+    const [currentUser, setCurrentUser] = useState<any>(null);
+
+    // Quản lý Đặt cọc
+    const [selectedDepositRoom, setSelectedDepositRoom] = useState<any>(null);
+    const [soGiuongDeposit, setSoGiuongDeposit] = useState(1);
+    const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                setCurrentUser(JSON.parse(storedUser));
+            } catch (e) {
+                console.error("Error parsing user from localStorage", e);
+            }
+        }
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('currentUser');
+        setCurrentUser(null);
+    };
+
+    const btn_submitDeposit = async () => {
+        if (!selectedDepositRoom) return;
+
+        // Bắt đăng nhập nếu chưa có
+        if (!currentUser) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
+        setIsSubmittingDeposit(true);
+        try {
+            const userId = currentUser.user?.makh || currentUser.makh || currentUser.user?.id || currentUser.id || 1; 
+
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/booking/dat-coc`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    maKH: userId,
+                    maPhong: selectedDepositRoom.maphong || selectedDepositRoom.MaPhong,
+                    soGiuong: soGiuongDeposit,
+                    soThangThue: 6
+                })
+            });
+            const data = await res.json();
+            
+            if (res.ok && data.success && data.data) {
+                alert(`Đặt cọc thành công cho phòng ${selectedDepositRoom.tenphong || selectedDepositRoom.TenPhong}! Chuyển hướng tới trang thanh toán...`);
+                setSelectedDepositRoom(null);
+                navigate(`/xac-nhan-dat-coc/${data.data.maPDC}`);
+            } else {
+                alert(data.message || 'Có lỗi xảy ra khi đặt cọc.');
+            }
+        } catch (error) {
+            alert('Lỗi kết nối máy chủ khi đặt cọc.');
+        } finally {
+            setIsSubmittingDeposit(false);
+        }
+    };
 
 
     const loadDanhSachQuanTam = () => {
@@ -48,29 +109,19 @@ export const MHTimKiemPhong = () => {
             const res = await fetch(`${import.meta.env.VITE_API_URL}/api/phong/search?${query.toString()}`);
             const result = await res.json();
             if (result.success && result.data && Array.isArray(result.data)) {
-                const enrichedData = result.data.map((p: any) => {
-                    const fakeTienIch = [];
-                    const id = Number(p.MaPhong || p.maphong || 1);
-                    if (id % 2 === 0 || id % 3 === 0) fakeTienIch.push("wifi");
-                    if (id % 2 !== 0) fakeTienIch.push("mayLanh");
-                    if (id % 4 === 0) fakeTienIch.push("tuCaNhan");
-
-                    return {
-                        maphong: p.MaPhong || p.maphong,
-                        tenphong: p.TenPhong || p.tenphong,
-                        chinhanh: p.ChiNhanh || p.chinhanh || "TP. Hồ Chí Minh",
-                        giatien: Number(p.GiaTien || p.giatien || 0),
-                        succhua: Number(p.SucChua || p.succhua || 0),
-                        sogiuongtrong: Number(p.SoGiuongTrong ?? p.sogiuongtrong ?? p.SucChua ?? p.succhua ?? 0),
-                        dientich: Number(p.DienTich || p.dientich || 25),
-                        trangthai: (p.TrangThai === 1 || p.TrangThai === "Còn trống" || p.trangthai === 1 || p.trangthai === "Còn trống") ? "Còn trống" : "Sắp hết",
-                        badgeColor: (p.TrangThai === "Sắp hết" || p.trangthai === "Sắp hết") ? "warning" : "success",
-                        tienich: p.TienIch || p.tienich || (fakeTienIch.length > 0 ? fakeTienIch : ["wifi", "mayLanh", "tuCaNhan"]),
-                        hinhanh: p.HinhAnh || p.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
-                    };
-                });
-                const availableRooms = enrichedData.filter((p: any) => p.sogiuongtrong > 0);
-                setDanhSachPhong(availableRooms);
+                const enrichedData = result.data.map((p: any) => ({
+                    maphong: p.MaPhong || p.maphong,
+                    tenphong: p.TenPhong || p.tenphong,
+                    chinhanh: p.ChiNhanh || p.chinhanh || "TP. Hồ Chí Minh",
+                    giatien: Number(p.GiaTien || p.giatien || 0),
+                    succhua: Number(p.SucChua || p.succhua || 0),
+                    dientich: Number(p.DienTich || p.dientich || 25),
+                    trangthai: (p.TrangThai === 1 || p.TrangThai === "Còn trống" || p.trangthai === 1 || p.trangthai === "Còn trống") ? "Còn trống" : "Sắp hết",
+                    badgeColor: (p.TrangThai === "Sắp hết" || p.trangthai === "Sắp hết") ? "warning" : "success",
+                    tienich: p.TienIch || p.tienich || ["wifi", "mayLanh", "tuCaNhan"],
+                    hinhanh: p.HinhAnh || p.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"
+                }));
+                setDanhSachPhong(enrichedData);
             } else {
                 setDanhSachPhong([]);
             }
@@ -90,7 +141,7 @@ export const MHTimKiemPhong = () => {
         const selectedIds = danhSachPhong.filter(p => p.selected).map(p => ({
             maphong: p.MaPhong || p.maphong,
             tenphong: p.TenPhong || p.tenphong,
-            giatien: p.giatien,
+            giathue: p.GiaTien || p.giathue,
             hinhanh: p.HinhAnh || p.hinhanh
         }));
         
@@ -124,15 +175,14 @@ export const MHTimKiemPhong = () => {
             const newList = [...danhSachQuanTam, {
                 maphong: phongId,
                 tenphong: phong.TenPhong || phong.tenphong,
-                giatien: phong.giatien,
+                giathue: phong.GiaTien || phong.giathue,
                 hinhanh: phong.HinhAnh || phong.hinhanh
             }];
             setDanhSachQuanTam(newList);
             localStorage.setItem("danhSachPhongQuanTam", JSON.stringify(newList));
+            alert(`Đã thêm "${phong.TenPhong || phong.tenphong}" vào danh sách quan tâm!`);
         } else {
-            const newList = danhSachQuanTam.filter((p: any) => (p.maphong || p.MaPhong) !== phongId);
-            setDanhSachQuanTam(newList);
-            localStorage.setItem("danhSachPhongQuanTam", JSON.stringify(newList));
+            alert("Phòng này đã có trong danh sách quan tâm của bạn.");
         }
     };
 
@@ -173,17 +223,53 @@ export const MHTimKiemPhong = () => {
         return true;
     });
 
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [selectedCapacity, slGiaTien, amenities]);
-
-    const totalPages = Math.ceil(filteredRooms.length / ITEMS_PER_PAGE);
-    const paginatedRooms = filteredRooms.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
-
     return (
-        <div className="bg-[#F7F9FB] text-[#191C1E] font-sans pb-24">
+        <div className="min-h-screen bg-[#F7F9FB] text-[#191C1E] font-sans pb-24">
+            {/* Top App Bar chuẩn 100% hình ảnh mobile MH_tim_kiem_phong.png */}
+            <header className="bg-white border-b border-[#E0E3E5] h-14 fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4">
+                <div className="flex items-center gap-3">
+                    <button className="text-[#00236F] active:scale-95 transition-transform flex items-center">
+                        <span className="material-symbols-outlined text-[26px]">menu</span>
+                    </button>
+                    <h1 className="text-[#00236F] font-bold text-[20px] tracking-tight">FIT 4.0</h1>
+                </div>
+
+                <div className="flex items-center gap-3">
+                    {/* Nút Phòng quan tâm hiển thị trên Desktop hoặc khi có danh sách */}
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="hidden md:flex items-center gap-1.5 py-1.5 px-3.5 rounded-full bg-[#DCE1FF] border border-[#00236F] text-[#00236F] font-semibold text-[13px] transition-all active:scale-95"
+                    >
+                        <span className="material-symbols-outlined text-[18px]">favorite</span>
+                        <span>Phòng quan tâm</span>
+                        {danhSachQuanTam.length > 0 && (
+                            <span className="bg-[#EF4444] text-white rounded-full px-1.5 py-0.5 text-[11px] font-bold">
+                                {danhSachQuanTam.length}
+                            </span>
+                        )}
+                    </button>
+
+                    <div className="flex items-center gap-2">
+                        {currentUser ? (
+                            <div className="flex items-center gap-2 py-1.5 px-3 rounded-full bg-[#EBF5FF] border border-[#BFDBFE] text-[#1E40AF] font-bold text-xs cursor-pointer" onClick={handleLogout} title="Nhấn để đăng xuất">
+                                <span className="material-symbols-outlined text-[18px]">person</span>
+                                <span>{currentUser.user?.username || currentUser.username || currentUser.hoten || currentUser.email || "Guest"}</span>
+                            </div>
+                        ) : (
+                            <button
+                                onClick={() => setIsAuthModalOpen(true)}
+                                className="flex items-center gap-1.5 py-1.5 px-4 rounded-full bg-[#00236F] text-white font-bold text-[13px] hover:bg-[#00184D] transition-all active:scale-95"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">login</span>
+                                <span>Đăng nhập</span>
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </header>
+
             {/* Main Container */}
-            <div className="px-4 sm:px-6 lg:px-12 w-full max-w-[1800px] mx-auto mt-6">
+            <main className="pt-20 px-4 sm:px-6 lg:px-12 w-full max-w-[1800px] mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* CỘT TRÁI TRÊN PC / TRÊN CÙNG MOBILE: BỘ LỌC TÌM KIẾM */}
                     <div className="lg:col-span-4 lg:sticky lg:top-20">
@@ -231,7 +317,7 @@ export const MHTimKiemPhong = () => {
                                     <input
                                         className="w-full accent-[#00236F] h-2 bg-[#DCE1FF] rounded-lg cursor-pointer"
                                         max="10000000"
-                                        min="0"
+                                        min="1500000"
                                         step="500000"
                                         type="range"
                                         value={slGiaTien}
@@ -303,168 +389,126 @@ export const MHTimKiemPhong = () => {
                         </div>
 
                         {/* Room List / Grid - 2 cột trên PC, 1 cột trên mobile */}
-                        {paginatedRooms.length === 0 ? (
-                            <div className="text-center py-20 text-[#54647A] bg-white rounded-3xl border border-[#E0E3E5] shadow-sm">
-                                <span className="material-symbols-outlined text-[48px] text-[#C5C5D3] block mb-3 mx-auto">search_off</span>
-                                Không tìm thấy phòng phù hợp.
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                {paginatedRooms.map((phong: any) => {
-                            const isWishlisted = danhSachQuanTam.some((p: any) => p.maphong === phong.maphong);
-                            const badgeText = phong.trangthai || "Còn trống";
-                            const isWarningBadge = badgeText === "Sắp hết" || phong.badgeColor === "warning";
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {filteredRooms.map((phong: any) => {
+                                const isWishlisted = danhSachQuanTam.some((p: any) => p.maphong === phong.maphong);
+                                const badgeText = phong.trangthai || "Còn trống";
+                                const isWarningBadge = badgeText === "Sắp hết" || phong.badgeColor === "warning";
 
-                            return (
-                                <div
-                                    key={phong.maphong}
-                                    onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
-                                    className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between cursor-pointer hover:shadow-md transition-shadow"
-                                >
-                                    <div>
-                                        {/* Room Image */}
-                                        <div 
-                                            className="relative h-48 w-full bg-[#ECEEF0] cursor-pointer"
-                                            onClick={() => navigate(`/phong/${phong.maphong}`)}
-                                        >
-                                            <img
-                                                alt={phong.tenphong}
-                                                className="w-full h-full object-cover"
-                                                src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"}
-                                            />
-                                            <div className="absolute top-3 right-3">
-                                                <span
-                                                    className={
-                                                        isWarningBadge
-                                                            ? "bg-[#D97706]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
-                                                            : "bg-[#10B981]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
-                                                    }
-                                                >
-                                                    {badgeText}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Info */}
-                                        <div className="p-4 flex flex-col gap-2.5">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h4 
-                                                        className="text-[#00236F] font-bold text-[16px] leading-tight cursor-pointer hover:underline"
-                                                        onClick={() => navigate(`/phong/${phong.maphong}`)}
+                                return (
+                                    <div
+                                        key={phong.maphong}
+                                        className="bg-white rounded-2xl overflow-hidden border border-[#E0E3E5] shadow-sm flex flex-col justify-between"
+                                    >
+                                        <div>
+                                            {/* Room Image */}
+                                            <div
+                                                className="relative h-48 w-full bg-[#ECEEF0] cursor-pointer"
+                                                onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
+                                            >
+                                                <img
+                                                    alt={phong.tenphong}
+                                                    className="w-full h-full object-cover"
+                                                    src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=800&q=80"}
+                                                />
+                                                <div className="absolute top-3 right-3">
+                                                    <span
+                                                        className={
+                                                            isWarningBadge
+                                                                ? "bg-[#D97706]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
+                                                                : "bg-[#10B981]/90 text-white font-medium text-[11px] px-3 py-1 rounded-full shadow-sm"
+                                                        }
                                                     >
-                                                        {phong.tenphong}
-                                                    </h4>
-                                                    <p className="text-[#54647A] text-[12px] mt-0.5">
-                                                        {phong.chinhanh || "Tòa A • Tầng 1"}
-                                                    </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-[#00236F] font-bold text-[17px]">
-                                                        {(Number(phong.giatien) / 1000000).toFixed(1)}M
-                                                    </p>
-                                                    <p className="text-[#54647A] text-[9px] uppercase font-medium tracking-wider">
-                                                        VNĐ / THÁNG
-                                                    </p>
+                                                        {badgeText}
+                                                    </span>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-4 text-[#54647A] text-[12px]">
-                                                <div className="flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[17px]">group</span>
-                                                    <span>{phong.succhua || 4} người</span>
+                                            {/* Info */}
+                                            <div className="p-4 flex flex-col gap-2.5">
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <h4
+                                                            className="text-[#00236F] font-bold text-[16px] leading-tight cursor-pointer hover:underline"
+                                                            onClick={() => navigate(`/phong/${phong.maphong}`, { state: { room: phong } })}
+                                                        >
+                                                            {phong.tenphong}
+                                                        </h4>
+                                                        <p className="text-[#54647A] text-[12px] mt-0.5">
+                                                            {phong.chinhanh || "Tòa A • Tầng 1"}
+                                                        </p>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-[#00236F] font-bold text-[17px]">
+                                                            {(Number(phong.giatien) / 1000000).toFixed(1)}M
+                                                        </p>
+                                                        <p className="text-[#54647A] text-[9px] uppercase font-medium tracking-wider">
+                                                            VNĐ / THÁNG
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[17px]">square_foot</span>
-                                                    <span>{phong.dientich || 25}m²</span>
-                                                </div>
-                                            </div>
 
-                                            {/* Hiển thị tiện ích có sẵn của phòng */}
-                                            <div className="flex flex-wrap gap-1.5 pt-1">
-                                                {phong.tienich?.includes("wifi") && (
-                                                    <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
-                                                        <span className="material-symbols-outlined text-[13px]">wifi</span> Wi-Fi
-                                                    </span>
-                                                )}
-                                                {phong.tienich?.includes("mayLanh") && (
-                                                    <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
-                                                        <span className="material-symbols-outlined text-[13px]">ac_unit</span> Máy lạnh
-                                                    </span>
-                                                )}
-                                                {phong.tienich?.includes("tuCaNhan") && (
-                                                    <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
-                                                        <span className="material-symbols-outlined text-[13px]">lock</span> Tủ cá nhân
-                                                    </span>
-                                                )}
+                                                <div className="flex items-center gap-4 text-[#54647A] text-[12px]">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-[17px]">group</span>
+                                                        <span>{phong.succhua || 4} người</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="material-symbols-outlined text-[17px]">square_foot</span>
+                                                        <span>{phong.dientich || 25}m²</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Hiển thị tiện ích có sẵn của phòng */}
+                                                <div className="flex flex-wrap gap-1.5 pt-1">
+                                                    {phong.tienich?.includes("wifi") && (
+                                                        <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
+                                                            <span className="material-symbols-outlined text-[13px]">wifi</span> Wi-Fi
+                                                        </span>
+                                                    )}
+                                                    {phong.tienich?.includes("mayLanh") && (
+                                                        <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
+                                                            <span className="material-symbols-outlined text-[13px]">ac_unit</span> Máy lạnh
+                                                        </span>
+                                                    )}
+                                                    {phong.tienich?.includes("tuCaNhan") && (
+                                                        <span className="inline-flex items-center gap-1 bg-[#D0E1FB]/50 text-[#00236F] px-2 py-0.5 rounded-lg text-[11px] font-semibold">
+                                                            <span className="material-symbols-outlined text-[13px]">lock</span> Tủ cá nhân
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
+
+                                        {/* Action Buttons chuẩn 100% hình ảnh */}
+                                        <div className="p-4 pt-0 flex gap-2.5">
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedDepositRoom(phong);
+                                                    setSoGiuongDeposit(1);
+                                                }}
+                                                className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
+                                            >
+                                                Đặt cọc
+                                            </button>
+                                            <button
+                                                onClick={() => btn_henXemPhong(phong)}
+                                                className={
+                                                    isWishlisted
+                                                        ? "flex-1 bg-[#D0E1FB] border border-[#00236F] text-[#00236F] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
+                                                        : "flex-1 bg-white border border-[#00236F] text-[#00236F] hover:bg-[#F7F9FB] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
+                                                }
+                                            >
+                                                {isWishlisted ? "Đã quan tâm" : "Hẹn xem phòng"}
+                                            </button>
+                                        </div>
                                     </div>
-
-                                    {/* Action Buttons chuẩn 100% hình ảnh */}
-                                    <div className="p-4 pt-0 flex gap-2.5">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setSelectedRoomToDeposit(phong); }}
-                                            className="flex-1 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
-                                        >
-                                            Đặt cọc
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); btn_henXemPhong(phong); }}
-                                            className={
-                                                isWishlisted
-                                                    ? "flex-1 bg-[#D0E1FB] border border-[#00236F] text-[#00236F] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
-                                                    : "flex-1 bg-white border border-[#00236F] text-[#00236F] hover:bg-[#F7F9FB] font-semibold text-[13px] py-2.5 rounded-xl transition-all active:scale-95"
-                                            }
-                                        >
-                                            {isWishlisted ? "Đã quan tâm" : "Hẹn xem phòng"}
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                            </div>
-                        )}
-
-                        {/* Pagination Controls */}
-                        {totalPages > 1 && (
-                            <div className="flex justify-center items-center gap-2 mt-8">
-                                <button
-                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                                    disabled={currentPage === 1}
-                                    className="w-10 h-10 flex justify-center items-center rounded-xl border border-[#C5C5D3] text-[#444651] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-colors"
-                                >
-                                    <span className="material-symbols-outlined">chevron_left</span>
-                                </button>
-                                
-                                <div className="flex items-center gap-1">
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                                        <button
-                                            key={page}
-                                            onClick={() => setCurrentPage(page)}
-                                            className={`w-10 h-10 rounded-xl font-bold text-[14px] transition-colors ${
-                                                currentPage === page 
-                                                    ? "bg-[#00236F] text-white" 
-                                                    : "text-[#444651] hover:bg-white"
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    ))}
-                                </div>
-
-                                <button
-                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                                    disabled={currentPage === totalPages}
-                                    className="w-10 h-10 flex justify-center items-center rounded-xl border border-[#C5C5D3] text-[#444651] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white transition-colors"
-                                >
-                                    <span className="material-symbols-outlined">chevron_right</span>
-                                </button>
-                            </div>
-                        )}
+                                );
+                            })}
+                        </div>
                     </div>
                 </div>
-            </div>
+            </main>
 
             {/* Floating Wishlist Button cho Mobile khi có phòng trong danh sách */}
             {danhSachQuanTam.length > 0 && (
@@ -477,7 +521,8 @@ export const MHTimKiemPhong = () => {
                 </button>
             )}
 
-
+            {/* Bottom Navigation Bar luôn hiển thị ở dưới cùng */}
+            <BottomNav />
 
             {/* Modal Danh Sách Phòng Quan Tâm */}
             {isModalOpen && (
@@ -514,10 +559,7 @@ export const MHTimKiemPhong = () => {
                                         >
                                             <div className="flex items-center gap-3.5">
                                                 {/* Thumbnail ảnh phòng */}
-                                                <div 
-                                                    className="w-16 h-16 rounded-xl bg-[#ECEEF0] overflow-hidden shrink-0 border border-[#E0E3E5] cursor-pointer"
-                                                    onClick={() => navigate(`/phong/${phong.maphong}`)}
-                                                >
+                                                <div className="w-16 h-16 rounded-xl bg-[#ECEEF0] overflow-hidden shrink-0 border border-[#E0E3E5]">
                                                     <img
                                                         src={phong.hinhanh || "https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=400&q=80"}
                                                         alt={phong.tenphong}
@@ -525,12 +567,7 @@ export const MHTimKiemPhong = () => {
                                                     />
                                                 </div>
                                                 <div>
-                                                    <h4 
-                                                        className="font-bold text-[15px] text-[#00236F] cursor-pointer hover:underline"
-                                                        onClick={() => navigate(`/phong/${phong.maphong}`)}
-                                                    >
-                                                        {phong.tenphong}
-                                                    </h4>
+                                                    <h4 className="font-bold text-[15px] text-[#00236F]">{phong.tenphong}</h4>
                                                     <p className="text-[12px] text-[#54647A]">{phong.chinhanh}</p>
                                                     <p className="text-[14px] font-bold text-[#00236F] mt-0.5">
                                                         {Number(phong.giatien).toLocaleString()}đ<span className="text-[11px] font-normal text-[#54647A]">/tháng</span>
@@ -571,11 +608,103 @@ export const MHTimKiemPhong = () => {
                 </div>
             )}
 
-            <DatCocModal 
-                isOpen={!!selectedRoomToDeposit} 
-                onClose={() => setSelectedRoomToDeposit(null)} 
-                roomInfo={selectedRoomToDeposit} 
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                onSuccess={(user) => {
+                    setCurrentUser(user);
+                    if (selectedDepositRoom) {
+                        btn_submitDeposit();
+                    }
+                }}
             />
+
+            {/* Modal Xác nhận Đặt cọc */}
+            {selectedDepositRoom && (
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex justify-center items-center p-4">
+                    <div className="bg-white rounded-2xl w-[90vw] max-w-[500px] flex flex-col shadow-2xl overflow-hidden border border-[#E0E3E5]">
+                        <div className="p-5 border-b border-[#E0E3E5] flex justify-between items-center bg-[#F7F9FB]">
+                            <h2 className="font-bold text-[19px] text-[#00236F] flex items-center gap-2">
+                                <span className="material-symbols-outlined">edit_note</span>
+                                Xác nhận đặt cọc
+                            </h2>
+                            <button
+                                onClick={() => setSelectedDepositRoom(null)}
+                                className="w-9 h-9 rounded-full bg-white border border-[#E0E3E5] flex items-center justify-center text-[#54647A] hover:text-[#00236F] hover:bg-gray-100 transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <h3 className="text-[18px] font-bold text-[#191C1E] mb-2">{selectedDepositRoom.tenphong || selectedDepositRoom.TenPhong}</h3>
+                            <p className="text-[13px] text-[#54647A] mb-4">Chi nhánh: {selectedDepositRoom.chinhanh}</p>
+
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="block text-[13px] font-semibold text-[#444651] mb-2">Số giường muốn thuê</label>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setSoGiuongDeposit(Math.max(1, soGiuongDeposit - 1))}
+                                            className="w-10 h-10 rounded-xl border border-[#C5C5D3] flex items-center justify-center hover:bg-gray-50 transition-colors text-[#54647A]"
+                                            disabled={soGiuongDeposit <= 1}
+                                        >
+                                            <span className="material-symbols-outlined">remove</span>
+                                        </button>
+                                        <span className="text-[20px] font-bold text-[#00236F] w-12 text-center">{soGiuongDeposit}</span>
+                                        <button
+                                            onClick={() => {
+                                                // TODO: Thay bằng số giường trống thực tế của phòng, tạm thời hardcode là 4
+                                                const maxBeds = 4;
+                                                setSoGiuongDeposit(Math.min(maxBeds, soGiuongDeposit + 1));
+                                            }}
+                                            className="w-10 h-10 rounded-xl border border-[#C5C5D3] flex items-center justify-center hover:bg-gray-50 transition-colors text-[#54647A]"
+                                            disabled={soGiuongDeposit >= 4} // Giả định max là 4
+                                        >
+                                            <span className="material-symbols-outlined">add</span>
+                                        </button>
+                                        <span className="text-[12px] text-[#54647A] ml-2">(Tối đa 4 giường)</span>
+                                    </div>
+                                </div>
+
+                                <div className="p-4 bg-[#F7F9FB] rounded-xl border border-[#E0E3E5] flex flex-col gap-2">
+                                    <div className="flex justify-between items-center text-[13px]">
+                                        <span className="text-[#54647A]">Giá thuê/giường/tháng</span>
+                                        <span className="font-semibold text-[#191C1E]">
+                                            {Number(selectedDepositRoom.giatien).toLocaleString()} đ
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[15px] pt-2 border-t border-[#E0E3E5]">
+                                        <span className="font-bold text-[#444651]">Tiền cọc (2 tháng)</span>
+                                        <span className="font-bold text-[#EF4444] text-[18px]">
+                                            {Number(selectedDepositRoom.giatien * 2 * soGiuongDeposit).toLocaleString()} đ
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="p-5 border-t border-[#E0E3E5] bg-[#F7F9FB] flex justify-end gap-3">
+                            <button
+                                onClick={() => setSelectedDepositRoom(null)}
+                                className="py-2.5 px-6 bg-white border border-[#C5C5D3] hover:bg-gray-50 text-[#191C1E] font-semibold text-[13px] rounded-xl transition-colors"
+                            >
+                                Hủy bỏ
+                            </button>
+                            <button
+                                onClick={btn_submitDeposit}
+                                disabled={isSubmittingDeposit}
+                                className="py-2.5 px-6 bg-[#00236F] hover:bg-[#1E3A8A] text-white font-semibold text-[13px] rounded-xl shadow-md transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50"
+                            >
+                                {isSubmittingDeposit ? (
+                                    <><span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Đang xử lý...</>
+                                ) : (
+                                    <><span className="material-symbols-outlined text-[18px]">lock</span> Xác nhận đặt cọc</>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

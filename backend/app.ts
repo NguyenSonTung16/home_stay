@@ -4,6 +4,7 @@ import path from 'path';
 import routes from './src/routes';
 import { startCronJobs } from './src/jobs/cron';
 import { DonHangService } from './src/services/DonHangService';
+import { PhieuDatCocService } from './src/services/PhieuDatCocService';
 
 const app = express();
 startCronJobs();
@@ -28,4 +29,5 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
     // Khởi động cron job đối soát đơn hàng
     DonHangService.startCronJob();
+    PhieuDatCocService.startCronJob();
 });
