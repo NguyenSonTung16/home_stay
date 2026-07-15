@@ -6,11 +6,11 @@ const service = new PhieuDatCocService();
 
 // ─── Zod Schemas ───────────────────────────────────────────────────────────
 const TaoDatCocSchema = z.object({
-  maKH: z.number({ coerce: true }).int().positive(),
-  maGiuong: z.number({ coerce: true }).int().positive().optional().nullable(),
-  maPhong: z.number({ coerce: true }).int().positive().optional().nullable(),
-  soGiuongThue: z.number({ coerce: true }).int().min(1).max(20).optional().nullable(),
-  soGiuong: z.number({ coerce: true }).int().min(1).max(20).optional().nullable(),
+  maKH: z.coerce.number().int().positive(),
+  maGiuong: z.coerce.number().int().positive().optional().nullable(),
+  maPhong: z.coerce.number().int().positive().optional().nullable(),
+  soGiuongThue: z.coerce.number().int().min(1).max(20).optional().nullable(),
+  soGiuong: z.coerce.number().int().min(1).max(20).optional().nullable(),
 });
 
 const GuiChungTuSchema = z.object({
@@ -19,7 +19,7 @@ const GuiChungTuSchema = z.object({
 });
 
 const XacNhanTienMatSchema = z.object({
-  maNhanVien: z.number({ coerce: true }).int().positive(),
+  maNhanVien: z.coerce.number().int().positive(),
   duyet: z.boolean(),
 });
 
@@ -46,7 +46,7 @@ export class DatCocController {
   /** POST /api/booking/dat-coc/:maPDC/thanh-toan-online */
   taoThanhToanOnline = async (req: Request, res: Response): Promise<void> => {
     try {
-      const maPDC = parseInt(req.params.maPDC);
+      const maPDC = parseInt(req.params.maPDC as string);
       if (isNaN(maPDC)) { res.status(400).json({ success: false, message: 'maPDC không hợp lệ' }); return; }
       const referer = req.headers.referer;
       const origin = (req.headers.origin as string | undefined) || 
@@ -61,7 +61,7 @@ export class DatCocController {
   /** POST /api/booking/dat-coc/:maPDC/thanh-toan-tien-mat */
   guiChungTuTienMat = async (req: Request, res: Response): Promise<void> => {
     try {
-      const maPDC = parseInt(req.params.maPDC);
+      const maPDC = parseInt(req.params.maPDC as string);
       const parsed = GuiChungTuSchema.safeParse(req.body);
       if (!parsed.success) {
         res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ', errors: parsed.error.flatten() });
@@ -77,7 +77,7 @@ export class DatCocController {
   /** POST /api/booking/dat-coc/:maPDC/xac-nhan-tien-mat — chỉ QuanLy */
   xacNhanTienMat = async (req: Request, res: Response): Promise<void> => {
     try {
-      const maPDC = parseInt(req.params.maPDC);
+      const maPDC = parseInt(req.params.maPDC as string);
       const parsed = XacNhanTienMatSchema.safeParse(req.body);
       if (!parsed.success) {
         res.status(400).json({ success: false, message: 'Dữ liệu không hợp lệ', errors: parsed.error.flatten() });
@@ -93,7 +93,7 @@ export class DatCocController {
   /** GET /api/booking/dat-coc/:maPDC/status */
   layTrangThai = async (req: Request, res: Response): Promise<void> => {
     try {
-      const maPDC = parseInt(req.params.maPDC);
+      const maPDC = parseInt(req.params.maPDC as string);
       const result = await service.layTrangThai(maPDC);
       res.status(200).json({ success: true, data: result });
     } catch (err: any) {

@@ -64,7 +64,7 @@ export class ThanhToanCocController {
   /** Cũ — giữ lại để không phá route cũ */
   getThongTinThanhToan = async (req: Request, res: Response): Promise<void> => {
     try {
-      const maPDC = parseInt(req.params.maCoc);
+      const maPDC = parseInt(req.params.maCoc as string);
       const result = await service.layTrangThai(maPDC);
       res.status(200).json({ success: true, data: result });
     } catch (err: any) {

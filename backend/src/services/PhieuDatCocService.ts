@@ -1,4 +1,5 @@
 import { PhieuDatCocRepository } from '../repositories/PhieuDatCocRepository';
+import { ChiTietXuLyDatCocRepository } from '../repositories/ChiTietXuLyDatCocRepository';
 import { GiuongRepository } from '../repositories/GiuongRepository';
 import { KhachHangRepository } from '../repositories/KhachHangRepository';
 import { PaypalService } from './PaypalService';
@@ -10,6 +11,7 @@ import cron from 'node-cron';
 
 export class PhieuDatCocService {
   private repo = new PhieuDatCocRepository();
+  private chiTietRepo = new ChiTietXuLyDatCocRepository();
   private giuongRepo = new GiuongRepository();
   private khRepo = new KhachHangRepository();
   private hopDongRepo = new HopDongRepository();
@@ -18,6 +20,7 @@ export class PhieuDatCocService {
 
   // ─────────────────────────────────────────────────────────────────────────
   // 1. TẠO PHIẾU ĐẶT CỌC (POST /dat-coc)
+  // Transaction 2 bước: INSERT PhieuDatCoc → INSERT ChiTietXuLyDatCoc
   // ─────────────────────────────────────────────────────────────────────────
   async taoDatCoc(maKH: number, maGiuong: number | null, soGiuongThue: number, maPhong?: number | null): Promise<any> {
     const client = await db.connect();
@@ -64,14 +67,17 @@ export class PhieuDatCocService {
       const tienCoc = tienThuePerThang * 2 * soGiuongThue;
       const thoiGianHetHan = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      // Tạo phiếu
+      // BƯỚC 1: INSERT PhieuDatCoc (8 cột gốc)
       const phieu = await this.repo.taoPhieu(client, {
         maKH,
-        maGiuong: targetGiuongId,
         maPhong: giuong.maphong,
+        soTien: tienCoc,
+      });
+
+      // BƯỚC 2: INSERT ChiTietXuLyDatCoc (trong cùng transaction)
+      await this.chiTietRepo.taoChiTiet(client, phieu.macoc, {
+        maGiuong: targetGiuongId,
         soGiuongThue,
-        tienThuePerThang,
-        tienCoc,
         thoiGianHetHan,
       });
 
@@ -108,12 +114,12 @@ export class PhieuDatCocService {
       throw { status: 400, message: `Phiếu #${maPDC} không ở trạng thái ChoThanhToan (hiện: ${phieu.trangthaimoi})` };
     }
 
-    if (new Date(phieu.thoigianhethan) < new Date()) {
+    if (phieu.thoigianhethan && new Date(phieu.thoigianhethan) < new Date()) {
       throw { status: 410, message: 'Phiếu đặt cọc đã hết hạn' };
     }
 
     // Tỷ giá 25000 VND/USD (giống DonHangService)
-    const amountUSD = Number(phieu.tiencoc) / 25000;
+    const amountUSD = Number(phieu.sotien) / 25000;
     const referenceId = `DATCOC_${maPDC}_${Date.now()}`;
 
     const paypalOrder = await this.paypalService.createOrder(amountUSD, referenceId, origin);
@@ -123,12 +129,12 @@ export class PhieuDatCocService {
     const approveUrl = approveLinkObj.href;
     const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(approveUrl)}`;
 
-    // Cập nhật PhuongThucThanhToan = ChuyenKhoan, ghi PayPal Order ID tạm
+    // Cập nhật PTThanhToan = ChuyenKhoan, ghi PayPal Order ID tạm
     const client = await db.connect();
     try {
       await client.query('BEGIN');
       await client.query(
-        `UPDATE PhieuDatCoc SET PhuongThucThanhToan = 'ChuyenKhoan', MaGiaoDich = $1 WHERE MaCoc = $2`,
+        `UPDATE PhieuDatCoc SET PTThanhToan = 'ChuyenKhoan', MaGiaoDich = $1 WHERE MaCoc = $2`,
         [paypalOrder.id, maPDC]
       );
       await client.query('COMMIT');
@@ -144,7 +150,7 @@ export class PhieuDatCocService {
       paypalOrderId: paypalOrder.id,
       approveUrl,
       qrImageUrl,
-      tienCoc: Number(phieu.tiencoc),
+      tienCoc: Number(phieu.sotien),
       thoiGianHetHan: phieu.thoigianhethan,
     };
   }
@@ -185,12 +191,14 @@ export class PhieuDatCocService {
       // Cập nhật PhieuDatCoc → DaThanhToan
       await this.repo.capNhatTrangThai(client, phieu.macoc, 'DaThanhToan', { maGiaoDich });
 
-      // Cập nhật Giuong → DaCoc (ONLY here)
-      await this.giuongRepo.capNhatTrangThaiStr(client, phieu.magiuong, 'DaCoc');
+      // Cập nhật Giuong → DaCoc (lấy magiuong từ ChiTietXuLyDatCoc)
+      if (lockedPhieu.magiuong) {
+        await this.giuongRepo.capNhatTrangThaiStr(client, lockedPhieu.magiuong, 'DaCoc');
+      }
 
       // Tự động sinh Hợp đồng & Hóa đơn kỳ 1
       const maHD = await this.hopDongRepo.taoHopDongTuDong(client, lockedPhieu);
-      const tienPhong = Number(lockedPhieu.tienthueperthang) * Number(lockedPhieu.sogiuongthue);
+      const tienPhong = Number(lockedPhieu.sotien);
       await this.hoaDonPDKRepo.taoHoaDonKyDau(client, maHD, tienPhong);
 
       await client.query('COMMIT');
@@ -223,21 +231,24 @@ export class PhieuDatCocService {
       if (!['ChoThanhToan', 'ChoXacNhanTienMat'].includes(phieu.trangthaimoi)) {
         throw { status: 400, message: `Phiếu không thể gửi chứng từ ở trạng thái ${phieu.trangthaimoi}` };
       }
-      if (new Date(phieu.thoigianhethan) < new Date()) {
+      if (phieu.thoigianhethan && new Date(phieu.thoigianhethan) < new Date()) {
         throw { status: 410, message: 'Phiếu đặt cọc đã hết hạn' };
       }
 
+      // Cập nhật trạng thái PhieuDatCoc
       await this.repo.capNhatTrangThai(client, maPDC, 'ChoXacNhanTienMat', {
-        maHoaDonTienMat,
-        urlChungTu,
         maGiaoDich: `TIENMAT_${maPDC}_${Date.now()}`,
       });
 
-      // Cập nhật PhuongThucThanhToan
+      // Cập nhật PTThanhToan
       await client.query(
-        `UPDATE PhieuDatCoc SET PhuongThucThanhToan = 'TienMat' WHERE MaCoc = $1`,
+        `UPDATE PhieuDatCoc SET PTThanhToan = 'TienMat' WHERE MaCoc = $1`,
         [maPDC]
       );
+
+      // Cập nhật MinhChung trong ChiTietXuLyDatCoc (bảng con)
+      const minhChung = urlChungTu || maHoaDonTienMat;
+      await this.chiTietRepo.capNhatMinhChung(client, maPDC, minhChung);
 
       await client.query('COMMIT');
       return { success: true, message: 'Đã gửi chứng từ, chờ Quản lý xác nhận.' };
@@ -266,13 +277,20 @@ export class PhieuDatCocService {
       }
 
       if (duyet) {
-        // Duyệt: → DaThanhToan + Giuong → DaCoc
-        await this.repo.capNhatTrangThai(client, maPDC, 'DaThanhToan', { nguoiXacNhan: maNhanVien });
-        await this.giuongRepo.capNhatTrangThaiStr(client, phieu.magiuong, 'DaCoc');
+        // Duyệt: PhieuDatCoc → DaThanhToan
+        await this.repo.capNhatTrangThai(client, maPDC, 'DaThanhToan', {});
+
+        // Cập nhật NguoiXacNhan + ThoiGianXacNhan trong ChiTietXuLyDatCoc
+        await this.chiTietRepo.capNhatThoiGianXacNhan(client, maPDC, maNhanVien);
+
+        // Giuong → DaCoc (lấy magiuong từ ChiTietXuLyDatCoc)
+        if (phieu.magiuong) {
+          await this.giuongRepo.capNhatTrangThaiStr(client, phieu.magiuong, 'DaCoc');
+        }
 
         // Tự động sinh Hợp đồng & Hóa đơn kỳ 1
         const maHD = await this.hopDongRepo.taoHopDongTuDong(client, phieu);
-        const tienPhong = Number(phieu.tienthueperthang) * Number(phieu.sogiuongthue);
+        const tienPhong = Number(phieu.sotien);
         await this.hoaDonPDKRepo.taoHoaDonKyDau(client, maHD, tienPhong);
 
         await client.query('COMMIT');
@@ -298,6 +316,7 @@ export class PhieuDatCocService {
 
   // ─────────────────────────────────────────────────────────────────────────
   // 6. CRON JOB — HỦY PHIẾU QUÁ HẠN (chạy mỗi 5 phút)
+  //    Điều kiện WHERE dựa trên ChiTietXuLyDatCoc.ThoiGianHetHan
   // ─────────────────────────────────────────────────────────────────────────
   async huyPhieuQuaHan(): Promise<void> {
     const phieuList = await this.repo.layPhieuQuaHan();
@@ -316,6 +335,8 @@ export class PhieuDatCocService {
         }
 
         await this.repo.capNhatTrangThai(client, phieu.macoc, 'DaHuy', {});
+
+        // Lấy magiuong từ phieu (đã JOIN khi layPhieuQuaHan)
         if (phieu.magiuong) {
           await this.giuongRepo.capNhatTrangThaiStr(client, phieu.magiuong, 'Trong');
         } else if (phieu.maphong) {
@@ -349,7 +370,7 @@ export class PhieuDatCocService {
     if (!phieu) throw { status: 404, message: `Không tìm thấy phiếu #${maPDC}` };
 
     // Auto-capture nếu ở trạng thái ChoThanhToan và có mã giao dịch PayPal
-    if (phieu.trangthaimoi === 'ChoThanhToan' && phieu.magiaodich && phieu.phuongthucthanhtoan === 'ChuyenKhoan') {
+    if (phieu.trangthaimoi === 'ChoThanhToan' && phieu.magiaodich && phieu.ptthanhtoan === 'ChuyenKhoan') {
       try {
         const orderData = await this.paypalService.getOrder(phieu.magiaodich);
         if (orderData.status === 'APPROVED') {
@@ -360,26 +381,25 @@ export class PhieuDatCocService {
             phieu = await this.repo.layTheoId(maPDC); // reload phieu
           }
         } else if (orderData.status === 'COMPLETED') {
-          // Trường hợp PayPal đã hoàn thành nhưng DB chưa cập nhật
           console.log(`[PhieuDatCocService] Phát hiện Order ${phieu.magiaodich} COMPLETED. Đồng bộ DB...`);
           await this.xuLyWebhookDatCoc(phieu.magiaodich);
           phieu = await this.repo.layTheoId(maPDC); // reload phieu
         }
       } catch (err: any) {
-        console.error(`[PhieuDatCocService] Lỗi tự động capture/kiểm tra đơn PayPal ${phieu.magiaodich}:`, err.message);
+        console.error(`[PhieuDatCocService] Lỗi tự động capture/kiểm tra đơn PayPal ${phieu?.magiaodich}:`, err.message);
       }
     }
 
     return {
-      maPDC: phieu.macoc,
-      trangThai: phieu.trangthaimoi,
-      tienCoc: Number(phieu.tiencoc),
-      thoiGianHetHan: phieu.thoigianhethan,
-      tenPhong: phieu.tenphong,
-      phuongThuc: phieu.phuongthucthanhtoan,
-      urlChungTu: phieu.urlchungtu,
-      thoiGianXacNhan: phieu.thoigianxacnhan,
-      maGiaoDich: phieu.magiaodich,
+      maPDC: phieu!.macoc,
+      trangThai: phieu!.trangthaimoi,
+      tienCoc: Number(phieu!.sotien),
+      thoiGianHetHan: phieu!.thoigianhethan,
+      tenPhong: phieu!.tenphong,
+      phuongThuc: phieu!.ptthanhtoan,
+      urlChungTu: phieu!.urlchungtu,
+      thoiGianXacNhan: phieu!.thoigianxacnhan,
+      maGiaoDich: phieu!.magiaodich,
     };
   }
 
@@ -387,14 +407,14 @@ export class PhieuDatCocService {
   // EMAIL HELPERS
   // ─────────────────────────────────────────────────────────────────────────
   private async guiEmailXacNhanDatCoc(phieu: any): Promise<void> {
-    const email = phieu.email;
-    const ten = phieu.hoten || 'Quý khách';
+    const email = phieu?.email;
+    const ten = phieu?.hoten || 'Quý khách';
     if (!email) return;
 
     await EmailService.sendMail({
       to: email,
       subject: `[FIT 4.0 HomeStay] Xác nhận đặt cọc thành công — Phiếu #${phieu.macoc}`,
-      text: `Chào ${ten}, đặt cọc phiếu #${phieu.macoc} đã được xác nhận thành công. Số tiền: ${Number(phieu.tiencoc).toLocaleString()}đ.`,
+      text: `Chào ${ten}, đặt cọc phiếu #${phieu.macoc} đã được xác nhận thành công. Số tiền: ${Number(phieu.sotien).toLocaleString()}đ.`,
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;border:1px solid #e5e7eb;border-radius:8px">
           <h2 style="color:#10B981;margin-top:0">✅ Đặt Cọc Thành Công</h2>
@@ -403,7 +423,7 @@ export class PhieuDatCocService {
           <table style="width:100%;border-collapse:collapse;margin:15px 0">
             <tr><td style="padding:8px 0;color:#6b7280">Mã phiếu:</td><td style="font-weight:bold">#${phieu.macoc}</td></tr>
             <tr><td style="padding:8px 0;color:#6b7280">Phòng:</td><td style="font-weight:bold">${phieu.tenphong || ''}</td></tr>
-            <tr><td style="padding:8px 0;color:#6b7280">Số tiền cọc:</td><td style="font-weight:bold;color:#10B981;font-size:16px">${Number(phieu.tiencoc).toLocaleString()}đ</td></tr>
+            <tr><td style="padding:8px 0;color:#6b7280">Số tiền cọc:</td><td style="font-weight:bold;color:#10B981;font-size:16px">${Number(phieu.sotien).toLocaleString()}đ</td></tr>
           </table>
           <p>Cảm ơn bạn đã sử dụng dịch vụ FIT 4.0 HomeStay!</p>
         </div>
@@ -412,8 +432,8 @@ export class PhieuDatCocService {
   }
 
   private async guiEmailHuyDatCoc(phieu: any): Promise<void> {
-    const email = phieu.email;
-    const ten = phieu.hoten || 'Quý khách';
+    const email = phieu?.email;
+    const ten = phieu?.hoten || 'Quý khách';
     if (!email) return;
 
     await EmailService.sendMail({

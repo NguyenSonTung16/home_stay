@@ -12,7 +12,7 @@ export const searchRooms = async (req: Request, res: Response) => {
              lp.TenLoai as "type", lp.GiaTien as "price", lp.SucChua as "capacity",
              (lp.SucChua 
               - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
-              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+              - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
              )::int AS "sogiuongtrong",
              (
                SELECT json_agg(dvp.TenDichVu)
@@ -22,10 +22,10 @@ export const searchRooms = async (req: Request, res: Response) => {
              ) as "amenities"
       FROM Phong p
       JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
-      WHERE (lp.SucChua 
-              - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
-              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
-             ) > 0
+       WHERE (lp.SucChua 
+               - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
+               - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
+              ) > 0
     `;
     const params: any[] = [];
     let paramIndex = 1;
@@ -59,7 +59,7 @@ export const getRoomDetails = async (req: Request, res: Response) => {
              lp.TenLoai as "type", lp.GiaTien as "price", lp.GiaTien as "giatien", lp.SucChua as "capacity", lp.SucChua as "succhua",
              (lp.SucChua 
               - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
-              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+              - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
              )::int AS "sogiuongtrong",
              (
                SELECT json_agg(dvp.TenDichVu)

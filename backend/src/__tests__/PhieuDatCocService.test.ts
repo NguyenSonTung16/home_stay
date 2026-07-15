@@ -25,6 +25,8 @@ jest.mock('../repositories/PhieuDatCocRepository');
 jest.mock('../repositories/GiuongRepository');
 jest.mock('../services/PaypalService');
 jest.mock('../services/EmailService');
+jest.mock('../repositories/HopDongRepository');
+jest.mock('../repositories/HoaDonPhiDinhKyRepository');
 
 import { db } from '../config/db';
 import { PhieuDatCocRepository } from '../repositories/PhieuDatCocRepository';

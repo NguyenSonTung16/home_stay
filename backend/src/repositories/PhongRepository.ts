@@ -12,14 +12,14 @@ export class PhongRepository {
              lp.TenLoai, lp.GiaTien, lp.SucChua,
              (lp.SucChua 
               - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
-              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+              - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
              )::int AS sogiuongtrong,
              (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong) AS tonggiuong
       FROM Phong p
       JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai
       WHERE (lp.SucChua 
               - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
-              - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+              - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
              ) > 0
       ORDER BY p.MaPhong
     `);

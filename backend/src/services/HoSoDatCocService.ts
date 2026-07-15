@@ -16,10 +16,12 @@ export class HoSoDatCocService {
   async pheDuyetHoSo(maCoc: number, isDuyet: boolean): Promise<any> {
     // Join KhachHang and Phong to get email, customer name, and room name
     const res = await db.query(`
-      SELECT p.*, k.Email as email, k.HoTen as hoten, ph.TenPhong as tenphong
+      SELECT p.*, k.Email as email, k.HoTen as hoten, ph.TenPhong as tenphong,
+             ctdc.MaGiuong as magiuong
       FROM PhieuDatCoc p
       JOIN KhachHang k ON p.MaKH = k.MaKH
       LEFT JOIN Phong ph ON p.MaPhong = ph.MaPhong
+      LEFT JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = p.MaCoc
       WHERE p.MaCoc = $1
     `, [maCoc]);
     const phieu = res.rows[0];

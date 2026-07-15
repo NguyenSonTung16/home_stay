@@ -41,10 +41,11 @@ export class BaoCaoRepository {
           END as time_bucket
         FROM (
           -- Nguồn 1: Đặt cọc
-          SELECT 'dat_coc' as nguon, pdc.SoTien as sotien, pdc.ThoiGianXacNhan as thoigian, p.ChiNhanh as chinhanh
+          SELECT 'dat_coc' as nguon, pdc.SoTien as sotien, ctdc.ThoiGianXacNhan as thoigian, p.ChiNhanh as chinhanh
           FROM PhieuDatCoc pdc
+          JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
           LEFT JOIN Phong p ON pdc.MaPhong = p.MaPhong
-          WHERE pdc.TrangThaiMoi = 'DaThanhToan' AND pdc.ThoiGianXacNhan IS NOT NULL
+          WHERE pdc.TrangThaiMoi = 'DaThanhToan' AND ctdc.ThoiGianXacNhan IS NOT NULL
 
           UNION ALL
 

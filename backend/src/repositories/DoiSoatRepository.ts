@@ -24,11 +24,11 @@ export class DoiSoatRepository {
     let idx = 1;
 
     if (filters.thang !== undefined) {
-      whereClauses.push(`EXTRACT(MONTH FROM pdc.ThoiGianTao) = $${idx++}`);
+      whereClauses.push(`EXTRACT(MONTH FROM pdc.NgayCoc) = $${idx++}`);
       params.push(filters.thang);
     }
     if (filters.nam !== undefined) {
-      whereClauses.push(`EXTRACT(YEAR FROM pdc.ThoiGianTao) = $${idx++}`);
+      whereClauses.push(`EXTRACT(YEAR FROM pdc.NgayCoc) = $${idx++}`);
       params.push(filters.nam);
     }
     if (filters.chiNhanh) {
@@ -55,12 +55,13 @@ export class DoiSoatRepository {
     // Lấy danh sách
     let queryStr = `
       SELECT pdc.MaCoc as macoc, pdc.SoTien as sotien, pdc.NgayCoc as ngaycoc,
-             pdc.TrangThaiMoi as trangthai, pdc.PhuongThucThanhToan as ptthanhtoan,
-             pdc.ThoiGianTao as thoigiantao, pdc.ThoiGianXacNhan as thoigianxacnhan,
+             pdc.TrangThaiMoi as trangthai, pdc.PTThanhToan as ptthanhtoan,
+             pdc.NgayCoc as thoigiantao, ctdc.ThoiGianXacNhan as thoigianxacnhan,
              pdc.MaGiaoDich as magiaodich,
              p.TenPhong as tenphong, p.ChiNhanh as chinhanh,
              kh.HoTen as hoten, kh.Avatar as avatar
       FROM PhieuDatCoc pdc
+      LEFT JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
       LEFT JOIN Phong p ON pdc.MaPhong = p.MaPhong
       LEFT JOIN KhachHang kh ON pdc.MaKH = kh.MaKH
       WHERE ${whereClauseStr}
@@ -87,11 +88,11 @@ export class DoiSoatRepository {
     let idx = 1;
 
     if (filters.thang !== undefined) {
-      whereClauses.push(`EXTRACT(MONTH FROM pdc.ThoiGianTao) = $${idx++}`);
+      whereClauses.push(`EXTRACT(MONTH FROM pdc.NgayCoc) = $${idx++}`);
       params.push(filters.thang);
     }
     if (filters.nam !== undefined) {
-      whereClauses.push(`EXTRACT(YEAR FROM pdc.ThoiGianTao) = $${idx++}`);
+      whereClauses.push(`EXTRACT(YEAR FROM pdc.NgayCoc) = $${idx++}`);
       params.push(filters.nam);
     }
     if (filters.chiNhanh) {

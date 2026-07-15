@@ -1,4 +1,5 @@
 import { PhieuDatCocRepository } from '../repositories/PhieuDatCocRepository';
+import { db } from '../config/db';
 
 export class ThanhToanCocService {
   private phieuDatCocRepo = new PhieuDatCocRepository();
@@ -8,7 +9,8 @@ export class ThanhToanCocService {
     if (!phieu) {
       throw new Error('Không tìm thấy phiếu đặt cọc.');
     }
-    if (phieu.trangthai !== 1) {
+    // Trạng thái sử dụng TrangThaiMoi (VARCHAR)
+    if (!['ChoThanhToan', 'ChoDuyet'].includes(phieu.trangthaimoi)) {
       throw new Error('Phiếu đặt cọc không ở trạng thái chờ thanh toán.');
     }
 
@@ -23,10 +25,20 @@ export class ThanhToanCocService {
     if (!phieu) {
       throw new Error('Không tìm thấy phiếu đặt cọc.');
     }
-    
-    // Update status to 2: Chờ Kế toán duyệt
-    const success = await this.phieuDatCocRepo.updateStatusAndTransaction(maCoc, 2, ptThanhToan, maGiaoDich, minhChung);
-    
+
+    // Update status: chỉ cập nhật các cột thuộc PhieuDatCoc (8 cột gốc)
+    const success = await this.phieuDatCocRepo.updateStatusAndTransaction(maCoc, 3, ptThanhToan, maGiaoDich);
+
+    // Cập nhật MinhChung trong ChiTietXuLyDatCoc nếu có
+    if (minhChung) {
+      await db.query(
+        `INSERT INTO ChiTietXuLyDatCoc (MaCoc, MinhChung)
+         VALUES ($1, $2)
+         ON CONFLICT (MaCoc) DO UPDATE SET MinhChung = EXCLUDED.MinhChung`,
+        [maCoc, minhChung]
+      );
+    }
+
     if (!success) {
       throw new Error('Lỗi khi cập nhật thanh toán.');
     }
@@ -42,14 +54,23 @@ export class ThanhToanCocService {
     if (!phieu) {
       throw new Error('Không tìm thấy phiếu đặt cọc.');
     }
-    
-    const success = await this.phieuDatCocRepo.delete(maCoc);
-    if (!success) {
-      throw new Error('Không thể xóa phiếu đặt cọc này.');
+
+    // Hủy bằng cách cập nhật TrangThaiMoi thay vì xóa
+    const client = await db.connect();
+    try {
+      await client.query('BEGIN');
+      await client.query(`UPDATE PhieuDatCoc SET TrangThaiMoi = 'DaHuy' WHERE MaCoc = $1`, [maCoc]);
+      await client.query('COMMIT');
+    } catch (e) {
+      await client.query('ROLLBACK');
+      throw e;
+    } finally {
+      client.release();
     }
+
     return {
       success: true,
-      message: 'Đã xóa phiếu đặt cọc thành công.'
+      message: 'Đã hủy phiếu đặt cọc thành công.'
     };
   }
 }

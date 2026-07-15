@@ -21,7 +21,7 @@ export class DatCocService {
         SELECT lp.SucChua,
                (lp.SucChua 
                 - (SELECT COUNT(*) FROM Giuong g WHERE g.MaPhong = p.MaPhong AND g.TrangThai = 1)
-                - COALESCE((SELECT SUM(SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+                - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
                )::int AS sogiuongtrong,
                p.TenPhong, lp.GiaTien, p.TieuChiGioiTinh
         FROM Phong p 
@@ -56,9 +56,9 @@ export class DatCocService {
       
       // 3. Create PhieuDatCoc (Trạng thái = 0: Chờ Sale duyệt - theo Use Case, cần nhân viên Sale phê duyệt trước khi thanh toán)
       const phieuRes = await client.query(
-        `INSERT INTO PhieuDatCoc (SoTien, TrangThai, MaKH, MaPhong, SoGiuong, GioiTinh, SoNguoiO, NgayDuKienVao) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
-        [tienCoc, 0, maKH, maPhong, soGiuong, gioiTinh, soNguoiO, ngayDuKienVao]
+        `INSERT INTO PhieuDatCoc (SoTien, TrangThaiMoi, MaKH, MaPhong)
+         VALUES ($1, 'ChoDuyet', $2, $3) RETURNING *`,
+        [tienCoc, maKH, maPhong]
       );
       
       await client.query('COMMIT');

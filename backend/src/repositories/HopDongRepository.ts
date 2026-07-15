@@ -59,7 +59,7 @@ export class HopDongRepository {
         g.MaPhong,
         ph.TenPhong,
         lp.GiaTien AS GiaThue,
-        pdc.SoGiuong,
+        ctdc.SoGiuongThue AS SoGiuong,
         pdc.SoTien AS TienCoc,
         h.NgayKy AS NgayBatDau,
         h.NgayHetHan AS NgayKetThuc
@@ -70,6 +70,7 @@ export class HopDongRepository {
       JOIN Phong ph ON g.MaPhong = ph.MaPhong
       JOIN LoaiPhong lp ON ph.MaLoai = lp.MaLoai
       LEFT JOIN PhieuDatCoc pdc ON pdc.MaKH = k.MaKH AND pdc.MaPhong = ph.MaPhong
+      LEFT JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
       WHERE k.MaTK = $1 AND h.NgayHetHan >= CURRENT_DATE
       ORDER BY h.MaHD DESC LIMIT 1
     `, [maTK]);
@@ -83,7 +84,7 @@ export class HopDongRepository {
         g.MaPhong,
         ph.TenPhong,
         lp.GiaTien AS GiaThue,
-        pdc.SoGiuong,
+        ctdc.SoGiuongThue AS SoGiuong,
         pdc.SoTien AS TienCoc,
         h.NgayKy AS NgayBatDau,
         h.NgayHetHan AS NgayKetThuc
@@ -94,6 +95,7 @@ export class HopDongRepository {
       JOIN Phong ph ON g.MaPhong = ph.MaPhong
       JOIN LoaiPhong lp ON ph.MaLoai = lp.MaLoai
       LEFT JOIN PhieuDatCoc pdc ON pdc.MaKH = k.MaKH AND pdc.MaPhong = ph.MaPhong
+      LEFT JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
       WHERE k.MaTK = $1
       ORDER BY h.MaHD DESC LIMIT 1
     `, [maTK]);
@@ -115,6 +117,7 @@ export class HopDongRepository {
     `, [maHD, phieu.makh]);
 
     // 3. Thêm Chi Tiết Giường
+    // magiuong được lấy từ kết quả JOIN PhieuDatCoc + ChiTietXuLyDatCoc
     await client.query(`
       INSERT INTO ChiTietGiuong (MaHD, MaGiuong) VALUES ($1, $2)
     `, [maHD, phieu.magiuong]);

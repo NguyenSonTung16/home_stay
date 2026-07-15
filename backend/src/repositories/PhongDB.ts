@@ -9,7 +9,7 @@ export class PhongDB {
                    lp.TenLoai, lp.GiaTien, lp.SucChua,
                    (lp.SucChua 
                     - COUNT(CASE WHEN g.TrangThai = 1 THEN 1 END)
-                    - COALESCE((SELECT SUM(pdc.SoGiuong) FROM PhieuDatCoc pdc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThai IN (0, 1, 2, 3)), 0)
+                    - COALESCE((SELECT SUM(ctdc.SoGiuongThue) FROM PhieuDatCoc pdc JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc WHERE pdc.MaPhong = p.MaPhong AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat', 'DaThanhToan')), 0)
                    )::int AS sogiuongtrong
             FROM Phong p
             JOIN LoaiPhong lp ON p.MaLoai = lp.MaLoai

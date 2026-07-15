@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Database name="HomeStay">
+    <Description>Sơ đồ cấu trúc cơ sở dữ liệu HomeStay (Bao gồm cấu trúc bảng, mối quan hệ và dữ liệu mẫu)</Description>
+    
+    <Tables>
+        <!-- LEVEL 0: Các bảng gốc (không chứa khóa ngoại) -->
+        <Table name="TaiKhoan">
+            <Description>Lưu trữ thông tin tài khoản người dùng đăng nhập hệ thống</Description>
+            <Columns>
+                <Column name="MaTK" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã tài khoản tự sinh"/>
+                <Column name="Username" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tên đăng nhập"/>
+                <Column name="Password" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Mật khẩu đã mã hóa"/>
+                <Column name="VaiTro" type="VARCHAR(20)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Vai trò hệ thống (Admin, QuanLy, Sale, KeToan, Khach)"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái tài khoản (1: Hoạt động, 0: Bị khóa)"/>
+                <Column name="NgayTao" type="DATE" isPrimaryKey="false" isForeignKey="false" isNullable="true" default="CURRENT_DATE" description="Ngày khởi tạo tài khoản"/>
+                <Column name="LanDangNhapCuoi" type="TIMESTAMP" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Thời gian đăng nhập gần nhất"/>
+                <Column name="Token" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Token xác thực hoặc khôi phục"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaTK">1</Value>
+                    <Value column="Username">admin</Value>
+                    <Value column="Password">123</Value>
+                    <Value column="VaiTro">Admin</Value>
+                    <Value column="TrangThai">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaTK">2</Value>
+                    <Value column="Username">quanly</Value>
+                    <Value column="Password">123</Value>
+                    <Value column="VaiTro">QuanLy</Value>
+                    <Value column="TrangThai">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaTK">3</Value>
+                    <Value column="Username">nvsale</Value>
+                    <Value column="Password">123</Value>
+                    <Value column="VaiTro">Sale</Value>
+                    <Value column="TrangThai">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaTK">4</Value>
+                    <Value column="Username">ketoan</Value>
+                    <Value column="Password">123</Value>
+                    <Value column="VaiTro">KeToan</Value>
+                    <Value column="TrangThai">1</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="LoaiPhong">
+            <Description>Danh mục các loại phòng thuê</Description>
+            <Columns>
+                <Column name="MaLoai" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã loại phòng"/>
+                <Column name="TenLoai" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tên loại phòng (Standard, VIP, Studio,...)"/>
+                <Column name="GiaTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Giá thuê loại phòng"/>
+                <Column name="SucChua" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Sức chứa người tối đa"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaLoai">1</Value>
+                    <Value column="TenLoai">Standard</Value>
+                    <Value column="GiaTien">500000.00</Value>
+                    <Value column="SucChua">2</Value>
+                </Row>
+                <Row>
+                    <Value column="MaLoai">2</Value>
+                    <Value column="TenLoai">Thường 4 người</Value>
+                    <Value column="GiaTien">2500000.00</Value>
+                    <Value column="SucChua">4</Value>
+                </Row>
+                <Row>
+                    <Value column="MaLoai">3</Value>
+                    <Value column="TenLoai">Cao cấp 2 người</Value>
+                    <Value column="GiaTien">3800000.00</Value>
+                    <Value column="SucChua">2</Value>
+                </Row>
+                <Row>
+                    <Value column="MaLoai">4</Value>
+                    <Value column="TenLoai">Studio 1 người</Value>
+                    <Value column="GiaTien">8500000.00</Value>
+                    <Value column="SucChua">1</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="DichVuPhong">
+            <Description>Danh mục tiện ích và dịch vụ đi kèm sẵn trong phòng</Description>
+            <Columns>
+                <Column name="MaDVP" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã dịch vụ phòng"/>
+                <Column name="TenDichVu" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tên dịch vụ tiện ích"/>
+                <Column name="GiaTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Đơn giá dịch vụ"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaDVP">1</Value>
+                    <Value column="TenDichVu">Wi-Fi Tốc độ cao</Value>
+                    <Value column="GiaTien">100000.00</Value>
+                </Row>
+                <Row>
+                    <Value column="MaDVP">2</Value>
+                    <Value column="TenDichVu">Máy lạnh Inverter</Value>
+                    <Value column="GiaTien">0.00</Value>
+                </Row>
+                <Row>
+                    <Value column="MaDVP">3</Value>
+                    <Value column="TenDichVu">Tủ cá nhân Khóa từ</Value>
+                    <Value column="GiaTien">0.00</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="DichVuKhac">
+            <Description>Dịch vụ tùy chọn phát sinh (điện, nước, dọn phòng, giặt là,...)</Description>
+            <Columns>
+                <Column name="MaDV" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã dịch vụ khác"/>
+                <Column name="TenDichVu" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tên dịch vụ ngoài"/>
+                <Column name="DonGia" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Đơn giá tính tiền"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaDV">1</Value>
+                    <Value column="TenDichVu">Dọn phòng 2 lần/tuần</Value>
+                    <Value column="DonGia">150000.00</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <!-- LEVEL 1: Các bảng chứa 1 khóa ngoại trỏ tới bảng gốc -->
+        <Table name="NhanVien">
+            <Description>Thông tin nhân viên vận hành hệ thống</Description>
+            <Columns>
+                <Column name="MaNV" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã nhân viên"/>
+                <Column name="TenNV" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Họ tên nhân viên"/>
+                <Column name="ChucVu" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Chức vụ đảm nhiệm"/>
+                <Column name="MaTK" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã tài khoản liên kết"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaNV">1</Value>
+                    <Value column="TenNV">Admin</Value>
+                    <Value column="ChucVu">Admin</Value>
+                    <Value column="MaTK">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaNV">2</Value>
+                    <Value column="TenNV">Quan ly 1</Value>
+                    <Value column="ChucVu">Quan Ly</Value>
+                    <Value column="MaTK">2</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="KhachHang">
+            <Description>Thông tin khách thuê HomeStay</Description>
+            <Columns>
+                <Column name="MaKH" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã khách hàng"/>
+                <Column name="HoTen" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Họ tên đầy đủ"/>
+                <Column name="CCCD" type="VARCHAR(20)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Số CCCD/Hộ chiếu"/>
+                <Column name="SDT" type="VARCHAR(15)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số điện thoại liên lạc"/>
+                <Column name="Email" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Địa chỉ email cá nhân"/>
+                <Column name="DiaChi" type="VARCHAR(200)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Địa chỉ thường trú"/>
+                <Column name="Avatar" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Đường dẫn ảnh đại diện"/>
+                <Column name="STKNhanCoc" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số tài khoản ngân hàng để nhận lại cọc khi trả phòng"/>
+                <Column name="MaTK" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã tài khoản liên kết"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaKH">99</Value>
+                    <Value column="HoTen">Nguyễn Văn A</Value>
+                    <Value column="CCCD">079199000123</Value>
+                    <Value column="Email">nguyenvana@gmail.com</Value>
+                    <Value column="SDT">0901234567</Value>
+                    <Value column="MaTK">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaKH">1</Value>
+                    <Value column="HoTen">khach1</Value>
+                    <Value column="CCCD">00000000001</Value>
+                    <Value column="Email">khach1@test.com</Value>
+                    <Value column="SDT">090000001</Value>
+                    <Value column="MaTK">5</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="Phong">
+            <Description>Thông tin chi tiết các phòng trong HomeStay</Description>
+            <Columns>
+                <Column name="MaPhong" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã số phòng"/>
+                <Column name="TenPhong" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tên/Số phòng hiển thị"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái phòng (1: Trống, 0: Đang thuê,...)"/>
+                <Column name="ChiNhanh" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Chi nhánh/Vị trí địa lý"/>
+                <Column name="TieuChiGioiTinh" type="VARCHAR(20)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Tiêu chí giới tính phòng (Nam, Nữ, Nam/Nữ)"/>
+                <Column name="HinhAnh" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Đường dẫn hình ảnh phòng"/>
+                <Column name="MaLoai" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Liên kết loại phòng"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaPhong">101</Value>
+                    <Value column="TenPhong">Studio Cao Cấp - T12</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="ChiNhanh">Quận 1, TP. HCM</Value>
+                    <Value column="TieuChiGioiTinh">Nam/Nữ</Value>
+                    <Value column="MaLoai">4</Value>
+                </Row>
+                <Row>
+                    <Value column="MaPhong">102</Value>
+                    <Value column="TenPhong">Căn Hộ Deluxe - B04</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="ChiNhanh">Quận 3, TP. HCM</Value>
+                    <Value column="TieuChiGioiTinh">Nam/Nữ</Value>
+                    <Value column="MaLoai">2</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="ChiTietDichVuPhong">
+            <Description>Bảng trung gian n-n giữa LoaiPhong và DichVuPhong</Description>
+            <Columns>
+                <Column name="MaLoai" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Liên kết loại phòng"/>
+                <Column name="MaDVP" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Liên kết dịch vụ phòng"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaLoai">2</Value>
+                    <Value column="MaDVP">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaLoai">2</Value>
+                    <Value column="MaDVP">2</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <!-- LEVEL 2: Chi tiết tài sản, lịch hẹn & đặt cọc -->
+        <Table name="Giuong">
+            <Description>Chi tiết các giường ngủ trong từng phòng (hỗ trợ mô hình KTX/Shared Room)</Description>
+            <Columns>
+                <Column name="MaGiuong" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã giường"/>
+                <Column name="TenGiuong" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Ký hiệu tên giường (Giường A, Giường B,...)"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái giường (1: Trống, 0: Đã có khách thuê)"/>
+                <Column name="MaPhong" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Liên kết phòng chứa giường"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaGiuong">1</Value>
+                    <Value column="TenGiuong">Giường 1</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="MaPhong">102</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="PhieuDangKyHen">
+            <Description>Phiếu hẹn xem phòng trực tiếp của khách hàng</Description>
+            <Columns>
+                <Column name="MaPhieu" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã phiếu hẹn"/>
+                <Column name="SoNguoi" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số lượng người xem phòng cùng"/>
+                <Column name="NgayHen" type="TIMESTAMP" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Ngày hẹn xem phòng"/>
+                <Column name="GioHen" type="TIME" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Giờ hẹn xem phòng"/>
+                <Column name="GhiChu" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Ghi chú thêm của khách"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái lịch hẹn (0: Chờ duyệt, 1: Đã duyệt, 2: Đã hủy)"/>
+                <Column name="MaKH" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Khách hàng đặt lịch hẹn"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaPhieu">1</Value>
+                    <Value column="SoNguoi">2</Value>
+                    <Value column="NgayHen">2026-07-15 09:30:00</Value>
+                    <Value column="GioHen">09:30:00</Value>
+                    <Value column="GhiChu">Xin xem kỹ phòng bếp và vệ sinh</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="MaKH">99</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="CT_LichHen">
+            <Description>Chi tiết danh sách các phòng khách hàng muốn hẹn xem trong một phiếu hẹn</Description>
+            <Columns>
+                <Column name="MaPhieu" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã phiếu hẹn xem"/>
+                <Column name="MaPhong" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã phòng quan tâm"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaPhieu">1</Value>
+                    <Value column="MaPhong">101</Value>
+                </Row>
+                <Row>
+                    <Value column="MaPhieu">1</Value>
+                    <Value column="MaPhong">102</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="PhieuDatCoc">
+            <Description>Lưu thông tin đặt cọc giữ chỗ phòng của khách hàng</Description>
+            <Columns>
+                <Column name="MaCoc" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã giao dịch đặt cọc"/>
+                <Column name="SoTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Số tiền đặt cọc giữ phòng"/>
+                <Column name="NgayCoc" type="DATE" isPrimaryKey="false" isForeignKey="false" isNullable="true" default="CURRENT_DATE" description="Ngày tiến hành đặt cọc"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái cọc (0: Chưa thanh toán, 1: Đã đặt cọc, 2: Đã hoàn cọc/hết hạn)"/>
+                <Column name="MaGiaoDich" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Mã giao dịch cổng thanh toán Paypal/VNPAY"/>
+                <Column name="PTThanhToan" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Phương thức thực hiện thanh toán"/>
+                <Column name="MaKH" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Khách hàng đặt cọc"/>
+                <Column name="MaPhong" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Phòng được đặt cọc giữ chỗ"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaCoc">1</Value>
+                    <Value column="SoTien">4000000.00</Value>
+                    <Value column="NgayCoc">2026-07-15</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="MaKH">1</Value>
+                    <Value column="MaPhong">102</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="ChiSoDienNuoc">
+            <Description>Ghi nhận chỉ số điện nước định kỳ hàng tháng của từng phòng</Description>
+            <Columns>
+                <Column name="MaCS" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã chỉ số điện nước"/>
+                <Column name="Thang" type="VARCHAR(7)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Tháng ghi nhận chỉ số (Định dạng YYYY-MM)"/>
+                <Column name="CSDienCu" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Chỉ số điện cũ đầu tháng"/>
+                <Column name="CSDienMoi" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Chỉ số điện mới cuối tháng"/>
+                <Column name="CSNuocCu" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Chỉ số nước cũ đầu tháng"/>
+                <Column name="CSNuocMoi" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Chỉ số nước mới cuối tháng"/>
+                <Column name="MaPhong" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã phòng ghi nhận chỉ số"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaCS">1</Value>
+                    <Value column="Thang">2026-07</Value>
+                    <Value column="CSDienCu">100</Value>
+                    <Value column="CSDienMoi">250</Value>
+                    <Value column="CSNuocCu">10</Value>
+                    <Value column="CSNuocMoi">25</Value>
+                    <Value column="MaPhong">1</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <!-- LEVEL 3: Hợp đồng & Các chi tiết ràng buộc theo hợp đồng -->
+        <Table name="HopDong">
+            <Description>Hợp đồng thuê phòng ký kết giữa khách hàng và HomeStay</Description>
+            <Columns>
+                <Column name="MaHD" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã hợp đồng thuê phòng"/>
+                <Column name="NgayKy" type="DATE" isPrimaryKey="false" isForeignKey="false" isNullable="true" default="CURRENT_DATE" description="Ngày ký kết hợp đồng"/>
+                <Column name="NgayHetHan" type="DATE" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Ngày hợp đồng hết hiệu lực"/>
+                <Column name="MaKHDaiDien" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Khách hàng đại diện ký tên"/>
+                <Column name="MaNV" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Nhân viên lập hợp đồng"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaHD">1001</Value>
+                    <Value column="NgayKy">2026-07-15</Value>
+                    <Value column="NgayHetHan">2026-12-31</Value>
+                    <Value column="MaKHDaiDien">1</Value>
+                    <Value column="MaNV">1</Value>
+                </Row>
+                <Row>
+                    <Value column="MaHD">9999</Value>
+                    <Value column="NgayKy">2026-07-15</Value>
+                    <Value column="NgayHetHan">2026-12-31</Value>
+                    <Value column="MaKHDaiDien">99</Value>
+                    <Value column="MaNV">1</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="ThanhVienThue">
+            <Description>Danh sách khách thuê cùng phòng/sử dụng chung hợp đồng</Description>
+            <Columns>
+                <Column name="MaHD" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã hợp đồng thuê"/>
+                <Column name="MaKH" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Khách thuê cùng phòng"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaHD">9999</Value>
+                    <Value column="MaKH">99</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="ChiTietGiuong">
+            <Description>Liên kết bàn giao các giường cụ thể trong hợp đồng thuê</Description>
+            <Columns>
+                <Column name="MaHD" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã hợp đồng"/>
+                <Column name="MaGiuong" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã giường được bàn giao"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaHD">1001</Value>
+                    <Value column="MaGiuong">1</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="ChiTietDichVu">
+            <Description>Danh sách dịch vụ ngoài đăng ký sử dụng trong hợp đồng</Description>
+            <Columns>
+                <Column name="MaHD" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã hợp đồng"/>
+                <Column name="MaDV" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã dịch vụ khác đăng ký"/>
+                <Column name="SoLuong" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số lượng đăng ký sử dụng"/>
+            </Columns>
+            <SampleData>
+                <!-- Trống -->
+            </SampleData>
+        </Table>
+
+        <Table name="HoaDonDinhKy">
+            <Description>Hóa đơn tiền phòng, phí quản lý và dịch vụ định kỳ hàng tháng</Description>
+            <Columns>
+                <Column name="MaHDDK" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã hóa đơn định kỳ"/>
+                <Column name="TienPhong" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Tiền thuê phòng tháng đó"/>
+                <Column name="TienDichVu" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Tiền sử dụng dịch vụ"/>
+                <Column name="PhiQuanLy" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Phí quản lý vận hành"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái hóa đơn (1: Chưa thanh toán, 2: Đã thanh toán,...)"/>
+                <Column name="HanThanhToan" type="DATE" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Hạn chót thanh toán hóa đơn"/>
+                <Column name="ThoiGianTT" type="TIMESTAMP" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Thời gian thực hiện thanh toán thực tế"/>
+                <Column name="MaGiaoDich" type="VARCHAR(100)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Mã giao dịch ngân hàng / Paypal"/>
+                <Column name="PTThanhToan" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Phương thức thanh toán"/>
+                <Column name="MaHD" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã hợp đồng thuê liên quan"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaHDDK">1</Value>
+                    <Value column="TienPhong">3500000.00</Value>
+                    <Value column="TienDichVu">1250000.00</Value>
+                    <Value column="PhiQuanLy">200000.00</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="HanThanhToan">2023-11-20</Value>
+                    <Value column="MaHD">9999</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="LichSuGiaDichVu">
+            <Description>Lịch sử giá tiền dịch vụ tại thời điểm lập hóa đơn định kỳ</Description>
+            <Columns>
+                <Column name="MaHDDK" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã hóa đơn định kỳ"/>
+                <Column name="MaDV" type="INT" isPrimaryKey="true" isForeignKey="true" isNullable="false" description="Mã dịch vụ khác"/>
+                <Column name="GiaTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Đơn giá dịch vụ tại thời điểm xuất hóa đơn"/>
+            </Columns>
+            <SampleData>
+                <!-- Trống -->
+            </SampleData>
+        </Table>
+
+        <!-- LEVEL 4: Luồng trả phòng, đối soát & phát sinh điện nước -->
+        <Table name="YeuCauTraPhong">
+            <Description>Yêu cầu chấm dứt hợp đồng và trả phòng của khách thuê</Description>
+            <Columns>
+                <Column name="MaYC" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã yêu cầu trả phòng"/>
+                <Column name="NgayDuKien" type="DATE" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Ngày dự kiến dọn đi"/>
+                <Column name="STKNhanCoc" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số tài khoản nhận hoàn cọc"/>
+                <Column name="TrangThai" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Trạng thái yêu cầu (0: Đang xử lý, 1: Đã chấp nhận, 2: Đã hoàn tất)"/>
+                <Column name="LyDo" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Lý do trả phòng"/>
+                <Column name="MaHD" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã hợp đồng cần chấm dứt"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaYC">1</Value>
+                    <Value column="NgayDuKien">2024-01-01</Value>
+                    <Value column="TrangThai">1</Value>
+                    <Value column="MaHD">1001</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="PhieuKiemTraPhong">
+            <Description>Biên bản kiểm tra tình trạng phòng khi trả phòng để tính khấu trừ hư hỏng</Description>
+            <Columns>
+                <Column name="MaPKT" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã phiếu kiểm tra phòng"/>
+                <Column name="TinhTrang" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Đánh giá tình trạng chung phòng"/>
+                <Column name="ChiTietHuHong" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Mô tả chi tiết trang thiết bị hỏng hóc"/>
+                <Column name="PhiHuHong" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Phí phạt đền bù hư hỏng tài sản"/>
+                <Column name="PhiVeSinh" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Phí dọn dẹp vệ sinh trả phòng"/>
+                <Column name="ThuHoiKhoa" type="BOOLEAN" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Đã thu hồi khóa phòng chưa"/>
+                <Column name="KyBienBan" type="BOOLEAN" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Khách hàng đã ký xác nhận biên bản chưa"/>
+                <Column name="MaYC" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Liên kết yêu cầu trả phòng"/>
+                <Column name="MaNV" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Nhân viên thực hiện kiểm tra"/>
+            </Columns>
+            <SampleData>
+                <!-- Trống -->
+            </SampleData>
+        </Table>
+
+        <Table name="BangDoiSoat">
+            <Description>Bảng đối soát tài chính khi trả phòng (Hoàn cọc - Phạt khấu trừ = Thực nhận)</Description>
+            <Columns>
+                <Column name="MaBDS" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã bảng đối soát"/>
+                <Column name="TienCoc" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số tiền cọc gốc ban đầu"/>
+                <Column name="KhauTru" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Tổng số tiền khấu trừ (hư hỏng, vệ sinh, nợ điện nước...)"/>
+                <Column name="ThucNhanChi" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Số tiền thực tế chi trả hoàn cọc lại cho khách"/>
+                <Column name="MaPKT" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Liên kết biên bản kiểm tra phòng tương ứng"/>
+                <Column name="MaNV" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Nhân viên đối soát lập bảng"/>
+            </Columns>
+            <SampleData>
+                <!-- Trống -->
+            </SampleData>
+        </Table>
+
+        <Table name="HoaDonDienNuoc">
+            <Description>Hóa đơn thu tiền điện nước dựa theo chỉ số định kỳ</Description>
+            <Columns>
+                <Column name="MaHDDN" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã hóa đơn điện nước"/>
+                <Column name="MaPhong" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã phòng thanh toán"/>
+                <Column name="Thang" type="VARCHAR(7)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tháng xuất hóa đơn (YYYY-MM)"/>
+                <Column name="CSDienCu" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Chỉ số điện cũ"/>
+                <Column name="CSDienMoi" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Chỉ số điện mới"/>
+                <Column name="CSNuocCu" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Chỉ số nước cũ"/>
+                <Column name="CSNuocMoi" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Chỉ số nước mới"/>
+                <Column name="TienDien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tiền điện tính toán"/>
+                <Column name="TienNuoc" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tiền nước tính toán"/>
+                <Column name="TongTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tổng cộng tiền điện nước"/>
+                <Column name="TrangThai" type="VARCHAR(20)" isPrimaryKey="false" isForeignKey="false" isNullable="false" default="ChuaThanhToan" description="Trạng thái (ChuaThanhToan, DaThanhToan)"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaHDDN">1</Value>
+                    <Value column="MaPhong">1</Value>
+                    <Value column="Thang">2026-07</Value>
+                    <Value column="CSDienCu">100</Value>
+                    <Value column="CSDienMoi">250</Value>
+                    <Value column="CSNuocCu">10</Value>
+                    <Value column="CSNuocMoi">25</Value>
+                    <Value column="TienDien">375000.00</Value>
+                    <Value column="TienNuoc">150000.00</Value>
+                    <Value column="TongTien">525000.00</Value>
+                    <Value column="TrangThai">ChuaThanhToan</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="HoaDonPhiDinhKy">
+            <Description>Hóa đơn phí định kỳ phát sinh theo hợp đồng thuê</Description>
+            <Columns>
+                <Column name="MaPDK" type="SERIAL" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã hóa đơn phí định kỳ"/>
+                <Column name="MaHD" type="INT" isPrimaryKey="false" isForeignKey="true" isNullable="false" description="Mã hợp đồng thuê liên kết"/>
+                <Column name="Thang" type="VARCHAR(7)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tháng áp dụng phí (YYYY-MM)"/>
+                <Column name="TienPhong" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tiền phòng tháng đó"/>
+                <Column name="TienDichVu" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tiền dịch vụ kèm theo tháng đó"/>
+                <Column name="TongTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tổng tiền hóa đơn"/>
+                <Column name="TrangThai" type="VARCHAR(20)" isPrimaryKey="false" isForeignKey="false" isNullable="false" default="ChuaThanhToan" description="Trạng thái (ChuaThanhToan, DaThanhToan)"/>
+            </Columns>
+            <SampleData>
+                <Row>
+                    <Value column="MaPDK">1</Value>
+                    <Value column="MaHD">1001</Value>
+                    <Value column="Thang">2026-07</Value>
+                    <Value column="TienPhong">2000000.00</Value>
+                    <Value column="TienDichVu">200000.00</Value>
+                    <Value column="TongTien">2200000.00</Value>
+                    <Value column="TrangThai">ChuaThanhToan</Value>
+                </Row>
+            </SampleData>
+        </Table>
+
+        <Table name="DonHang">
+            <Description>Thông tin giao dịch thanh toán đơn hàng/hóa đơn tổng hợp của khách thuê</Description>
+            <Columns>
+                <Column name="MaDH" type="VARCHAR(100)" isPrimaryKey="true" isForeignKey="false" isNullable="false" description="Mã đơn hàng/Giao dịch"/>
+                <Column name="LoaiHoaDon" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Loại hóa đơn liên quan (DienNuoc, PhiDinhKy, DatCoc,...)"/>
+                <Column name="PhuongThuc" type="VARCHAR(50)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Phương thức thực hiện thanh toán"/>
+                <Column name="TongTien" type="DECIMAL(10,2)" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Tổng giá trị đơn hàng thanh toán"/>
+                <Column name="MaHoaDon" type="INT" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="ID hóa đơn cụ thể cần thanh toán"/>
+                <Column name="TrangThai" type="VARCHAR(20)" isPrimaryKey="false" isForeignKey="false" isNullable="false" default="DangCho" description="Trạng thái giao dịch (DangCho, ThanhToanThanhCong, DaHuy)"/>
+                <Column name="ThoiGianHetHan" type="TIMESTAMP" isPrimaryKey="false" isForeignKey="false" isNullable="false" description="Thời hạn chót hiệu lực của đơn hàng để thanh toán"/>
+                <Column name="IdempotencyKey" type="VARCHAR(255)" isPrimaryKey="false" isForeignKey="false" isNullable="true" description="Khóa chống trùng lắp giao dịch"/>
+                <Column name="NgayTao" type="TIMESTAMP" isPrimaryKey="false" isForeignKey="false" isNullable="true" default="CURRENT_TIMESTAMP" description="Thời điểm khởi tạo đơn hàng"/>
+            </Columns>
+            <SampleData>
+                <!-- Trống -->
+            </SampleData>
+        </Table>
+    </Tables>
+
+    <!-- Mối quan hệ giữa các bảng (Relationships) -->
+    <Relationships>
+        <Relationship name="FK_NhanVien_TaiKhoan" parentTable="TaiKhoan" parentColumn="MaTK" childTable="NhanVien" childColumn="MaTK" type="OneToOne"/>
+        <Relationship name="FK_KhachHang_TaiKhoan" parentTable="TaiKhoan" parentColumn="MaTK" childTable="KhachHang" childColumn="MaTK" type="OneToOne"/>
+        
+        <Relationship name="FK_Phong_LoaiPhong" parentTable="LoaiPhong" parentColumn="MaLoai" childTable="Phong" childColumn="MaLoai" type="ManyToOne"/>
+        
+        <Relationship name="FK_CTDVP_LoaiPhong" parentTable="LoaiPhong" parentColumn="MaLoai" childTable="ChiTietDichVuPhong" childColumn="MaLoai" type="ManyToMany"/>
+        <Relationship name="FK_CTDVP_DichVuPhong" parentTable="DichVuPhong" parentColumn="MaDVP" childTable="ChiTietDichVuPhong" childColumn="MaDVP" type="ManyToMany"/>
+        
+        <Relationship name="FK_Giuong_Phong" parentTable="Phong" parentColumn="MaPhong" childTable="Giuong" childColumn="MaPhong" type="ManyToOne"/>
+        
+        <Relationship name="FK_PhieuDangKyHen_KhachHang" parentTable="KhachHang" parentColumn="MaKH" childTable="PhieuDangKyHen" childColumn="MaKH" type="ManyToOne"/>
+        
+        <Relationship name="FK_CTLichHen_PhieuDangKyHen" parentTable="PhieuDangKyHen" parentColumn="MaPhieu" childTable="CT_LichHen" childColumn="MaPhieu" type="ManyToMany"/>
+        <Relationship name="FK_CTLichHen_Phong" parentTable="Phong" parentColumn="MaPhong" childTable="CT_LichHen" childColumn="MaPhong" type="ManyToMany"/>
+        
+        <Relationship name="FK_PhieuDatCoc_KhachHang" parentTable="KhachHang" parentColumn="MaKH" childTable="PhieuDatCoc" childColumn="MaKH" type="ManyToOne"/>
+        <Relationship name="FK_PhieuDatCoc_Phong" parentTable="Phong" parentColumn="MaPhong" childTable="PhieuDatCoc" childColumn="MaPhong" type="ManyToOne"/>
+        
+        <Relationship name="FK_ChiSoDienNuoc_Phong" parentTable="Phong" parentColumn="MaPhong" childTable="ChiSoDienNuoc" childColumn="MaPhong" type="ManyToOne"/>
+        
+        <Relationship name="FK_HopDong_KhachHang" parentTable="KhachHang" parentColumn="MaKH" childTable="HopDong" childColumn="MaKHDaiDien" type="ManyToOne"/>
+        <Relationship name="FK_HopDong_NhanVien" parentTable="NhanVien" parentColumn="MaNV" childTable="HopDong" childColumn="MaNV" type="ManyToOne"/>
+        
+        <Relationship name="FK_ThanhVienThue_HopDong" parentTable="HopDong" parentColumn="MaHD" childTable="ThanhVienThue" childColumn="MaHD" type="ManyToMany"/>
+        <Relationship name="FK_ThanhVienThue_KhachHang" parentTable="KhachHang" parentColumn="MaKH" childTable="ThanhVienThue" childColumn="MaKH" type="ManyToMany"/>
+        
+        <Relationship name="FK_ChiTietGiuong_HopDong" parentTable="HopDong" parentColumn="MaHD" childTable="ChiTietGiuong" childColumn="MaHD" type="ManyToMany"/>
+        <Relationship name="FK_ChiTietGiuong_Giuong" parentTable="Giuong" parentColumn="MaGiuong" childTable="ChiTietGiuong" childColumn="MaGiuong" type="ManyToMany"/>
+        
+        <Relationship name="FK_ChiTietDichVu_HopDong" parentTable="HopDong" parentColumn="MaHD" childTable="ChiTietDichVu" childColumn="MaHD" type="ManyToMany"/>
+        <Relationship name="FK_ChiTietDichVu_DichVuKhac" parentTable="DichVuKhac" parentColumn="MaDV" childTable="ChiTietDichVu" childColumn="MaDV" type="ManyToMany"/>
+        
+        <Relationship name="FK_HoaDonDinhKy_HopDong" parentTable="HopDong" parentColumn="MaHD" childTable="HoaDonDinhKy" childColumn="MaHD" type="ManyToOne"/>
+        
+        <Relationship name="FK_LichSuGiaDichVu_HoaDonDinhKy" parentTable="HoaDonDinhKy" parentColumn="MaHDDK" childTable="LichSuGiaDichVu" childColumn="MaHDDK" type="ManyToMany"/>
+        <Relationship name="FK_LichSuGiaDichVu_DichVuKhac" parentTable="DichVuKhac" parentColumn="MaDV" childTable="LichSuGiaDichVu" childColumn="MaDV" type="ManyToMany"/>
+        
+        <Relationship name="FK_YeuCauTraPhong_HopDong" parentTable="HopDong" parentColumn="MaHD" childTable="YeuCauTraPhong" childColumn="MaHD" type="ManyToOne"/>
+        
+        <Relationship name="FK_PhieuKiemTraPhong_YeuCauTraPhong" parentTable="YeuCauTraPhong" parentColumn="MaYC" childTable="PhieuKiemTraPhong" childColumn="MaYC" type="OneToOne"/>
+        <Relationship name="FK_PhieuKiemTraPhong_NhanVien" parentTable="NhanVien" parentColumn="MaNV" childTable="PhieuKiemTraPhong" childColumn="MaNV" type="ManyToOne"/>
+        
+        <Relationship name="FK_BangDoiSoat_PhieuKiemTraPhong" parentTable="PhieuKiemTraPhong" parentColumn="MaPKT" childTable="BangDoiSoat" childColumn="MaPKT" type="OneToOne"/>
+        <Relationship name="FK_BangDoiSoat_NhanVien" parentTable="NhanVien" parentColumn="MaNV" childTable="BangDoiSoat" childColumn="MaNV" type="ManyToOne"/>
+        
+        <Relationship name="FK_HoaDonDienNuoc_Phong" parentTable="Phong" parentColumn="MaPhong" childTable="HoaDonDienNuoc" childColumn="MaPhong" type="ManyToOne"/>
+        
+        <Relationship name="FK_HoaDonPhiDinhKy_HopDong" parentTable="HopDong" parentColumn="MaHD" childTable="HoaDonPhiDinhKy" childColumn="MaHD" type="ManyToOne"/>
+    </Relationships>
+</Database>

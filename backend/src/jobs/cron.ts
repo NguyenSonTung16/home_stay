@@ -14,10 +14,15 @@ export function startCronJobs() {
       
       const res = await db.query(`
         UPDATE PhieuDatCoc 
-        SET TrangThai = 4 
-        WHERE (TrangThai = 1 AND NgayCoc < NOW() - INTERVAL '12 hours')
-           OR (TrangThai = 0 AND NgayCoc < NOW() - INTERVAL '48 hours')
-        RETURNING MaCoc, SoGiuong, MaPhong
+        SET TrangThaiMoi = 'DaHuy' 
+        WHERE MaCoc IN (
+          SELECT pdc.MaCoc 
+          FROM PhieuDatCoc pdc
+          LEFT JOIN ChiTietXuLyDatCoc ctdc ON pdc.MaCoc = ctdc.MaCoc
+          WHERE (pdc.TrangThaiMoi = 'ChoThanhToan' AND ctdc.ThoiGianHetHan < NOW())
+             OR (pdc.TrangThaiMoi = 'ChoDuyet' AND pdc.NgayCoc < CURRENT_DATE - INTERVAL '2 days')
+        )
+        RETURNING MaCoc, MaPhong
       `);
 
       if (res.rowCount && res.rowCount > 0) {

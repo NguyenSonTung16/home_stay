@@ -112,20 +112,32 @@ CREATE TABLE CT_LichHen (
 CREATE TABLE PhieuDatCoc (
     MaCoc SERIAL PRIMARY KEY,
     SoTien DECIMAL(10,2) NOT NULL,
-    NgayCoc TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    TrangThai INT NOT NULL,
+    NgayCoc DATE DEFAULT CURRENT_DATE,
+    TrangThaiMoi VARCHAR(30) NOT NULL DEFAULT 'ChoDuyet',
     MaGiaoDich VARCHAR(100),
     PTThanhToan VARCHAR(50),
-    SoGiuong INT DEFAULT 1,
-    GioiTinh VARCHAR(10),
-    SoNguoiO INT DEFAULT 1,
-    NgayDuKienVao DATE,
-    MinhChung VARCHAR(255),
     MaKH INT NOT NULL,
     MaPhong INT NOT NULL,
     FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH),
     FOREIGN KEY (MaPhong) REFERENCES Phong(MaPhong)
 );
+
+-- Bảng chi tiết xử lý đặt cọc (1-1 với PhieuDatCoc)
+-- Theo pattern: YeuCauTraPhong <-> PhieuKiemTraPhong
+CREATE TABLE ChiTietXuLyDatCoc (
+    MaCoc           INT NOT NULL,
+    MaGiuong        INT,
+    SoGiuongThue    INT DEFAULT 1,
+    ThoiGianHetHan  TIMESTAMP,
+    MinhChung       VARCHAR(500),
+    NguoiXacNhan    INT,
+    ThoiGianXacNhan TIMESTAMP,
+    PRIMARY KEY (MaCoc),
+    FOREIGN KEY (MaCoc)         REFERENCES PhieuDatCoc(MaCoc) ON DELETE CASCADE,
+    FOREIGN KEY (MaGiuong)      REFERENCES Giuong(MaGiuong),
+    FOREIGN KEY (NguoiXacNhan)  REFERENCES NhanVien(MaNV)
+);
+
 
 CREATE TABLE ChiSoDienNuoc (
     MaCS SERIAL PRIMARY KEY,
