@@ -5,6 +5,7 @@ import routes from './src/routes';
 import { startCronJobs } from './src/jobs/cron';
 import { DonHangService } from './src/services/DonHangService';
 import { PhieuDatCocService } from './src/services/PhieuDatCocService';
+import { HoaDonPhiDinhKyService } from './src/services/HoaDonPhiDinhKyService';
 
 const app = express();
 startCronJobs();
@@ -30,4 +31,5 @@ app.listen(PORT, () => {
     // Khởi động cron job đối soát đơn hàng
     DonHangService.startCronJob();
     PhieuDatCocService.startCronJob();
+    HoaDonPhiDinhKyService.startCronJob();
 });

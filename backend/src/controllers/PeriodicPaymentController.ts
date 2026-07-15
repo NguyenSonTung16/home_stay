@@ -201,4 +201,13 @@ export class PeriodicPaymentController {
       return res.status(500).json({ success: false, message: error.message });
     }
   };
+
+  public triggerHoaDonCron = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const result = await HoaDonPhiDinhKyService.runAutoGenerateInvoices();
+      res.status(200).json({ success: true, message: 'Chạy cron job thành công', data: result });
+    } catch (error: any) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  };
 }

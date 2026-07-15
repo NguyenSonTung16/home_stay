@@ -54,9 +54,22 @@ export class HopDongRepository {
   }
   async layHopDongActiveTheoMaTK(maTK: number): Promise<any> {
     const res = await db.query(`
-      SELECT h.* 
+      SELECT 
+        h.*,
+        g.MaPhong,
+        ph.TenPhong,
+        lp.GiaTien AS GiaThue,
+        pdc.SoGiuong,
+        pdc.SoTien AS TienCoc,
+        h.NgayKy AS NgayBatDau,
+        h.NgayHetHan AS NgayKetThuc
       FROM HopDong h
       JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH
+      JOIN ChiTietGiuong ctg ON h.MaHD = ctg.MaHD
+      JOIN Giuong g ON ctg.MaGiuong = g.MaGiuong
+      JOIN Phong ph ON g.MaPhong = ph.MaPhong
+      JOIN LoaiPhong lp ON ph.MaLoai = lp.MaLoai
+      LEFT JOIN PhieuDatCoc pdc ON pdc.MaKH = k.MaKH AND pdc.MaPhong = ph.MaPhong
       WHERE k.MaTK = $1 AND h.NgayHetHan >= CURRENT_DATE
       ORDER BY h.MaHD DESC LIMIT 1
     `, [maTK]);
@@ -65,13 +78,47 @@ export class HopDongRepository {
 
   async layHopDongGanNhatTheoMaTK(maTK: number): Promise<any> {
     const res = await db.query(`
-      SELECT h.* 
+      SELECT 
+        h.*,
+        g.MaPhong,
+        ph.TenPhong,
+        lp.GiaTien AS GiaThue,
+        pdc.SoGiuong,
+        pdc.SoTien AS TienCoc,
+        h.NgayKy AS NgayBatDau,
+        h.NgayHetHan AS NgayKetThuc
       FROM HopDong h
       JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH
+      JOIN ChiTietGiuong ctg ON h.MaHD = ctg.MaHD
+      JOIN Giuong g ON ctg.MaGiuong = g.MaGiuong
+      JOIN Phong ph ON g.MaPhong = ph.MaPhong
+      JOIN LoaiPhong lp ON ph.MaLoai = lp.MaLoai
+      LEFT JOIN PhieuDatCoc pdc ON pdc.MaKH = k.MaKH AND pdc.MaPhong = ph.MaPhong
       WHERE k.MaTK = $1
       ORDER BY h.MaHD DESC LIMIT 1
     `, [maTK]);
     return res.rows.length ? res.rows[0] : null;
+  }
 
+  async taoHopDongTuDong(client: any, phieu: any): Promise<number> {
+    // 1. Tạo Hợp Đồng (NgayKy = NOW, NgayHetHan = NOW + 6 months, NhanVien = 1)
+    const resHD = await client.query(`
+      INSERT INTO HopDong (NgayKy, NgayHetHan, MaKHDaiDien, MaNV) 
+      VALUES (CURRENT_DATE, CURRENT_DATE + INTERVAL '6 months', $1, 1) 
+      RETURNING MaHD
+    `, [phieu.makh]);
+    const maHD = resHD.rows[0].mahd;
+
+    // 2. Thêm Thành Viên Thuê
+    await client.query(`
+      INSERT INTO ThanhVienThue (MaHD, MaKH) VALUES ($1, $2)
+    `, [maHD, phieu.makh]);
+
+    // 3. Thêm Chi Tiết Giường
+    await client.query(`
+      INSERT INTO ChiTietGiuong (MaHD, MaGiuong) VALUES ($1, $2)
+    `, [maHD, phieu.magiuong]);
+
+    return maHD;
   }
 }

@@ -493,13 +493,13 @@ export default function DoiSoat() {
                 </tr>
               </thead>
               <tbody className="text-[14px] font-body text-[#191C1E]">
-                {list.map(item => {
+                {list.map((item, index) => {
                   const badge = getBadgeStyle(item.trangthai);
                   const displayId = activeTab === 'dat-coc' ? item.macoc : activeTab === 'hoa-don-dinh-ky' ? item.mapdk : item.mahddn;
                   const paymentDate = activeTab === 'dat-coc' ? item.thoigiantao : item.ngaytao;
 
                   return (
-                    <tr key={displayId} className="border-b border-[#E0E3E5] hover:bg-slate-50 transition-colors">
+                    <tr key={displayId || `fallback-${index}`} className="border-b border-[#E0E3E5] hover:bg-slate-50 transition-colors">
                       {/* Mã GD */}
                       <td className="px-5 py-4 font-semibold text-primary">
                         {item.magiaodich || item.madh || `HD#${displayId}`}

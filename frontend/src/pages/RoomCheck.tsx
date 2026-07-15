@@ -303,11 +303,7 @@ const RoomCheck: React.FC = () => {
                 <div>
                   <p className="font-label text-secondary">Khách thuê</p>
                   <p className="font-h2 text-h2 font-bold text-primary">
-                    {activeRecord === 'HD-9999'
-                      ? 'Nguyễn Văn A'
-                      : activeRecord === 'HD-8821'
-                      ? 'Trần Thị B'
-                      : 'Lê Văn C'}
+                    {activeRecordData?.name || 'Chưa rõ'}
                   </p>
                 </div>
               </div>
@@ -320,11 +316,7 @@ const RoomCheck: React.FC = () => {
                 <div>
                   <p className="font-label text-secondary">Phòng</p>
                   <p className="font-h2 text-h2 font-bold text-primary">
-                    {activeRecord === 'HD-9999'
-                      ? 'P.102'
-                      : activeRecord === 'HD-8821'
-                      ? 'P.205'
-                      : 'P.401'}
+                    {activeRecordData?.room || 'Chưa rõ'}
                   </p>
                 </div>
               </div>
@@ -407,11 +399,7 @@ const RoomCheck: React.FC = () => {
             <div>
               <p className="font-label text-secondary">Khách thuê</p>
               <p className="font-h2 text-h2">
-                {activeRecord === 'HD-9999'
-                  ? 'Nguyễn Văn A'
-                  : activeRecord === 'HD-8821'
-                  ? 'Trần Thị B'
-                  : 'Lê Văn C'}
+                {activeRecordData?.name || 'Chưa rõ'}
               </p>
             </div>
           </div>
@@ -424,11 +412,7 @@ const RoomCheck: React.FC = () => {
             <div>
               <p className="font-label text-secondary">Phòng</p>
               <p className="font-h2 text-h2">
-                {activeRecord === 'HD-9999'
-                  ? 'P.102'
-                  : activeRecord === 'HD-8821'
-                  ? 'P.205'
-                  : 'P.401'}
+                {activeRecordData?.room || 'Chưa rõ'}
               </p>
             </div>
           </div>

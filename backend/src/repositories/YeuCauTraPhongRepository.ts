@@ -3,12 +3,15 @@ import { db } from '../config/db';
 export class YeuCauTraPhongRepository {
   async docDanhSachYeuCau(): Promise<any> {
     const res = await db.query(`
-      SELECT y.*, h.MaHD, k.HoTen, p.TenPhong
+      SELECT y.*, h.MaHD, k.HoTen, 
+             (SELECT p.TenPhong 
+              FROM ChiTietGiuong cg 
+              JOIN Giuong g ON cg.MaGiuong = g.MaGiuong 
+              JOIN Phong p ON p.MaPhong = g.MaPhong 
+              WHERE cg.MaHD = h.MaHD LIMIT 1) as TenPhong
       FROM YeuCauTraPhong y 
       JOIN HopDong h ON y.MaHD = h.MaHD 
       JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH 
-      JOIN PhieuDatCoc c ON c.MaKH = k.MaKH
-      JOIN Phong p ON p.MaPhong = c.MaPhong
       ORDER BY y.NgayDuKien ASC
     `);
     return res.rows;

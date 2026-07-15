@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { HopDongService } from '../services/HopDongService';
 import { YeuCauTraPhongRepository } from '../repositories/YeuCauTraPhongRepository';
+import { db } from '../config/db';
 import jwt from 'jsonwebtoken';
 
 export class CheckoutController {
@@ -27,6 +28,15 @@ export class CheckoutController {
       if (!hopDong) {
         res.status(404).json({ success: false, message: 'Bạn không có hợp đồng nào đang có hiệu lực để trả phòng.' });
         return;
+      }
+
+      // Check first invoice
+      const dbRes = await db.query(`SELECT TrangThai FROM HoaDonPhiDinhKy WHERE MaHD = $1 ORDER BY MaPDK ASC LIMIT 1`, [hopDong.mahd]);
+      const isFirstPeriodPaid = dbRes.rows.length > 0 && dbRes.rows[0].trangthai === 'DaThanhToan';
+      
+      if (!isFirstPeriodPaid) {
+          res.status(400).json({ success: false, message: 'Bạn cần thanh toán hóa đơn kỳ đầu tiên trước khi yêu cầu trả phòng.' });
+          return;
       }
 
       // 2. Chèn flag phạt vào lý do nếu cần
@@ -63,14 +73,22 @@ export class CheckoutController {
       const hopDong = await this.hopDongService.layHopDongGanNhatTheoMaTK(maTK);
 
       if (!hopDong) {
-        res.status(200).json({ success: true, data: null });
+        res.status(200).json({ success: true, data: { status: 'NO_CONTRACT' } });
         return;
       }
+
+      // Check first invoice
+      const dbRes = await db.query(`SELECT TrangThai FROM HoaDonPhiDinhKy WHERE MaHD = $1 ORDER BY MaPDK ASC LIMIT 1`, [hopDong.mahd]);
+      const isFirstPeriodPaid = dbRes.rows.length > 0 && dbRes.rows[0].trangthai === 'DaThanhToan';
 
       // Lấy yêu cầu trả phòng của hợp đồng này
       const yeuCau = await this.yeuCauRepo.docYeuCauTheoHD(hopDong.mahd);
       if (!yeuCau) {
-        res.status(200).json({ success: true, data: null });
+        if (!isFirstPeriodPaid) {
+             res.status(200).json({ success: true, data: { status: 'UNPAID_FIRST_PERIOD', hopDong } });
+             return;
+        }
+        res.status(200).json({ success: true, data: { status: 'CAN_CHECKOUT', hopDong } });
         return;
       }
 
@@ -89,10 +107,11 @@ export class CheckoutController {
       res.status(200).json({ 
         success: true, 
         data: {
+          status: 'HAS_CHECKOUT_REQUEST',
           yeuCau,
           doiSoat,
           hopDong
-        } 
+        }
       });
     } catch (error) {
       console.error('Error getting checkout status:', error);

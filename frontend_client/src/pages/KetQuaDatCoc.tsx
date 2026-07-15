@@ -207,7 +207,7 @@ export const KetQuaDatCoc: React.FC = () => {
                 <h2 className={`text-xl font-bold ${statusConfig.titleColor} mb-2 leading-tight`}>
                   {statusConfig.title}
                 </h2>
-                <p className="text-xs text-[#54647A] leading-relaxed max-w-xs">
+                <p className="text-xs text-[#54647A] leading-relaxed w-full px-4">
                   {statusConfig.desc}
                 </p>
                 {statusConfig.stepBox}

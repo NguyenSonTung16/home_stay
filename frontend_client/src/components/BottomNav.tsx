@@ -14,7 +14,7 @@ const BottomNav: React.FC = () => {
     ];
 
     return (
-        <nav className="fixed bottom-0 left-0 right-0 h-[64px] bg-white border-t border-[#E0E3E5] flex justify-between items-center px-1 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] pb-safe">
+        <nav className="fixed bottom-0 left-0 right-0 h-[64px] bg-white border-t border-[#E0E3E5] flex justify-between items-center px-1 z-[9999] shadow-[0_-2px_10px_rgba(0,0,0,0.05)] pb-safe">
             {tabs.map((tab) => {
                 const active = location.pathname === tab.path;
                 return (

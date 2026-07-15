@@ -1,7 +1,8 @@
 {
   "scripts": {
     "dev": "tsx watch app.ts",
-    "start": "tsx app.ts"
+    "start": "tsx app.ts",
+    "db:reset": "node reset_db.js"
   },
   "dependencies": {
     "@paypal/checkout-server-sdk": "^1.0.3",

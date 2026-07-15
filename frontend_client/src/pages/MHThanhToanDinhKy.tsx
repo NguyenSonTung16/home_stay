@@ -38,6 +38,7 @@ export const MHThanhToanDinhKy: React.FC = () => {
       const infoRes = await fetch(`${import.meta.env.VITE_API_URL || ''}/api/hoa-don/active-info`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (infoRes.status === 401) { localStorage.removeItem('currentUser'); localStorage.removeItem('token'); setErrorMsg('Phiên dang nh?p dã h?t h?n. Vui lòng dang nh?p l?i.'); setLoading(false); return; }
       const infoData = await infoRes.json();
       
       if (infoData.success && infoData.data) {

@@ -3,6 +3,8 @@ import { GiuongRepository } from '../repositories/GiuongRepository';
 import { KhachHangRepository } from '../repositories/KhachHangRepository';
 import { PaypalService } from './PaypalService';
 import { EmailService } from './EmailService';
+import { HopDongRepository } from '../repositories/HopDongRepository';
+import { HoaDonPhiDinhKyRepository } from '../repositories/HoaDonPhiDinhKyRepository';
 import { db } from '../config/db';
 import cron from 'node-cron';
 
@@ -10,6 +12,8 @@ export class PhieuDatCocService {
   private repo = new PhieuDatCocRepository();
   private giuongRepo = new GiuongRepository();
   private khRepo = new KhachHangRepository();
+  private hopDongRepo = new HopDongRepository();
+  private hoaDonPDKRepo = new HoaDonPhiDinhKyRepository();
   private paypalService = new PaypalService();
 
   // ─────────────────────────────────────────────────────────────────────────
@@ -184,6 +188,11 @@ export class PhieuDatCocService {
       // Cập nhật Giuong → DaCoc (ONLY here)
       await this.giuongRepo.capNhatTrangThaiStr(client, phieu.magiuong, 'DaCoc');
 
+      // Tự động sinh Hợp đồng & Hóa đơn kỳ 1
+      const maHD = await this.hopDongRepo.taoHopDongTuDong(client, lockedPhieu);
+      const tienPhong = Number(lockedPhieu.tienthueperthang) * Number(lockedPhieu.sogiuongthue);
+      await this.hoaDonPDKRepo.taoHoaDonKyDau(client, maHD, tienPhong);
+
       await client.query('COMMIT');
 
       // Gửi email sau commit (async, không block)
@@ -260,6 +269,12 @@ export class PhieuDatCocService {
         // Duyệt: → DaThanhToan + Giuong → DaCoc
         await this.repo.capNhatTrangThai(client, maPDC, 'DaThanhToan', { nguoiXacNhan: maNhanVien });
         await this.giuongRepo.capNhatTrangThaiStr(client, phieu.magiuong, 'DaCoc');
+
+        // Tự động sinh Hợp đồng & Hóa đơn kỳ 1
+        const maHD = await this.hopDongRepo.taoHopDongTuDong(client, phieu);
+        const tienPhong = Number(phieu.tienthueperthang) * Number(phieu.sogiuongthue);
+        await this.hoaDonPDKRepo.taoHoaDonKyDau(client, maHD, tienPhong);
+
         await client.query('COMMIT');
 
         // Gửi email

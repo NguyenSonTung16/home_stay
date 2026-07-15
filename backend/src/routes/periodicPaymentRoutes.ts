@@ -19,4 +19,7 @@ router.post('/don-hang', controller.createDonHang);
 // GET /api/don-hang/:maDH/status
 router.get('/don-hang/:maDH/status', controller.getDonHangStatus);
 
+// POST /api/cron/trigger-hoa-don
+router.post('/cron/trigger-hoa-don', controller.triggerHoaDonCron);
+
 export default router;
