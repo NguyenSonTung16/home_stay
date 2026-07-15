@@ -120,7 +120,7 @@ const Roomdetail = () => {
  const roomPrice = room?.price || room?.giatien || 500000;
  const roomBranch = room?.branch || room?.chinhanh || 'Tòa A • TP. HCM';
  const roomImage = room?.image || room?.hinhanh || "https://lh3.googleusercontent.com/aida-public/AB6AXuA56wTxeaDwoV4hphGCAobuBPBGMz15TV8sqrs23Iootl2c2REQK3gh2Gyxqbt7NcNQ_qle03YUR-Gn5BhuzjJRM2hupvo8LL6G1RghfLVB2Y_wHJ8818rSHBnELZOC-B0Ero4BL41IXqElpnFUya7HSUap1fl4H8voJyx2eDycgBow7ZOSq3HlE9leUHMOEUGY2MRa0zB-DfBz5LoSzFMPDjEiJGJosgTUnhlKevB8xIMBp0jpuTyV9l8Ae6-XN21x88-3acBFkZmf";
-
+ const isWishlisted = danhSachQuanTam.some((p: any) => (p.maphong || p.MaPhong) == id || (p.maphong || p.MaPhong) == (room?.maphong || room?.MaPhong));
  if (loading) {
  return (
  <div className="min-h-screen flex items-center justify-center">
@@ -270,7 +270,6 @@ const Roomdetail = () => {
  </div>
  </section>
  </main>
- const isWishlisted = danhSachQuanTam.some((p: any) => (p.maphong || p.MaPhong) == id || (p.maphong || p.MaPhong) == (room?.maphong || room?.MaPhong));
 
  {/* Footer Action Buttons */}
  <footer
