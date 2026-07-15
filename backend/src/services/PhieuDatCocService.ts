@@ -100,7 +100,7 @@ export class PhieuDatCocService {
   // ─────────────────────────────────────────────────────────────────────────
   // 2. TẠO THANH TOÁN ONLINE (POST /dat-coc/:maPDC/thanh-toan-online)
   // ─────────────────────────────────────────────────────────────────────────
-  async taoThanhToanOnline(maPDC: number): Promise<any> {
+  async taoThanhToanOnline(maPDC: number, origin?: string): Promise<any> {
     const phieu = await this.repo.layTheoId(maPDC);
     if (!phieu) throw { status: 404, message: `Không tìm thấy phiếu đặt cọc #${maPDC}` };
 
@@ -116,7 +116,7 @@ export class PhieuDatCocService {
     const amountUSD = Number(phieu.tiencoc) / 25000;
     const referenceId = `DATCOC_${maPDC}_${Date.now()}`;
 
-    const paypalOrder = await this.paypalService.createOrder(amountUSD, referenceId);
+    const paypalOrder = await this.paypalService.createOrder(amountUSD, referenceId, origin);
     const approveLinkObj = paypalOrder.links?.find((l: any) => l.rel === 'approve');
     if (!approveLinkObj) throw { status: 500, message: 'Không tìm thấy link thanh toán PayPal' };
 

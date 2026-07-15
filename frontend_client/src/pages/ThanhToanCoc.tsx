@@ -89,12 +89,7 @@ export default function ThanhToanCoc() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#F7F9FB] pb-28 font-['Inter'] flex flex-col">
-      {/* Header */}
-      <div className="bg-[#00236F] text-white p-6 pt-10 rounded-b-[32px] shadow-sm mb-6 flex-shrink-0">
-        <h1 className="text-lg font-bold">Lịch Sử Đặt Cọc</h1>
-        <p className="text-xs text-white/70 mt-1">Quản lý và theo dõi toàn bộ lịch sử các giao dịch đặt cọc giữ chỗ của bạn.</p>
-      </div>
+    <div className="w-full min-h-screen bg-[#F7F9FB] pt-6 pb-28 font-['Inter'] flex flex-col">
 
       {/* Main Container */}
       <div className="max-w-2xl w-full mx-auto px-4 flex-grow space-y-6">

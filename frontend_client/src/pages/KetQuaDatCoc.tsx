@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 
-type TrangThai = 'DaThanhToan' | 'DaHuy' | 'ChoXacNhanTienMat' | 'ChoThanhToan';
+type TrangThai = 'DaThanhToan' | 'DaHuy' | 'ChoXacNhanTienMat' | 'ChoThanhToan' | 'ChoDuyet';
 
 interface PhieuInfo {
   maPDC: number;
@@ -155,15 +155,39 @@ export const KetQuaDatCoc: React.FC = () => {
           { label: 'Hạn xác nhận', value: formatDate(phieu.thoiGianHetHan) },
         ]
       };
+    } else if (phieu.trangThai === 'ChoDuyet') {
+      statusConfig = {
+        title: 'Chờ Sale Duyệt Phiếu',
+        desc: 'Yêu cầu đặt cọc của bạn đang được xử lý',
+        icon: 'hourglass_empty',
+        iconColor: 'text-purple-500 animate-spin-slow',
+        iconBg: 'bg-purple-100',
+        cardBg: 'bg-purple-50/50',
+        titleColor: 'text-purple-700',
+        infoTitleColor: 'text-purple-800',
+        borderClass: 'border-purple-200',
+        stepBox: (
+          <div className="bg-purple-50 rounded-xl p-4 text-xs text-purple-800 border border-purple-200 text-left w-full mt-4">
+            <p className="font-bold mb-1"> Bước tiếp theo</p>
+            <p className="leading-relaxed">Khi nhân viên Sale phê duyệt phiếu cọc, trạng thái sẽ chuyển sang <b>Chờ thanh toán</b>. Bạn sẽ nhận được thông báo để tiến hành thanh toán.</p>
+          </div>
+        ),
+        actions: [
+          { label: 'Xem danh sách phiếu cọc', onClick: () => navigate('/thanh-toan-coc'), isPrimary: true },
+          { label: 'Về trang chủ', onClick: () => navigate('/'), isPrimary: false }
+        ],
+        fields: [
+          { label: 'Mã phiếu', value: `#${phieu.maPDC}` },
+          { label: 'Phòng', value: phieu.tenPhong || '—' },
+          { label: 'Số tiền cọc', value: formatCurrency(phieu.tienCoc) },
+          { label: 'Hạn duyệt dự kiến', value: formatDate(phieu.thoiGianHetHan) },
+        ]
+      };
     }
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#F7F9FB] pb-28 font-['Inter'] flex flex-col">
-      {/* Header */}
-      <div className="bg-[#00236F] text-white p-6 pt-10 rounded-b-[32px] shadow-sm mb-6 flex items-center gap-3 flex-shrink-0">
-        <h1 className="text-lg font-bold">FIT 4.0 HOMESTAY</h1>
-      </div>
+    <div className="w-full min-h-screen bg-[#F7F9FB] pt-6 pb-28 font-['Inter'] flex flex-col">
 
       {/* Breadcrumb */}
       <div className="max-w-4xl w-full mx-auto px-4 md:px-8 text-xs text-[#54647A] flex items-center gap-2 mb-6">

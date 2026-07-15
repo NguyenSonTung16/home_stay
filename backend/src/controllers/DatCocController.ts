@@ -48,7 +48,10 @@ export class DatCocController {
     try {
       const maPDC = parseInt(req.params.maPDC);
       if (isNaN(maPDC)) { res.status(400).json({ success: false, message: 'maPDC không hợp lệ' }); return; }
-      const result = await service.taoThanhToanOnline(maPDC);
+      const referer = req.headers.referer;
+      const origin = (req.headers.origin as string | undefined) || 
+        (typeof referer === 'string' ? new URL(referer).origin : undefined);
+      const result = await service.taoThanhToanOnline(maPDC, origin);
       res.status(200).json({ success: true, data: result });
     } catch (err: any) {
       res.status(err.status || 500).json({ success: false, message: err.message });

@@ -20,7 +20,8 @@ export class DonHangService {
     loaiHoaDon: 'DienNuoc' | 'PhiDinhKy' | 'DatCoc',
     phuongThuc: string,
     maHoaDon: number,
-    idempotencyKey?: string
+    idempotencyKey?: string,
+    origin?: string
   ): Promise<any> {
     // 1. Kiểm tra Idempotency Key chống double-submit
     if (idempotencyKey) {
@@ -66,7 +67,7 @@ export class DonHangService {
     const referenceId = `${loaiHoaDon}_${maHoaDon}_${Date.now()}`;
 
     // 4. Tạo Order trên PayPal sandbox
-    const paypalOrder = await this.paypalService.createOrder(amountUSD, referenceId);
+    const paypalOrder = await this.paypalService.createOrder(amountUSD, referenceId, origin);
     const maDH = paypalOrder.id; // Lấy Order ID làm mã đơn hàng
 
     // Lấy link approve từ PayPal

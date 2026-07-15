@@ -2,6 +2,7 @@ import BottomNav from '../components/BottomNav';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthModal } from '../components/AuthModal';
+import { useAuth } from '../context/AuthContext';
 
 export const MHTimKiemPhong = () => {
     const navigate = useNavigate();
@@ -23,28 +24,15 @@ export const MHTimKiemPhong = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-    // Quản lý Đăng nhập / Người dùng
-    const [currentUser, setCurrentUser] = useState<any>(null);
+    const { currentUser, setCurrentUser, logout } = useAuth();
 
     // Quản lý Đặt cọc
     const [selectedDepositRoom, setSelectedDepositRoom] = useState<any>(null);
     const [soGiuongDeposit, setSoGiuongDeposit] = useState(1);
     const [isSubmittingDeposit, setIsSubmittingDeposit] = useState(false);
 
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            try {
-                setCurrentUser(JSON.parse(storedUser));
-            } catch (e) {
-                console.error("Error parsing user from localStorage", e);
-            }
-        }
-    }, []);
-
     const handleLogout = () => {
-        localStorage.removeItem('currentUser');
-        setCurrentUser(null);
+        logout();
     };
 
     const btn_submitDeposit = async () => {

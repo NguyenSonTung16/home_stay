@@ -15,7 +15,7 @@ async function run() {
       CASCADE;
 
       UPDATE Phong SET TrangThai = 1;
-      UPDATE Giuong SET TrangThai = 1;
+      UPDATE Giuong SET TrangThai = 1, TrangThaiStr = 'Trong';
     `;
     await pool.query(query);
     console.log('Database reset successfully!');

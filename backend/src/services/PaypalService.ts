@@ -71,18 +71,19 @@ export class PaypalService {
   /**
    * Tạo Order để thu tiền khách hàng (Customer checkout)
    */
-  public async createOrder(amountUSD: number, referenceId: string): Promise<any> {
+  public async createOrder(amountUSD: number, referenceId: string, origin?: string): Promise<any> {
     try {
       const accessToken = await this.getAccessToken();
 
       // Xác định return_url và cancel_url dựa trên referenceId
-      let returnUrl = 'http://localhost:5173/thanh-toan-ket-qua';
-      let cancelUrl = 'http://localhost:5173/thanh-toan-ket-qua';
+      const baseUrl = origin || 'http://localhost:5173';
+      let returnUrl = `${baseUrl}/thanh-toan-ket-qua`;
+      let cancelUrl = `${baseUrl}/thanh-toan-ket-qua`;
 
       if (referenceId.startsWith('DATCOC_')) {
         const maPDC = referenceId.split('_')[1];
-        returnUrl = `http://localhost:5173/xac-nhan-dat-coc/${maPDC}`;
-        cancelUrl = `http://localhost:5173/xac-nhan-dat-coc/${maPDC}`;
+        returnUrl = `${baseUrl}/xac-nhan-dat-coc/${maPDC}`;
+        cancelUrl = `${baseUrl}/xac-nhan-dat-coc/${maPDC}`;
       }
 
       const payload = {

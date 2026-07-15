@@ -72,12 +72,17 @@ export class PeriodicPaymentController {
       // Lấy Idempotency Key từ header hoặc body để chống double-submit
       const idempotencyKey = (req.headers['idempotency-key'] || req.headers['x-idempotency-key'] || req.body.idempotencyKey) as string | undefined;
 
+      const referer = req.headers.referer;
+      const origin = (req.headers.origin as string | undefined) || 
+        (typeof referer === 'string' ? new URL(referer).origin : undefined);
+
       // 2. Gọi service tạo đơn hàng / QR
       const data = await donHangService.taoMaQR(
         loaiHoaDon,
         phuongThuc,
         maHoaDon,
-        idempotencyKey
+        idempotencyKey,
+        origin
       );
 
       return res.status(201).json({ success: true, data });

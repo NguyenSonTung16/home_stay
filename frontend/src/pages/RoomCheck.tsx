@@ -240,7 +240,7 @@ const RoomCheck: React.FC = () => {
                   {record.room} - {record.id}
                 </span>
                 {record.trangthai === 1 && <span className="px-2 py-0.5 bg-secondary-container text-primary text-[10px] rounded font-bold uppercase">Chờ kiểm kê</span>}
-                {record.trangthai === 2 && <span className="px-2 py-0.5 bg-success/20 text-success text-[10px] rounded font-bold uppercase">Đã hoàn tất</span>}
+                {[2, 4, 5].includes(record.trangthai) && <span className="px-2 py-0.5 bg-success/20 text-success text-[10px] rounded font-bold uppercase">Đã hoàn tất</span>}
                 {record.trangthai === 3 && <span className="px-2 py-0.5 bg-error/20 text-error text-[10px] rounded font-bold uppercase">Đang tranh chấp</span>}
               </div>
               <div className="flex items-center justify-between text-secondary mt-1">

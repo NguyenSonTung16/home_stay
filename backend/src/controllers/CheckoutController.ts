@@ -137,7 +137,10 @@ export class CheckoutController {
       const amountUSD = Math.abs(amount) / 25000;
       const referenceId = `DEBT_${maHD}_${Date.now()}`;
       
-      const order = await paypalService.createOrder(amountUSD, referenceId);
+      const referer = req.headers.referer;
+      const origin = (req.headers.origin as string | undefined) || 
+        (typeof referer === 'string' ? new URL(referer).origin : undefined);
+      const order = await paypalService.createOrder(amountUSD, referenceId, origin);
       console.log(`[CheckoutController] createOrder success - orderId: ${order.id}`);
       res.status(200).json({ success: true, data: order });
     } catch (error) {

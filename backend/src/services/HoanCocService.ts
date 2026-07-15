@@ -3,6 +3,8 @@ import { PhieuKiemTraPhongService } from './PhieuKiemTraPhongService';
 import { BangDoiSoatRepository } from '../repositories/BangDoiSoatRepository';
 import { YeuCauTraPhongRepository } from '../repositories/YeuCauTraPhongRepository';
 import { PaypalService } from './PaypalService';
+import { EmailService } from './EmailService';
+import { db } from '../config/db';
 
 export interface IBangDoiSoat {
   tienCoc: number;
@@ -113,7 +115,7 @@ export class HoanCocService {
       // GỌI PAYPAL PAYOUT NẾU THỰC NHẬN CHI >= 0
       let paypalResponse = null;
       let newHopDongState = 4; // Mặc định là 4 (Đã thanh lý)
-      let newYeuCauState = 3;  // Mặc định là 3 (Đã hoàn tiền / Hoàn tất)
+      let newYeuCauState = 2;  // Cập nhật thành 2 (Đã hoàn tất) để tránh trùng với trạng thái 3 (Tranh chấp)
 
       if (chiPhi.thucNhanChi >= 0) {
         if (chiPhi.thucNhanChi > 0 && chiPhi.stk) {
@@ -145,6 +147,92 @@ export class HoanCocService {
 
       // Lưu bảng đối soát
       const result = await this.bangDoiSoatRepo.themPhanGhiMoi(bdsData);
+
+      // Gửi Email thông báo đối soát cho khách hàng
+      try {
+        const customerRes = await db.query(`
+          SELECT k.Email, k.HoTen
+          FROM HopDong h
+          JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH
+          WHERE h.MaHD = $1
+        `, [maHD]);
+        const customer = customerRes.rows[0];
+
+        const roomRes = await db.query(`
+          SELECT p.TenPhong
+          FROM ChiTietGiuong cg
+          JOIN Giuong g ON cg.MaGiuong = g.MaGiuong
+          JOIN Phong p ON g.MaPhong = p.MaPhong
+          WHERE cg.MaHD = $1
+          LIMIT 1
+        `, [maHD]);
+        const room = roomRes.rows[0];
+
+        if (customer && customer.email) {
+          if (chiPhi.thucNhanChi >= 0) {
+            // Mẫu email 1: Hoàn tiền cọc
+            await EmailService.sendMail({
+              to: customer.email,
+              subject: `[FIT 4.0 HomeStay] Thông báo kết quả đối soát & Hoàn trả tiền cọc — Hợp đồng #${maHD}`,
+              text: `Chào ${customer.hoten || 'Quý khách'},\nHệ thống thông báo thủ tục đối soát tài chính và trả phòng cho phòng ${room?.tenphong || ''} (Hợp đồng #${maHD}) đã được hoàn tất.\nSố tiền thực nhận hoàn trả: ${Number(chiPhi.thucNhanChi).toLocaleString()}đ.\n\nTrân trọng,\nHệ thống FIT 4.0 HomeStay.`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <h2 style="color: #10B981; margin-top: 0;">💵 Thông Báo Hoàn Trả Tiền Cọc Thành Công</h2>
+                  <p>Chào <strong>${customer.hoten || 'Quý khách'}</strong>,</p>
+                  <p>Hệ thống FIT 4.0 HomeStay thông báo thủ tục đối soát tài chính và trả phòng cho phòng <strong>${room?.tenphong || '—'}</strong> (Hợp đồng #${maHD}) đã được hoàn tất.</p>
+                  
+                  <h3 style="font-size: 14px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-top: 20px;">Chi tiết đối soát:</h3>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0;">
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tiền cọc gốc:</td><td style="text-align: right; font-weight: bold;">${(chiPhi.tienCoc || 0).toLocaleString()}đ</td></tr>
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tỷ lệ hoàn trả:</td><td style="text-align: right; font-weight: bold;">${chiPhi.tyLeHoanCoc || 100}%</td></tr>
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tiền cọc định mức:</td><td style="text-align: right; font-weight: bold;">${(chiPhi.tienHoanDinhMuc || 0).toLocaleString()}đ</td></tr>
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tổng chi phí khấu trừ:</td><td style="text-align: right; font-weight: bold; color: #EF4444;">-${(chiPhi.tongKhauTru || 0).toLocaleString()}đ</td></tr>
+                    <tr style="border-top: 1px solid #e5e7eb;"><td style="padding: 8px 0; font-weight: bold;">Số tiền thực tế hoàn trả:</td><td style="text-align: right; font-weight: bold; color: #10B981; font-size: 15px;">${Number(chiPhi.thucNhanChi).toLocaleString()}đ</td></tr>
+                  </table>
+
+                  <div style="background-color: #ECFDF5; border-left: 4px solid #10B981; padding: 12px; margin: 15px 0; border-radius: 4px;">
+                    <p style="margin: 0; color: #065F46; font-size: 13px; font-weight: bold;">💸 Phương thức nhận tiền:</p>
+                    <p style="margin: 4px 0 0 0; color: #065F46; font-size: 13px;">${chiPhi.thucNhanChi > 0 ? `Số tiền đã được thực hiện chuyển khoản qua cổng thanh toán PayPal đến tài khoản <strong>${chiPhi.stk || customer.email}</strong>.` : 'Số dư đối soát vừa đủ, không cần chuyển trả thêm.'}</p>
+                  </div>
+                  <p>Cảm ơn bạn đã đồng hành cùng FIT 4.0 HomeStay trong suốt thời gian qua!</p>
+                </div>
+              `
+            });
+          } else {
+            // Mẫu email 2: Thu thêm (Khách nợ)
+            await EmailService.sendMail({
+              to: customer.email,
+              subject: `[FIT 4.0 HomeStay] Thông báo kết quả đối soát & Thanh toán phát sinh — Hợp đồng #${maHD}`,
+              text: `Chào ${customer.hoten || 'Quý khách'},\nHệ thống thông báo thủ tục đối soát tài chính và trả phòng cho phòng ${room?.tenphong || ''} (Hợp đồng #${maHD}) đã được phê duyệt. Bạn có khoản công nợ cần thanh toán thêm: ${Math.abs(chiPhi.thucNhanChi).toLocaleString()}đ.\n\nTrân trọng,\nHệ thống FIT 4.0 HomeStay.`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+                  <h2 style="color: #EF4444; margin-top: 0;">⚠️ Thông Báo Phát Sinh Công Nợ Trả Phòng</h2>
+                  <p>Chào <strong>${customer.hoten || 'Quý khách'}</strong>,</p>
+                  <p>Hệ thống FIT 4.0 HomeStay thông báo thủ tục đối soát tài chính và trả phòng cho phòng <strong>${room?.tenphong || '—'}</strong> (Hợp đồng #${maHD}) đã được phê duyệt.</p>
+                  <p>Do tiền cọc phòng không đủ để bù đắp các chi phí đền bù hư hỏng hoặc phí phát sinh, bạn có một khoản công nợ cần thanh toán thêm:</p>
+
+                  <h3 style="font-size: 14px; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; margin-top: 20px;">Chi tiết đối soát:</h3>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0;">
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tiền cọc gốc:</td><td style="text-align: right; font-weight: bold;">${(chiPhi.tienCoc || 0).toLocaleString()}đ</td></tr>
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tỷ lệ hoàn trả:</td><td style="text-align: right; font-weight: bold;">${chiPhi.tyLeHoanCoc || 100}%</td></tr>
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tiền cọc định mức:</td><td style="text-align: right; font-weight: bold;">${(chiPhi.tienHoanDinhMuc || 0).toLocaleString()}đ</td></tr>
+                    <tr><td style="padding: 6px 0; color: #6b7280;">Tổng chi phí khấu trừ:</td><td style="text-align: right; font-weight: bold; color: #EF4444;">-${(chiPhi.tongKhauTru || 0).toLocaleString()}đ</td></tr>
+                    <tr style="border-top: 1px solid #e5e7eb;"><td style="padding: 8px 0; font-weight: bold; color: #EF4444;">Số tiền cần đóng thêm:</td><td style="text-align: right; font-weight: bold; color: #EF4444; font-size: 15px;">${Math.abs(chiPhi.thucNhanChi).toLocaleString()}đ</td></tr>
+                  </table>
+
+                  <div style="background-color: #FEF2F2; border-left: 4px solid #EF4444; padding: 12px; margin: 15px 0; border-radius: 4px;">
+                    <p style="margin: 0; color: #991B1B; font-size: 13px; font-weight: bold;">💳 Hướng dẫn thanh toán:</p>
+                    <p style="margin: 4px 0 0 0; color: #991B1B; font-size: 13px;">Bạn vui lòng đăng nhập vào trang web cá nhân -> mục <strong>Hợp đồng</strong> để tiến hành thanh toán nợ trực tuyến thông qua cổng thanh toán PayPal hoặc chuyển khoản trực tiếp.</p>
+                  </div>
+                  <p>Vui lòng hoàn tất thanh toán để chúng tôi có thể chính thức thanh lý hợp đồng thuê phòng của bạn. Xin cảm ơn!</p>
+                </div>
+              `
+            });
+          }
+        }
+      } catch (mailErr) {
+        console.error('Lỗi khi gửi email đối soát:', mailErr);
+      }
       
       return {
         success: true,
