@@ -108,6 +108,16 @@ export const MHDangKyLichHenXemPhong = () => {
                         message="Để bảo mật, hệ thống cần biết bạn là ai trước khi cho phép đặt lịch hẹn xem phòng. Vui lòng đăng nhập để tiếp tục!"
                     />
                 ) : (
+                <>
+                <div className="mb-4">
+                    <button 
+                        onClick={() => navigate(-1)} 
+                        className="flex items-center gap-2 text-[#54647A] hover:text-[#00236F] font-bold text-[14px] transition-colors"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">arrow_back</span>
+                        Quay lại
+                    </button>
+                </div>
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Cột trái trên Desktop / Phần trên Mobile: DANH SÁCH PHÒNG ĐÃ CHỌN */}
                     <div className="lg:col-span-5 flex flex-col gap-3">
@@ -253,6 +263,7 @@ export const MHDangKyLichHenXemPhong = () => {
                         </button>
                     </div>
                 </div>
+                </>
                 )}
             </div>
 
