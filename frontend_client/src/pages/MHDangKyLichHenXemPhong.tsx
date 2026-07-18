@@ -82,7 +82,7 @@ export const MHDangKyLichHenXemPhong = () => {
             if (result.success) {
                 alert(`Đăng ký lịch hẹn xem ${danhSachPhong.length} phòng vào ngày ${selectedDate} lúc ${selectedTime} thành công!`);
                 localStorage.removeItem("danhSachPhongQuanTam");
-                navigate('/lich-su-lich-hen');
+                navigate('/');
             } else {
                 alert(`Đăng ký lịch hẹn thất bại: ${result.message || 'Có lỗi xảy ra'}`);
             }
