@@ -75,6 +75,7 @@ export default function ThanhToanCoc() {
   const getBadgeStyle = (status: string) => {
     switch (status) {
       case 'DaThanhToan':
+      case 'DaHoanThanh':
         return { text: 'Đã hoàn tất', bg: 'bg-green-100 text-green-700 border-green-200' };
       case 'DaHuy':
         return { text: 'Đã hủy', bg: 'bg-gray-100 text-gray-600 border-gray-200' };

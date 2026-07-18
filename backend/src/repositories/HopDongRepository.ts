@@ -102,6 +102,31 @@ export class HopDongRepository {
     return res.rows.length ? res.rows[0] : null;
   }
 
+  async layDanhSachHopDongTheoMaTK(maTK: number): Promise<any[]> {
+    const res = await db.query(`
+      SELECT DISTINCT ON (h.MaHD)
+        h.*,
+        g.MaPhong,
+        ph.TenPhong,
+        lp.GiaTien AS GiaThue,
+        ctdc.SoGiuongThue AS SoGiuong,
+        pdc.SoTien AS TienCoc,
+        h.NgayKy AS NgayBatDau,
+        h.NgayHetHan AS NgayKetThuc
+      FROM HopDong h
+      JOIN KhachHang k ON h.MaKHDaiDien = k.MaKH
+      JOIN ChiTietGiuong ctg ON h.MaHD = ctg.MaHD
+      JOIN Giuong g ON ctg.MaGiuong = g.MaGiuong
+      JOIN Phong ph ON g.MaPhong = ph.MaPhong
+      JOIN LoaiPhong lp ON ph.MaLoai = lp.MaLoai
+      LEFT JOIN PhieuDatCoc pdc ON pdc.MaKH = k.MaKH AND pdc.MaPhong = ph.MaPhong
+      LEFT JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
+      WHERE k.MaTK = $1
+      ORDER BY h.MaHD DESC
+    `, [maTK]);
+    return res.rows;
+  }
+
   async taoHopDongTuDong(client: any, phieu: any): Promise<number> {
     // 1. Tạo Hợp Đồng (NgayKy = NOW, NgayHetHan = NOW + 6 months, NhanVien = 1)
     const resHD = await client.query(`

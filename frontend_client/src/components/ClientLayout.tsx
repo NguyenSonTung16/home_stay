@@ -10,7 +10,7 @@ export const ClientLayout: React.FC = () => {
     const { currentUser, logout, isAuthModalOpen, closeAuthModal, openAuthModal, setCurrentUser } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const displayUsername = currentUser?.user?.username || (currentUser as any)?.username || (currentUser as any)?.hoten || 'khach1';
+    const displayUsername = currentUser?.user?.username || (currentUser as any)?.username || (currentUser as any)?.hoten || 'Tài khoản';
 
     const showBottomNav = ['/', '/thanh-toan-coc', '/hop-dong', '/lich-su-lich-hen', '/thanh-toan-dinh-ky'].includes(location.pathname);
 

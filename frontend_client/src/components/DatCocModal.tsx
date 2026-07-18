@@ -103,30 +103,7 @@ export const DatCocModal: React.FC<DatCocModalProps> = ({ isOpen, onClose, roomI
               Vui lòng chờ nhân viên Sale xử lý hồ sơ. Bạn sẽ được thông báo khi có thể tiến hành thanh toán.
             </p>
 
-            <div className="w-full bg-[#F7F9FB] rounded-xl p-4 border border-[#E0E3E5] mb-6 text-left">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="material-symbols-outlined text-[#00236F] text-[18px]">info</span>
-                <span className="text-[13px] font-semibold text-[#191C1E]">Thông tin yêu cầu</span>
-              </div>
-              <div className="space-y-1.5 text-[13px]">
-                <div className="flex justify-between">
-                  <span className="text-[#54647A]">Phòng</span>
-                  <span className="font-medium text-[#191C1E]">{roomInfo.tenphong || roomInfo.TenPhong}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#54647A]">Số giường</span>
-                  <span className="font-medium text-[#191C1E]">{soGiuong} giường</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#54647A]">Giới tính</span>
-                  <span className="font-medium text-[#191C1E]">{gioiTinh}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[#54647A]">Tiền cọc dự kiến</span>
-                  <span className="font-bold text-[#EF4444]">{totalCoc.toLocaleString('vi-VN')}đ</span>
-                </div>
-              </div>
-            </div>
+
 
             <div className="w-full bg-amber-50 rounded-xl p-3 border border-amber-200 flex items-start gap-2 text-left mb-2">
               <span className="material-symbols-outlined text-amber-600 text-[18px] mt-0.5">schedule</span>

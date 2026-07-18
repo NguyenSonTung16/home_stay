@@ -67,6 +67,7 @@ export const KetQuaDatCoc: React.FC = () => {
     if (phieu.trangThai === 'DaThanhToan') {
       statusConfig = {
         title: 'Đặt Cọc Thành Công!',
+        desc: '',
         icon: 'check_circle',
         iconColor: 'text-green-500',
         iconBg: 'bg-green-100',
@@ -187,7 +188,7 @@ export const KetQuaDatCoc: React.FC = () => {
   }
 
   return (
-    <div className="w-full min-h-screen bg-[#F7F9FB] pt-6 pb-28 font-['Inter'] flex flex-col">
+    <div className="w-full min-h-screen bg-[#F7F9FB] pt-6 pb-28 font-['Inter']">
 
       {/* Breadcrumb */}
       <div className="max-w-4xl w-full mx-auto px-4 md:px-8 text-xs text-[#54647A] flex items-center gap-2 mb-6">
@@ -199,7 +200,7 @@ export const KetQuaDatCoc: React.FC = () => {
       </div>
 
       {/* Main Container */}
-      <div className="max-w-4xl w-full mx-auto px-4 md:px-8 flex-grow">
+      <div className="max-w-4xl w-full mx-auto px-4 md:px-8">
         {!phieu ? (
           <div className="bg-white border border-[#E0E3E5] rounded-2xl p-8 text-center text-[#54647A] py-16 shadow-sm">
             <span className="material-symbols-outlined text-5xl mb-3 text-red-400">receipt_long</span>
@@ -218,12 +219,12 @@ export const KetQuaDatCoc: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Layout 2 cột cho Desktop (lg), 1 cột cho Mobile */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-              {/* Cột trái (5/12): Card trạng thái */}
-              <div className="lg:col-span-5 bg-white border border-[#E0E3E5] rounded-2xl p-6 flex flex-col items-center text-center shadow-sm w-full">
-                <div className={`w-20 h-20 rounded-full ${statusConfig.iconBg} flex items-center justify-center flex-shrink-0 mb-4 shadow-sm`}>
+            {/* Layout 1 cột căn giữa */}
+            <div className="w-full">
+              
+              {/* Card trạng thái */}
+              <div className="max-w-[36rem] mx-auto w-full bg-white border border-[#E0E3E5] rounded-2xl p-6 text-center shadow-sm">
+                <div className={`w-20 h-20 mx-auto rounded-full ${statusConfig.iconBg} flex items-center justify-center flex-shrink-0 mb-4 shadow-sm`}>
                   <span className={`material-symbols-outlined text-4xl ${statusConfig.iconColor}`} style={{ fontVariationSettings: "'FILL' 1" }}>
                     {statusConfig.icon}
                   </span>
@@ -231,27 +232,12 @@ export const KetQuaDatCoc: React.FC = () => {
                 <h2 className={`text-xl font-bold ${statusConfig.titleColor} mb-2 leading-tight`}>
                   {statusConfig.title}
                 </h2>
-                <p className="text-xs text-[#54647A] leading-relaxed w-full px-4">
-                  {statusConfig.desc}
-                </p>
+                {statusConfig.desc && (
+                  <p className="text-xs text-[#54647A] leading-relaxed w-full px-4 mb-4">
+                    {statusConfig.desc}
+                  </p>
+                )}
                 {statusConfig.stepBox}
-              </div>
-
-              {/* Cột phải (7/12): Card Chi tiết phiếu cọc */}
-              <div className={`lg:col-span-7 rounded-2xl border ${statusConfig.borderClass} ${statusConfig.cardBg} p-6 space-y-4 shadow-sm w-full`}>
-                <h3 className={`font-bold text-sm ${statusConfig.infoTitleColor} border-b ${statusConfig.borderClass} pb-3`}>
-                  Chi tiết phiếu cọc
-                </h3>
-                <div className="space-y-3.5">
-                  {statusConfig.fields.map(({ label, value, highlight }) => (
-                    <div key={label} className="grid grid-cols-2 text-xs py-0.5 items-center">
-                      <span className="text-[#54647A] font-medium text-left">{label}</span>
-                      <span className={`font-semibold text-right break-words ${highlight ? 'text-green-700 text-[14px] bg-green-100/50 px-2 py-0.5 rounded inline-block self-end ml-auto' : 'text-[#191C1E]'}`}>
-                        {value}
-                      </span>
-                    </div>
-                  ))}
-                </div>
               </div>
 
             </div>

@@ -35,6 +35,14 @@ export class HoSoDatCocService {
       await this.phieuDatCocRepo.updateStatusAndTransaction(maCoc, 1, 'TienMat', undefined);
       await db.query(`UPDATE PhieuDatCoc SET TrangThaiMoi = 'ChoThanhToan' WHERE MaCoc = $1`, [maCoc]);
 
+      // [FIX BUG]: Reset lại thời gian đếm ngược 24h kể từ đúng thời điểm Admin bấm duyệt
+      await db.query(`
+        UPDATE ChiTietXuLyDatCoc 
+        SET ThoiGianHetHan = NOW() + INTERVAL '24 hours' 
+        WHERE MaCoc = $1
+      `, [maCoc]);
+
+
       // Send approval email
       if (phieu.email) {
         EmailService.sendMail({

@@ -46,7 +46,16 @@ export class PhieuDatCocRepository {
 
   async getPending(): Promise<any[]> {
     const res = await db.query(`
-      ${JOIN_VIEW}
+      SELECT
+        pdc.MaCoc as macoc, pdc.SoTien as sotien, pdc.NgayCoc as ngaycoc,
+        pdc.TrangThaiMoi as trangthaimoi, pdc.MaGiaoDich as magiaodich,
+        pdc.PTThanhToan as ptthanhtoan, pdc.MaKH as makh, pdc.MaPhong as maphong,
+        ctdc.MaGiuong as magiuong, ctdc.SoGiuongThue as sogiuongthue,
+        ctdc.ThoiGianHetHan as thoigianhethan, ctdc.MinhChung as urlchungtu,
+        ctdc.NguoiXacNhan as nguoixacnhan, ctdc.ThoiGianXacNhan as thoigianxacnhan,
+        k.HoTen as hoten, k.SDT as sdt, ph.TenPhong as tenphong
+      FROM PhieuDatCoc pdc
+      LEFT JOIN ChiTietXuLyDatCoc ctdc ON ctdc.MaCoc = pdc.MaCoc
       LEFT JOIN KhachHang k ON pdc.MaKH = k.MaKH
       LEFT JOIN Phong ph ON pdc.MaPhong = ph.MaPhong
       WHERE pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoXacNhanTienMat')
@@ -201,7 +210,7 @@ export class PhieuDatCocRepository {
       if (trangThai === 'DangCho') {
         queryStr += ` AND pdc.TrangThaiMoi IN ('ChoDuyet', 'ChoThanhToan', 'ChoXacNhanTienMat')`;
       } else if (trangThai === 'DaThanhToan') {
-        queryStr += ` AND pdc.TrangThaiMoi = 'DaThanhToan'`;
+        queryStr += ` AND pdc.TrangThaiMoi IN ('DaThanhToan', 'DaHoanThanh')`;
       } else if (trangThai === 'DaHuy') {
         queryStr += ` AND pdc.TrangThaiMoi = 'DaHuy'`;
       }

@@ -115,7 +115,7 @@ export class HoanCocService {
       // GỌI PAYPAL PAYOUT NẾU THỰC NHẬN CHI >= 0
       let paypalResponse = null;
       let newHopDongState = 4; // Mặc định là 4 (Đã thanh lý)
-      let newYeuCauState = 2;  // Cập nhật thành 2 (Đã hoàn tất) để tránh trùng với trạng thái 3 (Tranh chấp)
+      let newYeuCauState = 5;  // Cập nhật thành 5 (Đã hoàn tất) để frontend nhận diện isCompleted
 
       if (chiPhi.thucNhanChi >= 0) {
         if (chiPhi.thucNhanChi > 0 && chiPhi.stk) {
@@ -144,6 +144,29 @@ export class HoanCocService {
       if (maYC) {
         await this.yeuCauRepo.capNhatTrangThai(maYC, newYeuCauState);
       }
+
+      // [FIX BUG]: Giải phóng tài nguyên để trả lại giường trống cho phòng
+      // 1. Cập nhật phiếu đặt cọc thành 'DaHoanThanh' để xóa khỏi công thức tính sogiuongtrong
+      await db.query(`
+        UPDATE PhieuDatCoc 
+        SET TrangThaiMoi = 'DaHoanThanh'
+        WHERE MaCoc = (
+          SELECT pd.MaCoc FROM PhieuDatCoc pd
+          JOIN KhachHang kh ON kh.MaKH = pd.MaKH
+          JOIN HopDong hd ON hd.MaKHDaiDien = kh.MaKH
+          WHERE hd.MaHD = $1
+          LIMIT 1
+        )
+      `, [maHD]);
+
+      // 2. Reset trạng thái giường thực tế về 'Trong'
+      await db.query(`
+        UPDATE Giuong 
+        SET TrangThaiStr = 'Trong', TrangThai = 0 
+        WHERE MaGiuong IN (
+          SELECT MaGiuong FROM ChiTietGiuong WHERE MaHD = $1
+        )
+      `, [maHD]);
 
       // Lưu bảng đối soát
       const result = await this.bangDoiSoatRepo.themPhanGhiMoi(bdsData);

@@ -10,7 +10,7 @@ export class CheckoutController {
 
   public requestCheckout = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { ngayTra, stk, lyDo, viPhamBaoTre } = req.body;
+      const { ngayTra, stk, lyDo, viPhamBaoTre, maHD } = req.body;
       
       // Lấy JWT token từ header
       const authHeader = req.headers.authorization;
@@ -23,8 +23,14 @@ export class CheckoutController {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key') as any;
       const maTK = decoded.id || decoded.userId;
 
-      // 1. Tìm hợp đồng Active của user này
-      const hopDong = await this.hopDongService.layHopDongActiveTheoMaTK(maTK);
+      // 1. Tìm hợp đồng Active của user này (ưu tiên theo maHD nếu truyền lên)
+      let hopDong;
+      if (maHD) {
+        hopDong = await this.hopDongService.docThongTinHopDong(maHD);
+      } else {
+        hopDong = await this.hopDongService.layHopDongActiveTheoMaTK(maTK);
+      }
+
       if (!hopDong) {
         res.status(404).json({ success: false, message: 'Bạn không có hợp đồng nào đang có hiệu lực để trả phòng.' });
         return;
@@ -67,50 +73,57 @@ export class CheckoutController {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_key') as any;
       const maTK = decoded.id || decoded.userId;
 
-      // Tìm hợp đồng Active của user này (hoặc hợp đồng vừa thanh lý/chờ thanh lý)
-      // Chú ý: layHopDongActiveTheoMaTK hiện tại lấy TrangThai IN (1, 2, 3, 5).
-      // Nhưng nếu trả phòng xong nó sẽ là 4. Ta nên lấy hợp đồng gần nhất.
-      const hopDong = await this.hopDongService.layHopDongGanNhatTheoMaTK(maTK);
+      // Lấy danh sách hợp đồng của user này
+      const danhSachHopDong = await this.hopDongService.layDanhSachHopDongTheoMaTK(maTK);
 
-      if (!hopDong) {
-        res.status(200).json({ success: true, data: { status: 'NO_CONTRACT' } });
+      if (!danhSachHopDong || danhSachHopDong.length === 0) {
+        res.status(200).json({ success: true, data: { status: 'NO_CONTRACT', contracts: [] } });
         return;
       }
 
-      // Check first invoice
-      const dbRes = await db.query(`SELECT TrangThai FROM HoaDonPhiDinhKy WHERE MaHD = $1 ORDER BY MaPDK ASC LIMIT 1`, [hopDong.mahd]);
-      const isFirstPeriodPaid = dbRes.rows.length > 0 && dbRes.rows[0].trangthai === 'DaThanhToan';
+      const contractsWithStatus = [];
 
-      // Lấy yêu cầu trả phòng của hợp đồng này
-      const yeuCau = await this.yeuCauRepo.docYeuCauTheoHD(hopDong.mahd);
-      if (!yeuCau) {
-        if (!isFirstPeriodPaid) {
-             res.status(200).json({ success: true, data: { status: 'UNPAID_FIRST_PERIOD', hopDong } });
-             return;
-        }
-        res.status(200).json({ success: true, data: { status: 'CAN_CHECKOUT', hopDong } });
-        return;
-      }
+      for (const hopDong of danhSachHopDong) {
+        // Check first invoice
+        const dbRes = await db.query(`SELECT TrangThai FROM HoaDonPhiDinhKy WHERE MaHD = $1 ORDER BY MaPDK ASC LIMIT 1`, [hopDong.mahd]);
+        const isFirstPeriodPaid = dbRes.rows.length > 0 && dbRes.rows[0].trangthai === 'DaThanhToan';
 
-      // Nếu trạng thái >= 2, ta có thể lấy bảng đối soát
-      let doiSoat = null;
-      if (yeuCau.trangthai >= 2) {
-        try {
-          const { HoanCocService } = await import('../services/HoanCocService');
-          const hoanCocService = new HoanCocService();
-          doiSoat = await hoanCocService.tinhToanChiPhiDoiSoat(hopDong.mahd);
-        } catch (e) {
-          // Bỏ qua lỗi nếu chưa có phiếu kiểm tra phòng
+        // Lấy yêu cầu trả phòng của hợp đồng này
+        const yeuCau = await this.yeuCauRepo.docYeuCauTheoHD(hopDong.mahd);
+        
+        let contractStatus = 'CAN_CHECKOUT';
+        let doiSoat = null;
+
+        if (!yeuCau) {
+          if (!isFirstPeriodPaid) {
+               contractStatus = 'UNPAID_FIRST_PERIOD';
+          }
+        } else {
+          contractStatus = 'HAS_CHECKOUT_REQUEST';
+          // Nếu trạng thái >= 2, ta có thể lấy bảng đối soát
+          if (yeuCau.trangthai >= 2) {
+            try {
+              const { HoanCocService } = await import('../services/HoanCocService');
+              const hoanCocService = new HoanCocService();
+              doiSoat = await hoanCocService.tinhToanChiPhiDoiSoat(hopDong.mahd);
+            } catch (e) {
+              // Bỏ qua lỗi nếu chưa có phiếu kiểm tra phòng
+            }
+          }
         }
+
+        contractsWithStatus.push({
+          status: contractStatus,
+          yeuCau,
+          doiSoat,
+          hopDong
+        });
       }
 
       res.status(200).json({ 
         success: true, 
         data: {
-          status: 'HAS_CHECKOUT_REQUEST',
-          yeuCau,
-          doiSoat,
-          hopDong
+          contracts: contractsWithStatus
         }
       });
     } catch (error) {

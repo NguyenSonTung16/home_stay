@@ -33,4 +33,8 @@ export class HopDongService {
   async layHopDongGanNhatTheoMaTK(maTK: number) {
     return await this.hopDongRepo.layHopDongGanNhatTheoMaTK(maTK);
   }
+
+  async layDanhSachHopDongTheoMaTK(maTK: number) {
+    return await this.hopDongRepo.layDanhSachHopDongTheoMaTK(maTK);
+  }
 }

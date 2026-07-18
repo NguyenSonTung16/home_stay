@@ -29,6 +29,11 @@ Dữ liệu của dự án sử dụng PostgreSQL. Cách nhanh nhất là sử d
    npx ts-node seed.ts
    ```
    *File `seed.ts` này sẽ thực thi trực tiếp các câu lệnh SQL từ `database/seed.sql`.*
+4. **Xóa toàn bộ các phiếu đã test (Reset checkouts):**
+   ```bash
+   cd backend
+   npm run db:reset
+   ```
 
 ---
 
