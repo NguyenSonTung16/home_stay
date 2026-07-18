@@ -196,35 +196,7 @@ const RoomCheck: React.FC = () => {
             <span className="material-symbols-outlined">format_list_bulleted</span>
             Danh sách trả phòng
           </h2>
-          <div className="flex flex-col gap-3">
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-secondary text-sm">
-                search
-              </span>
-              <input
-                className="w-full pl-8 pr-3 py-1.5 bg-white border border-outline-variant rounded-md focus:ring-1 focus:ring-primary focus:border-primary outline-none text-sm text-body transition-all"
-                placeholder="Tìm kiếm mã HĐ..."
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="font-label font-bold text-secondary text-sm tracking-wider uppercase">
-                Trạng thái:
-              </span>
-              <select
-                className="border border-outline-variant rounded-md px-3 py-1.5 text-sm font-body text-primary focus:outline-none focus:border-primary flex-1 bg-white cursor-pointer"
-                value={filterStatus === null ? 'all' : filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value === 'all' ? null : Number(e.target.value))}
-              >
-                <option value="all">Tất cả</option>
-                <option value="1">Chờ kiểm kê</option>
-                <option value="3">Đang tranh chấp</option>
-                <option value="2">Đã hoàn tất</option>
-              </select>
-            </div>
-          </div>
+
         </div>
         <div className="flex-1 divide-y divide-outline-variant">
           {filteredRecords.map((record: any) => (
