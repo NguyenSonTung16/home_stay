@@ -157,20 +157,6 @@ const ContractCard: React.FC<{ contractData: any, fetchStatus: () => void }> = (
 
             {isExpanded && (
                 <div className="w-full px-5 pb-5 border-t border-[#F2F4F6] pt-4 animate-fadeIn">
-                    <div className="flex flex-col gap-1.5 text-[13px] text-[#54647A] font-medium w-full">
-                        <div className="flex items-start gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-[#A0ABBA] mt-[2px]">payments</span>
-                            <span>Giá thuê: <b className="text-[#00236F]">{Number(hopDong.giathue || 0).toLocaleString('vi-VN')}đ</b>/tháng</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-[#A0ABBA] mt-[2px]">bed</span>
-                            <span>Số giường cọc: <b className="text-[#191C1E]">{hopDong.sogiuong || 1}</b></span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-[#A0ABBA] mt-[2px]">savings</span>
-                            <span>Tiền cọc trong phòng: <b className="text-[#2E7D32]">{Number(hopDong.tiencoc || 0).toLocaleString('vi-VN')}đ</b></span>
-                        </div>
-                    </div>
 
                     {status === 'HAS_CHECKOUT_REQUEST' && yeuCau && (
                         <div className="w-full">
